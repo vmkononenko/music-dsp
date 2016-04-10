@@ -7,11 +7,17 @@
 #pragma once
 
 #include <complex>
+#include <vector>
+#include <stdint.h>
 
 class FFT {
+private:
+    uint32_t __bitReverse(uint32_t);
+    void __sortBitReversal(std::vector< std::complex<double> > &, uint32_t, uint32_t);
+    void __forward(std::vector< std::complex<double> > &, uint32_t, uint32_t);
+    void __exch(std::vector< std::complex<double> > &, uint32_t, uint32_t);
+    void __butterfly(std::vector< std::complex<double> > &input, uint32_t, uint32_t);
+
 public:
-	FFT();
-	std::complex<double *> forward(std::complex<double *>, int);
-	std::complex<double *> inverse(std::complex<double *>, int);
-	virtual ~FFT();
+	void forward(std::vector< std::complex<double> > &);
 };
