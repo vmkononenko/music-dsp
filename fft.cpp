@@ -18,12 +18,13 @@ uint32_t FFT::__bitReverse(uint32_t n) {
         0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
     };
 
-    typeof(n) ret = 0;
+    uint32_t ret = 0;
     int i = 1;
 
     while (n != 0) {
-        ret |= (lookup[n & 0xf] << (8 * (sizeof(n) - i * sizeof(lookup[0]))));
-        n >>= sizeof(lookup[0]);
+        ret |= (lookup[n & 0xf] << (8 * sizeof(n) - i * 4));
+        n >>= 4;
+        i++;
     }
 
     return ret;
