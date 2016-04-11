@@ -57,12 +57,15 @@ void FFT::__butterfly(vector<complex_t> &input, uint32_t start, uint32_t end)
     uint32_t N = end - start;
 
     // ??? is frequency correct
+    // ??? double for N
     for (uint32_t k = 0; k <= N / 2; k++) {
-        complex_t S = polar(1.0, -2 * M_PI * k / N);
+        complex_t sine  = polar(1.0, -2 * M_PI * k / N);
+        complex_t *even = &input[k];
+        complex_t *odd  = &input[k + N/2];
 
-        input[k] =  input[k] * S;
-        input[k] += input[k + N/2];
-        input[k + N/2] -= input[k];
+        *odd *= sine;
+        *even += odd;
+        *odd -= *even;
     }
 }
 
@@ -73,9 +76,8 @@ void FFT::__forward(vector<complex_t> &input, uint32_t start, uint32_t end)
 
     __sortBitReversal(input, start, end);
 
-    // ??? which part is odd and which is even
-    __forward(input, start, end / 2);
-    __forward(input, end / 2 + 1, end);
+    __forward(input, start, end / 2);   // even
+    __forward(input, end / 2 + 1, end); // odd
 
     __butterfly(input, start, end);
 }
