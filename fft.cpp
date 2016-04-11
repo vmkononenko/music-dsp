@@ -12,7 +12,7 @@
 using namespace std;
 
 
-uint32_t FFT::__bitReverse(uint32_t n) {
+uint32_t FFT::__bitReverse(uint32_t n, uint8_t bitCnt) {
     static uint8_t lookup[] = {
         0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
         0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
@@ -22,7 +22,7 @@ uint32_t FFT::__bitReverse(uint32_t n) {
     int i = 1;
 
     while (n != 0) {
-        ret |= (lookup[n & 0xf] << (8 * sizeof(n) - i * 4));
+        ret |= (lookup[n & 0xf] << (bitCnt - i * 4));
         n >>= 4;
         i++;
     }
@@ -41,8 +41,14 @@ void FFT::__exch(vector<complex_t> &input, uint32_t i, uint32_t j)
 void FFT::__sortBitReversal(vector<complex_t> &input,
                             uint32_t start, uint32_t end)
 {
+    uint8_t maxBits = sqrt(input.size());
+    uint32_t reversed;
+
     for (uint32_t i = start; i <= end; i++) {
-        __exch(input, i, __bitReverse(i));
+        reversed = __bitReverse(i, maxBits);
+        if (reversed > i) {
+            __exch(input, i, reversed);
+        }
     }
 }
 
