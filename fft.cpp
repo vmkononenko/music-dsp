@@ -30,7 +30,7 @@ uint32_t FFT::__bitReverse(uint32_t n) {
     return ret;
 }
 
-void FFT::__exch(vector< complex<double> > &input, uint32_t i, uint32_t j)
+void FFT::__exch(vector<complex_t> &input, uint32_t i, uint32_t j)
 {
     complex<double> tmp = input[i];
 
@@ -38,7 +38,7 @@ void FFT::__exch(vector< complex<double> > &input, uint32_t i, uint32_t j)
     input[j] = tmp;
 }
 
-void FFT::__sortBitReversal(vector< complex<double> > &input,
+void FFT::__sortBitReversal(vector<complex_t> &input,
                             uint32_t start, uint32_t end)
 {
     for (uint32_t i = start; i <= end; i++) {
@@ -46,13 +46,13 @@ void FFT::__sortBitReversal(vector< complex<double> > &input,
     }
 }
 
-void FFT::__butterfly(vector< complex<double> > &input, uint32_t start, uint32_t end)
+void FFT::__butterfly(vector<complex_t> &input, uint32_t start, uint32_t end)
 {
     uint32_t N = end - start;
 
     // ??? is frequency correct
     for (uint32_t k = 0; k <= N / 2; k++) {
-        complex<double> S = polar(1.0, -2 * M_PI * k / N);
+        complex_t S = polar(1.0, -2 * M_PI * k / N);
 
         input[k] =  input[k] * S;
         input[k] += input[k + N/2];
@@ -60,7 +60,7 @@ void FFT::__butterfly(vector< complex<double> > &input, uint32_t start, uint32_t
     }
 }
 
-void FFT::__forward(vector< complex<double> > &input, uint32_t start, uint32_t end)
+void FFT::__forward(vector<complex_t> &input, uint32_t start, uint32_t end)
 {
     if (start == end)
         return;
@@ -74,7 +74,7 @@ void FFT::__forward(vector< complex<double> > &input, uint32_t start, uint32_t e
     __butterfly(input, start, end);
 }
 
-void FFT::forward(vector< complex<double> > &input)
+void FFT::forward(vector<complex_t> &input)
 {
 	if (input.size() == 0) {
 		throw invalid_argument("Empty input");
