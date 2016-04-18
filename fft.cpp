@@ -13,16 +13,33 @@ using namespace std;
 
 
 uint32_t FFT::__bitReverse(uint32_t n, uint8_t bitCnt) {
-    static uint8_t lookup[] = {
+    static uint8_t lookup4[] = {
         0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
         0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
     };
+
+    static uint8_t lookup3[] = {
+        0x0, 0x4, 0x2, 0x6, 0x1, 0x5, 0x3, 0x7
+    };
+
+    static uint8_t lookup2[] = {
+        0x0, 0x2, 0x1, 0x3
+    };
+
+    if (bitCnt == 1)
+        return n;
+    else if (bitCnt == 2)
+        return lookup2[n];
+    else if (bitCnt == 3)
+        return lookup3[n];
+    else if (bitCnt == 4)
+        return lookup4[n];
 
     uint32_t ret = 0;
     int i = 1;
 
     while (n != 0) {
-        ret |= (lookup[n & 0xf] << (bitCnt - i * 4));
+        ret |= (lookup4[n & 0b1111] << (bitCnt - i * 4));
         n >>= 4;
         i++;
     }
