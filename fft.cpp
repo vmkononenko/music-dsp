@@ -58,31 +58,33 @@ void FFT::__exch(vector<complex_t> &input, uint32_t i, uint32_t j)
 void FFT::__sortBitReversal(vector<complex_t> &input,
                             uint32_t start, uint32_t end)
 {
-    uint8_t maxBits = sqrt(input.size());
+    uint32_t N = end - start + 1;
+    uint8_t maxBits = log2(N);
     uint32_t reversed;
 
-    for (uint32_t i = start; i <= end; i++) {
+
+    for (uint32_t i = 0; i < N; i++) {
         reversed = __bitReverse(i, maxBits);
-        if (reversed > i) {
-            __exch(input, i, reversed);
+        if (reversed >  i) {
+            __exch(input, start + i, start + reversed);
         }
     }
 }
 
 void FFT::__butterfly(vector<complex_t> &input, uint32_t start, uint32_t end)
 {
-    uint32_t N = end - start;
+    uint32_t N = end - start + 1;
 
     // ??? is frequency correct
     // ??? double for N
-    for (uint32_t k = 0; k <= N / 2; k++) {
+    for (uint32_t k = 0; k < N / 2; k++) {
         complex_t sine  = polar(1.0, -2 * M_PI * k / N);
-        complex_t *even = &input[k];
-        complex_t *odd  = &input[k + N/2];
+        complex_t *even = &input[start + k];
+        complex_t *odd  = &input[start + k + N/2];
+        complex_t tmp = *odd * sine;
 
-        *odd *= sine;
-        *even += odd;
-        *odd -= *even;
+        *odd = *even + tmp;
+        *even = *even - tmp;
     }
 }
 
@@ -93,8 +95,8 @@ void FFT::__forward(vector<complex_t> &input, uint32_t start, uint32_t end)
 
     __sortBitReversal(input, start, end);
 
-    __forward(input, start, end / 2);   // even
-    __forward(input, end / 2 + 1, end); // odd
+    __forward(input, start, start + (end - start) / 2);   // even
+    __forward(input, start + (end - start) / 2 + 1, end); // odd
 
     __butterfly(input, start, end);
 }
