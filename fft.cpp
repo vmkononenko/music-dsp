@@ -73,18 +73,16 @@ void FFT::__sortBitReversal(vector<complex_t> &input,
 
 void FFT::__butterfly(vector<complex_t> &input, uint32_t start, uint32_t end)
 {
-    uint32_t N = end - start + 1;
+    double N = end - start + 1;
 
-    // ??? is frequency correct
-    // ??? double for N
     for (uint32_t k = 0; k < N / 2; k++) {
-        complex_t sine  = polar(1.0, -2 * M_PI * k / N);
+        complex_t twiddle = complex_t(cos(2 * M_PI * k / N), -sin(2 * M_PI * k / N));
         complex_t *even = &input[start + k];
         complex_t *odd  = &input[start + k + N/2];
-        complex_t tmp = *odd * sine;
+        complex_t tmp = *odd * twiddle;
 
-        *odd = *even + tmp;
-        *even = *even - tmp;
+        *odd = *even - tmp;
+        *even = *even + tmp;
     }
 }
 
@@ -93,18 +91,46 @@ void FFT::__forward(vector<complex_t> &input, uint32_t start, uint32_t end)
     if (start == end)
         return;
 
-    __sortBitReversal(input, start, end);
-
     __forward(input, start, start + (end - start) / 2);   // even
     __forward(input, start + (end - start) / 2 + 1, end); // odd
 
     __butterfly(input, start, end);
 }
 
+void FFT::__forward(vector<complex_t> &input)
+{
+    uint32_t stages = log2(input.size());
+
+    for (uint32_t stage = 1; stage <= stages; stage++) {
+        double subFftPoints = 1 << stage;
+
+        for (uint32_t j = 0; j < input.size(); j += subFftPoints) {
+            for (uint32_t i = 0; i < subFftPoints / 2; i++) {
+                complex_t twiddle = complex_t(cos(2 * M_PI * i / subFftPoints),
+                                             -sin(2 * M_PI * i / subFftPoints));
+                complex_t *even = &input[j + i];
+                complex_t *odd  = &input[j + i + subFftPoints / 2];
+                complex_t tmp = *odd * twiddle;
+
+                *odd = *even - tmp;
+                *even = *even + tmp;
+            }
+        }
+    }
+}
+
 void FFT::forward(vector<complex_t> &input)
 {
-	if (input.size() == 0) {
-		throw invalid_argument("Empty input");
-	}
-	__forward(input, 0, input.size() - 1);
+    if (input.size() == 0) {
+        throw invalid_argument("Empty input");
+    }
+
+    __sortBitReversal(input, 0, input.size() - 1);
+    //__forward(input, 0, input.size() - 1);
+    __forward(input);
+
+
+    for (complex_t &Xn : input) {
+        Xn = Xn / (double)input.size();
+    }
 }
