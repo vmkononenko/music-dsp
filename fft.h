@@ -30,4 +30,5 @@ private:
 
 public:
 	void forward(std::vector<complex_t> &);
+	void toPolar(std::vector<complex_t> &);
 };

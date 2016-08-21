@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <stdint.h>
+#include <math.h>
 
 #include "fft.h"
 
@@ -132,5 +133,21 @@ void FFT::forward(vector<complex_t> &input)
 
     for (complex_t &Xn : input) {
         Xn = Xn / (double)input.size();
+    }
+}
+
+void FFT::toPolar(std::vector<complex_t> &input)
+{
+    if (input.size() == 0) {
+        throw invalid_argument("Empty input");
+    }
+
+    for (unsigned int i = 0; i < input.size() / 2; i++) {
+        double re = real(input[i]);
+        double im = imag(input[i]);
+        double mag = sqrt(im * im + re * re);
+        double theta = atan(im/re);
+
+        input[i] = complex_t (mag, theta);
     }
 }
