@@ -129,11 +129,6 @@ void FFT::forward(vector<complex_t> &input)
     __sortBitReversal(input, 0, input.size() - 1);
     //__forward(input, 0, input.size() - 1);
     __forward(input);
-
-
-    for (complex_t &Xn : input) {
-        Xn = Xn / (double)input.size();
-    }
 }
 
 void FFT::toPolar(std::vector<complex_t> &input)
