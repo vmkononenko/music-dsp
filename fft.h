@@ -29,6 +29,7 @@ private:
     void __butterfly(std::vector<complex_t> &input, uint32_t, uint32_t);
 
 public:
-	void forward(std::vector<complex_t> &);
-	void toPolar(std::vector<complex_t> &);
+    void forward(std::vector<complex_t> &);
+    void toPolar(std::vector<complex_t> &);
+    void inverse(std::vector<complex_t> &);
 };

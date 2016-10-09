@@ -131,6 +131,11 @@ void FFT::forward(vector<complex_t> &input)
     __forward(input);
 }
 
+/**
+ * Converts frequency domain from rectangular to polar notation
+ *
+ * @param input frequency domain in rectangular notation
+ */
 void FFT::toPolar(std::vector<complex_t> &input)
 {
     if (input.size() == 0) {
@@ -144,5 +149,31 @@ void FFT::toPolar(std::vector<complex_t> &input)
         double theta = atan(im/re);
 
         input[i] = complex_t (mag, theta);
+    }
+}
+
+/**
+ * Inverse DFT calculation
+ *
+ * @param input frequency domain in rectangular notation
+ */
+void FFT::inverse(vector<complex_t> &input)
+{
+    if (input.size() == 0) {
+        throw invalid_argument("Empty input");
+    }
+
+    unsigned int N = input.size();
+
+    /* change the sign of the imaginary part */
+    for (unsigned int k = 1; k < N; k++) {
+        input[k] = complex_t (real(input[k]), -imag(input[k]));
+    }
+
+    forward(input);
+
+    // divide the time domain by N and change the sign of imaginary part
+    for (unsigned int i = 1; i < N; i++) {
+        input[i] = complex_t (real(input[i]) / N, -imag(input[i]) / N);
     }
 }
