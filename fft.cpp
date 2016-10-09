@@ -146,7 +146,15 @@ void FFT::toPolar(std::vector<complex_t> &input)
         double re = real(input[i]);
         double im = imag(input[i]);
         double mag = sqrt(im * im + re * re);
-        double theta = atan(im/re);
+        double theta;
+
+        if (re == 0) {
+            // if the real part is zero, change it to negligibly
+            // small number to avoid division by 0
+            re = 1e-20;
+        }
+
+        theta = atan(im/re);
 
         input[i] = complex_t (mag, theta);
     }
