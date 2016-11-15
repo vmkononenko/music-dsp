@@ -5,7 +5,6 @@
  */
 
 #include <stdexcept>
-#include <stdint.h>
 #include <math.h>
 
 #include "fft.h"
@@ -50,7 +49,7 @@ uint32_t FFT::__bitReverse(uint32_t n, uint8_t bitCnt) {
 
 void FFT::__exch(vector<complex_t> &input, uint32_t i, uint32_t j)
 {
-    complex<double> tmp = input[i];
+    complex<amplitude_t> tmp = input[i];
 
     input[i] = input[j];
     input[j] = tmp;

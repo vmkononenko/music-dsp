@@ -6,15 +6,12 @@
 
 #pragma once
 
-#include <complex>
 #include <vector>
-#include <stdint.h>
+#include "lmtypes.h"
 
 #ifndef TEST_FRIENDS
 #define TEST_FRIENDS
 #endif
-
-typedef std::complex<double> complex_t;
 
 class FFT {
 
