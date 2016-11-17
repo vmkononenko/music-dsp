@@ -15,6 +15,6 @@ class WindowFunctions {
 TEST_FRIENDS;
 
 public:
-	static void hamming(amplitude_t *, uint32_t);
-	static void blackman(amplitude_t *, uint32_t);
+    static void applyHamming(amplitude_t *, uint32_t);
+    static void applyBlackman(amplitude_t *, uint32_t);
 };
