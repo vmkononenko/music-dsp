@@ -4,6 +4,8 @@
  *  Chord recognition implementation
  */
 
+#include <iostream> // TODO remove when __cutoffFreq is implemented
+
 #include "chord_detector.h"
 #include "lmhelpers.h"
 
@@ -21,10 +23,11 @@ ChordDetector::ChordDetector()
 
 void ChordDetector::__cutoffFreq(vector<complex_t> &x, amplitude_t freq, bool cutHigh)
 {
-
+    cout << x.size() << freq << cutHigh;
 }
 
-chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples)
+chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
+                                uint32_t sampleRate)
 {
     chord_t chord;
 
@@ -33,17 +36,21 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples)
         return chord;
     }
 
-    vector<complex_t> x = Helpers::timeDomain2ComplexVector(timeDomain, samples);
-    freq_hz_t freqTonic, tonicPitch;
+    vector<complex_t> x;
+    freq_hz_t pitchFreq;
+    uint32_t fftSize;
+
+    /* TODO: define minimum FFT size for frequency calculation precision */
+    fftSize = Helpers::nextPowerOf2(samples);
+    x = Helpers::timeDomain2ComplexVector(timeDomain, fftSize);
 
     __mFft->forward(x);
     __mFft->toPolar(x);
     __cutoffFreq(x, FREQ_A0, false);
     __cutoffFreq(x, FREQ_C8, true);
-    freqTonic = __mPitchDetector->getTonic(x);
 
-    tonicPitch = __mPitchDetector->getPitch(freqTonic);
-    if (tonicPitch == FREQ_INVALID) {
+    pitchFreq = __mPitchDetector->getPitch(x, sampleRate);
+    if (pitchFreq == FREQ_INVALID) {
         goto err;
     }
 

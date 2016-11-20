@@ -21,7 +21,6 @@
 typedef struct Chord {
     note_t      mainNote;
     octave_t    octave;
-    bool        sharp;
     bool        isMinor;
 
     Chord() : mainNote(note_Unknown) {}
@@ -53,9 +52,10 @@ public:
     /**
      * Detect chord corresponding to the given time domain
      *
-     * @param   x       time domain data
-     * @param   samples number of samples in x
+     * @param   x           time domain data
+     * @param   samples     number of samples in x
+     * @param   sampleRate  sample rate of x
      * @return  detected chord
      */
-    chord_t getChord(amplitude_t *, uint32_t);
+    chord_t getChord(amplitude_t *, uint32_t, uint32_t);
 };

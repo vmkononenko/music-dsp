@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "lmtypes.h"
@@ -19,27 +20,47 @@ class PitchDetector {
 TEST_FRIENDS;
 
 private:
+    freq_hz_t                   *__mPitches;
+    std::map<int8_t, note_t>    __mNotesFromA4;
+
+    void __initPitches();
+
+    /**
+     * @ return true if freq matches one of the pitch frequencies
+     */
     bool __isPitch(freq_hz_t freq);
 
+    /**
+     * Find frequency with the highest amplitude
+     *
+     * @param   x           frequency domain data
+     * @param   sampleRate  sample rate of x
+     * @return  frequency value
+     */
+    freq_hz_t __getTonic(std::vector<complex_t> x, uint32_t sampleRate);
+
 public:
+    /**
+     * Constructor
+     */
+    PitchDetector();
+
+    /**
+     * Destructor
+     */
+    ~PitchDetector();
+
     /**
      * Correspond frequency to the pitch
      *
      * In other words round up provided frequency value to one of the pitch
      * frequencies
      *
-     * @param   freq arbitrary frequency
+     * @param   freq        arbitrary frequency
+     * @param   sampleRate  sample rate of x
      * @return  pitch frequency corresponding to freq
      */
-    freq_hz_t getPitch(freq_hz_t freq);
-
-    /**
-     * Find frequency with the highest amplitude
-     *
-     * @param   x frequency domain data
-     * @return  frequency value
-     */
-    freq_hz_t getTonic(std::vector<complex_t> x);
+    freq_hz_t getPitch(std::vector<complex_t> x, uint32_t sampleRate);
 
     /**
      * Find note corresponding to the given pitch
@@ -48,5 +69,13 @@ public:
      * @return  note corresponding to the given pitch
      */
     note_t pitchToNote(freq_hz_t freq);
+
+    /**
+     * Find octave corresponding to the given pitch
+     *
+     * @param   pitch frequency in Hz
+     * @return  octave number corresponding to the given pitch
+     */
+    note_t pitchToOctave(freq_hz_t freq);
 };
 
