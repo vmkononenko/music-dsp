@@ -5,6 +5,7 @@
  */
 
 #include <stdexcept>
+#include <iostream>
 
 #include "lmtypes.h"
 #include "lmhelpers.h"
@@ -46,10 +47,10 @@ void PitchDetector::__initPitches()
 {
     __mPitches = new freq_hz_t[SEMITONES_TOTAL];
 
-    for (uint16_t i = 0; i < SEMITONES_TOTAL; i++) {
-        uint16_t n = i + SEMITONES_A0_TO_A4;
-        __mPitches[n] = pow(2, (n / SEMITONES_PER_OCTAVE)) * FREQ_A4_NOTE;
-        __mPitches[n] = Helpers::stdRound<freq_hz_t>(__mPitches[n], FREQ_PRECISION);
+    for (int16_t i = 0; i < SEMITONES_TOTAL; i++) {
+        int16_t n = i + SEMITONES_A0_TO_A4;
+        __mPitches[i] = pow(2, (n / SEMITONES_PER_OCTAVE)) * FREQ_A4_NOTE;
+        __mPitches[i] = Helpers::stdRound<freq_hz_t>(__mPitches[n], FREQ_PRECISION);
     }
 }
 
@@ -63,9 +64,9 @@ bool PitchDetector::__isPitch(freq_hz_t freq)
         mid = start + (end - start) / 2;
 
         if (__mPitches[mid] < freq) {
-            start = mid;
+            start = mid + 1;
         } else if (__mPitches[mid] > freq) {
-            end = mid;
+            end = mid - 1;
         } else {
             return true;
         }
@@ -100,8 +101,8 @@ freq_hz_t PitchDetector::__getTonic(std::vector<complex_t> x, uint32_t sampleRat
 
 freq_hz_t PitchDetector::getPitch(std::vector<complex_t> x, uint32_t sampleRate)
 {
-    freq_hz_t freqTonic;    // frequency with the highest amplitude
-    freq_hz_t freqPitch;    // closest pitch matching freqTonic
+    freq_hz_t freqTonic;                // frequency with the highest amplitude
+    freq_hz_t freqPitch = FREQ_INVALID; // closest pitch matching freqTonic
     freq_hz_t deltaRight, deltaLeft, deltaMid;
     uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
 
@@ -120,9 +121,9 @@ freq_hz_t PitchDetector::getPitch(std::vector<complex_t> x, uint32_t sampleRate)
         deltaRight = abs(__mPitches[mid + 1] - freqTonic);
 
         if (deltaLeft < deltaMid) {
-            end = mid;
+            end = mid - 1;
         } else if (deltaRight < deltaMid) {
-            start = mid;
+            start = mid + 1;
         } else {
             freqPitch = __mPitches[mid];
             break;
@@ -142,5 +143,6 @@ note_t PitchDetector::pitchToNote(freq_hz_t freq)
     uint8_t semitonesFromA4 = Helpers::stdRound(SEMITONES_PER_OCTAVE *
                                                 log2(freq / FREQ_A4_NOTE), 0);
 
-    return __mNotesFromA4[semitonesFromA4];
+    return (__mNotesFromA4.find(semitonesFromA4) != __mNotesFromA4.end() ?
+            __mNotesFromA4[semitonesFromA4] : note_Unknown);
 }

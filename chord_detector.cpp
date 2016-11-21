@@ -54,6 +54,8 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
         goto err;
     }
 
+    chord.mainNote = __mPitchDetector->pitchToNote(pitchFreq);
+
     return chord;
 
 err:
