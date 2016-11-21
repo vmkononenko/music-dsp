@@ -38,13 +38,15 @@ private:
     /**
      *  Cuts off unwanted frequency range from the input frequency domain
      *
-     *  @param x        input frequency domain
-     *  @param freq     frequency to cut from
-     *  @param cutHigh  cut range higher than freq if set to true
-     *                  fill range lower than freq to 0 (but not cut the range off
-     *                  from vector to be able to calculate Hz from index in x)
+     *  @param x            input frequency domain
+     *  @param sampleRate   sample rate of x
+     *  @param freq         frequency to cut from
+     *  @param cutHigh      cut range higher than freq if set to true
+     *                      fill range lower than freq to 0 (but not cut the
+     *                      range off from vector to be able to calculate Hz
+     *                      from index in x)
      */
-    void __cutoffFreq(std::vector<complex_t> &, amplitude_t, bool);
+    void __cutoffFreq(std::vector<complex_t> &, uint32_t, amplitude_t, bool);
 
 public:
     ChordDetector();

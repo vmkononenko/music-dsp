@@ -21,9 +21,28 @@ ChordDetector::ChordDetector()
     __mPitchDetector = new PitchDetector();
 }
 
-void ChordDetector::__cutoffFreq(vector<complex_t> &x, amplitude_t freq, bool cutHigh)
+void ChordDetector::__cutoffFreq(vector<complex_t> &x, uint32_t sampleRate,
+                                 amplitude_t freq, bool cutHigh)
 {
-    cout << x.size() << freq << cutHigh;
+    double cutFromIdx = freq * sampleRate / x.size();
+
+    if (cutHigh) {
+        cutFromIdx = ceil(cutFromIdx);
+    } else {
+        cutFromIdx = floor(cutFromIdx);
+    }
+
+    if ((cutFromIdx < 0) || (cutFromIdx >= x.size())) {
+        return;
+    }
+
+    if (cutHigh) {
+        x.erase(x.begin() + cutFromIdx, x.end());
+    } else {
+        for (uint32_t i = 0; i <= cutFromIdx; i++) {
+            x[i] = complex_t (0, 0);
+        }
+    }
 }
 
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
@@ -46,8 +65,8 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
 
     __mFft->forward(x);
     __mFft->toPolar(x);
-    __cutoffFreq(x, FREQ_A0, false);
-    __cutoffFreq(x, FREQ_C8, true);
+    __cutoffFreq(x, sampleRate, FREQ_A0, false);
+    __cutoffFreq(x, sampleRate, FREQ_C8, true);
 
     pitchFreq = __mPitchDetector->getPitch(x, sampleRate);
     if (pitchFreq == FREQ_INVALID) {

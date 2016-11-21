@@ -117,9 +117,9 @@ freq_hz_t PitchDetector::getPitch(std::vector<complex_t> x, uint32_t sampleRate)
         deltaLeft = abs(__mPitches[mid - 1] - freqTonic);
         deltaRight = abs(__mPitches[mid + 1] - freqTonic);
 
-        if (deltaLeft < deltaMid) {
+        if ((deltaLeft < deltaMid) && (deltaMid < deltaRight)) {
             end = mid - 1;
-        } else if (deltaRight < deltaMid) {
+        } else if ((deltaLeft > deltaMid) && (deltaRight < deltaMid)) {
             start = mid + 1;
         } else {
             freqPitch = __mPitches[mid];
