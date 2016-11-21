@@ -9,15 +9,18 @@
 
 #include "lmtypes.h"
 
-#define FREQ_INVALID    ((freq_hz_t) -1)
+#define FREQ_INVALID            ((freq_hz_t) -1)
+#define SEMITONES_A0_TO_A4      -48 // TODO: define proper values and notes
+#define SEMITONES_A4_TO_C8      200 // TODO: define proper values and notes
+#define SEMITONES_TOTAL         (SEMITONES_A4_TO_C8 - SEMITONES_A0_TO_A4)
 
-#ifndef TEST_FRIENDS
-#define TEST_FRIENDS
+#ifndef PITCH_DETECTOR_TEST_FRIENDS
+#define PITCH_DETECTOR_TEST_FRIENDS
 #endif
 
 class PitchDetector {
 
-TEST_FRIENDS;
+PITCH_DETECTOR_TEST_FRIENDS;
 
 private:
     freq_hz_t                   *__mPitches;

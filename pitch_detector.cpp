@@ -15,9 +15,6 @@
 #define FREQ_PRECISION          4
 #define OCTAVES_CNT             9   /* from 0 to 8 */
 #define SEMITONES_PER_OCTAVE    12
-#define SEMITONES_A0_TO_A4      -48 // TODO: define proper values and notes
-#define SEMITONES_A4_TO_C8      200 // TODO: define proper values and notes
-#define SEMITONES_TOTAL         (SEMITONES_A4_TO_C8 - SEMITONES_A0_TO_A4)
 
 
 PitchDetector::PitchDetector()
