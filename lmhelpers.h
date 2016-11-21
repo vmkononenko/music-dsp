@@ -35,9 +35,9 @@ public:
         if (scale == 0) {
             n = round(n);
         } else {
-            n *= (10 * scale);
+            n *= (pow(10, scale));
             n = round(n);
-            n /= scale;
+            n /= (pow(10, scale));
         }
 
         return n;
