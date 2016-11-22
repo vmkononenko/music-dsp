@@ -36,17 +36,30 @@ private:
     PitchDetector *__mPitchDetector;
 
     /**
-     *  Cuts off unwanted frequency range from the input frequency domain
+     *  Attenuate frequencies lower than freq to 0
      *
-     *  @param x            input frequency domain
-     *  @param sampleRate   sample rate of x
+     *  Attenuate instead of cutting of the range to be able to do conversion
+     *  between frequencies and indexes of FFT points
+     *
+     *  @param freqDomain   input frequency domain
+     *  @param len          number of points in freqDomain
      *  @param freq         frequency to cut from
-     *  @param cutHigh      cut range higher than freq if set to true
-     *                      fill range lower than freq to 0 (but not cut the
-     *                      range off from vector to be able to calculate Hz
-     *                      from index in x)
+     *  @param fftSize      taken FFT length
+     *  @param sampleRate   sample rate of the analyzed signal
      */
-    void __cutoffFreq(std::vector<complex_t> &, uint32_t, amplitude_t, bool);
+    void __attLowFreq(amplitude_t *, uint32_t, freq_hz_t, uint32_t, uint32_t);
+
+    /**
+     * Convert frequency to point index in frequency domain to cut off from
+     *
+     * Calculated index is then used to cut off unneeded high frequency range
+     * from the input frequency domain
+     *
+     * @param freq         frequency to cut from
+     * @param sampleRate   sample rate of the analyzed signal
+     * @param fftSize      taken FFT length
+     */
+    uint32_t __cutoffHighIdx(freq_hz_t freq, uint32_t sampleRate, uint32_t fftSize);
 
 public:
     ChordDetector();

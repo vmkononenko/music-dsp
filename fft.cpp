@@ -4,8 +4,9 @@
  *  Fast Fourier Transform implementation
  */
 
-#include <stdexcept>
+#include <algorithm>
 #include <math.h>
+#include <stdexcept>
 
 #include "fft.h"
 
@@ -130,40 +131,47 @@ void FFT::forward(vector<complex_t> &input)
     __forward(input);
 }
 
-/**
- * Converts frequency domain from rectangular to polar notation
- *
- * @param input frequency domain in rectangular notation
- */
-void FFT::toPolar(std::vector<complex_t> &input)
+uint32_t FFT::toPolar(std::vector<complex_t> &input,
+                      amplitude_t *freqDomainMagnitudes, uint32_t reqLen)
 {
+    if (&input == NULL) {
+        throw invalid_argument("input is NULL");
+    }
     if (input.size() == 0) {
         throw invalid_argument("Empty input");
     }
 
-    for (unsigned int i = 0; i < input.size() / 2; i++) {
+    uint32_t len = min(reqLen, (uint32_t)input.size() / 2);
+
+    for (unsigned int i = 0; i < len; i++) {
         double re = real(input[i]);
         double im = imag(input[i]);
         double mag = sqrt(im * im + re * re);
         double theta;
 
-        if (re == 0) {
-            // if the real part is zero, change it to negligibly
-            // small number to avoid division by 0
-            re = 1e-20;
+        if (freqDomainMagnitudes != NULL) {
+            freqDomainMagnitudes[i] = mag;
         }
+        else {
+            if (re == 0) {
+                // if the real part is zero, change it to negligibly
+                // small number to avoid division by 0
+                re = 1e-20;
+            }
 
-        theta = atan(im/re);
-
-        input[i] = complex_t (mag, theta);
+            theta = atan(im/re);
+            input[i] = complex_t (mag, theta);
+        }
     }
+
+    return len;
 }
 
-/**
- * Inverse DFT calculation
- *
- * @param input frequency domain in rectangular notation
- */
+void FFT::toPolar(std::vector<complex_t> &input)
+{
+    toPolar(input, NULL, input.size());
+}
+
 void FFT::inverse(vector<complex_t> &input)
 {
     if (input.size() == 0) {

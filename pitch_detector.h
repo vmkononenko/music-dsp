@@ -36,11 +36,14 @@ private:
     /**
      * Find frequency with the highest amplitude
      *
-     * @param   x           frequency domain data
-     * @param   sampleRate  sample rate of x
+     * @param   freqDomain  frequency domain magnitudes
+     * @param   len         number of points in freqDomain
+     * @param   fftSize     taken FFT length
+     * @param   sampleRate  sample rate of the analyzed signal
      * @return  frequency value
      */
-    freq_hz_t __getTonic(std::vector<complex_t> x, uint32_t sampleRate);
+    freq_hz_t __getTonic(amplitude_t *freqDomain, uint32_t len, uint32_t fftSize,
+                         uint32_t sampleRate);
 
 public:
     /**
@@ -54,16 +57,16 @@ public:
     ~PitchDetector();
 
     /**
-     * Correspond frequency to the pitch
+     * Detect pitch from the corresponding frequency domain points
      *
-     * In other words round up provided frequency value to one of the pitch
-     * frequencies
-     *
-     * @param   freq        arbitrary frequency
-     * @param   sampleRate  sample rate of x
-     * @return  pitch frequency corresponding to freq
+     * @param   freqDomain  frequency domain magnitudes
+     * @param   len         number of points in freqDomain
+     * @param   fftSize     taken FFT length
+     * @param   sampleRate  sample rate of the analyzed signal
+     * @return  detected pitch frequency
      */
-    freq_hz_t getPitch(std::vector<complex_t> x, uint32_t sampleRate);
+    freq_hz_t getPitch(amplitude_t *freqDomain, uint32_t len, uint32_t fftSize,
+                       uint32_t sampleRate);
 
     /**
      * Find note corresponding to the given pitch

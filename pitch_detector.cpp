@@ -11,7 +11,7 @@
 #include "lmhelpers.h"
 #include "pitch_detector.h"
 
-#define FREQ_A4_NOTE            ((freq_hz_t) 440)
+#define FREQ_A4                 ((freq_hz_t) 440)
 #define FREQ_PRECISION          4
 #define OCTAVES_CNT             9   /* from 0 to 8 */
 #define SEMITONES_PER_OCTAVE    12
@@ -44,10 +44,10 @@ void PitchDetector::__initPitches()
 {
     __mPitches = new freq_hz_t[SEMITONES_TOTAL];
 
-    for (int16_t i = 0; i < SEMITONES_TOTAL; i++) {
-        int16_t n = i + SEMITONES_A0_TO_A4;
-        __mPitches[i] = pow(2, (n / SEMITONES_PER_OCTAVE)) * FREQ_A4_NOTE;
-        __mPitches[i] = Helpers::stdRound<freq_hz_t>(__mPitches[n], FREQ_PRECISION);
+    for (int32_t i = 0; i < SEMITONES_TOTAL; i++) {
+        double n = i + SEMITONES_A0_TO_A4;
+        __mPitches[i] = pow(2, (n / SEMITONES_PER_OCTAVE)) * FREQ_A4;
+        __mPitches[i] = Helpers::stdRound<freq_hz_t>(__mPitches[i], FREQ_PRECISION);
     }
 }
 
@@ -73,19 +73,20 @@ bool PitchDetector::__isPitch(freq_hz_t freq)
 }
 
 /* TODO: reuse delta mechanism used in getPitch */
-freq_hz_t PitchDetector::__getTonic(std::vector<complex_t> x, uint32_t sampleRate)
+freq_hz_t PitchDetector::__getTonic(amplitude_t *freqDomain, uint32_t len,
+                                    uint32_t fftSize, uint32_t sampleRate)
 {
-    if (x.size() == 0 || sampleRate == 0) {
+    if (freqDomain == NULL || sampleRate == 0) {
         throw std::invalid_argument("Invalid argument");
     }
 
-    amplitude_t max = real(x[0]);
+    amplitude_t max = freqDomain[0];
     amplitude_t mag;
     uint32_t i = 0, maxIndex = 0;
 
     /* TODO: replace with faster algorithm than the one with linear complexity */
-    while (i < x.size()) {
-        mag = real(x[i]);
+    while (i < len) {
+        mag = freqDomain[i];
         if (mag > max) {
             max = mag;
             maxIndex = i;
@@ -93,17 +94,18 @@ freq_hz_t PitchDetector::__getTonic(std::vector<complex_t> x, uint32_t sampleRat
         i++;
     }
 
-    return (maxIndex * sampleRate / x.size());
+    return (maxIndex * sampleRate / fftSize);
 }
 
-freq_hz_t PitchDetector::getPitch(std::vector<complex_t> x, uint32_t sampleRate)
+freq_hz_t PitchDetector::getPitch(amplitude_t *freqDomain, uint32_t len,
+                                  uint32_t fftSize, uint32_t sampleRate)
 {
     freq_hz_t freqTonic;                // frequency with the highest amplitude
     freq_hz_t freqPitch = FREQ_INVALID; // closest pitch matching freqTonic
     freq_hz_t deltaRight, deltaLeft, deltaMid;
     uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
 
-    freqTonic = __getTonic(x, sampleRate);
+    freqTonic = __getTonic(freqDomain, len, fftSize, sampleRate);
 
     if (__isPitch(freqTonic)) {
         freqPitch = freqTonic;
@@ -117,11 +119,13 @@ freq_hz_t PitchDetector::getPitch(std::vector<complex_t> x, uint32_t sampleRate)
         deltaLeft = abs(__mPitches[mid - 1] - freqTonic);
         deltaRight = abs(__mPitches[mid + 1] - freqTonic);
 
-        if ((deltaLeft < deltaMid) && (deltaMid < deltaRight)) {
+        // TODO: check the case - when all values in __mPitches are 0 this
+        // loop becomes infinite
+        if (deltaLeft < deltaMid) {
             end = mid - 1;
-        } else if ((deltaLeft > deltaMid) && (deltaRight < deltaMid)) {
+        } else if (deltaRight < deltaMid) {
             start = mid + 1;
-        } else {
+        } else if ((deltaMid < deltaLeft) && (deltaMid < deltaRight)) {
             freqPitch = __mPitches[mid];
             break;
         }
@@ -137,8 +141,8 @@ note_t PitchDetector::pitchToNote(freq_hz_t freq)
         throw std::invalid_argument("Invalid argument");
     }
 
-    uint8_t semitonesFromA4 = Helpers::stdRound(SEMITONES_PER_OCTAVE *
-                                                log2(freq / FREQ_A4_NOTE), 0);
+    int32_t semitonesFromA4 = (int32_t)Helpers::stdRound(SEMITONES_PER_OCTAVE *
+            log2(freq / FREQ_A4), 0) % SEMITONES_PER_OCTAVE;
 
     return (__mNotesFromA4.find(semitonesFromA4) != __mNotesFromA4.end() ?
             __mNotesFromA4[semitonesFromA4] : note_Unknown);

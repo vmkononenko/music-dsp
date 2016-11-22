@@ -27,6 +27,33 @@ private:
 
 public:
     void forward(std::vector<complex_t> &);
+
+    /**
+     * Converts frequency domain from rectangular to polar notation
+     *
+     * @param input frequency domain in rectangular notation
+     */
     void toPolar(std::vector<complex_t> &);
+
+    /**
+     * Converts frequency domain from rectangular to polar notation
+     *
+     * If non-NULL freqDomainMagnitudes is passed as a parameter instead of
+     * doing in-place conversion to polar input is not touched. Corresponding
+     * reqLen polar magnitudes are written to freqDomainMagnitudes and phases
+     * are omitted.
+     *
+     * @param input frequency domain in rectangular notation
+     * @param freqDomainMagnitudes
+     * @param reqLen   convert only first reqLen points
+     * @return number of points converted
+     */
+    uint32_t toPolar(std::vector<complex_t> &, amplitude_t *, uint32_t);
+
+    /**
+     * Inverse DFT calculation
+     *
+     * @param input frequency domain in rectangular notation
+     */
     void inverse(std::vector<complex_t> &);
 };
