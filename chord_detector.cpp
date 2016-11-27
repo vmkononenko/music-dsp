@@ -86,3 +86,24 @@ err:
     chord.mainNote = note_Unknown;
     return chord;
 }
+
+vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMajor)
+{
+    /* whole, whole, half, whole, whole, whole, half */
+    uint8_t formulaMajor[] = {2, 2, 1, 2, 2, 2, 1};
+    /* whole, half, whole, whole, half, whole, whole */
+    uint8_t formulaMinor[] = {2, 1, 2, 2, 1, 2, 2};
+    uint8_t *formula = isMajor ? formulaMajor : formulaMinor;
+
+    vector<note_t> scale;
+    freq_hz_t pitch;
+
+    scale.push_back(mainNote);
+    pitch = __mPitchDetector->noteToPitch(mainNote, OCTAVE_4);
+    for (uint8_t i = 0; i < 7; /* size of formula */ i++) {
+        pitch = __mPitchDetector->getPitchByInterval(pitch, formula[i]);
+        scale.push_back(__mPitchDetector->pitchToNote(pitch));
+    }
+
+    return scale;
+}

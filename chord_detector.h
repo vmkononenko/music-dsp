@@ -73,4 +73,13 @@ public:
      * @return  detected chord
      */
     chord_t getChord(amplitude_t *, uint32_t, uint32_t);
+
+    /**
+     * Build major or minor scale from the main note
+     *
+     * @param   mainNote    main note to build the scale from
+     * @param   isMajor     specifies major or minor scale
+     * @return  requested scale
+     */
+    std::vector<note_t> getScale(note_t, bool);
 };
