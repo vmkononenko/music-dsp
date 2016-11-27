@@ -11,14 +11,15 @@
 #include "lmhelpers.h"
 #include "pitch_detector.h"
 
-#define FREQ_A4                 ((freq_hz_t) 440)
 #define FREQ_PRECISION          4
 #define OCTAVES_CNT             9   /* from 0 to 8 */
-#define SEMITONES_PER_OCTAVE    12
+#define SEMITONES_PER_OCTAVE    ((int32_t)12)
 
 
 PitchDetector::PitchDetector()
 {
+    __mNotesFromA4[-11] = note_A_sharp;
+    __mNotesFromA4[-10] = note_B;
     __mNotesFromA4[-9] = note_C;
     __mNotesFromA4[-8] = note_C_sharp;
     __mNotesFromA4[-7] = note_D;
@@ -31,6 +32,29 @@ PitchDetector::PitchDetector()
     __mNotesFromA4[0] = note_A;
     __mNotesFromA4[1] = note_A_sharp;
     __mNotesFromA4[2] = note_B;
+    __mNotesFromA4[3] = note_C;
+    __mNotesFromA4[4] = note_C_sharp;
+    __mNotesFromA4[5] = note_D;
+    __mNotesFromA4[6] = note_D_sharp;
+    __mNotesFromA4[7] = note_E;
+    __mNotesFromA4[8] = note_F;
+    __mNotesFromA4[9] = note_F_sharp;
+    __mNotesFromA4[10] = note_G;
+    __mNotesFromA4[11] = note_G_sharp;
+
+
+    __mSemitonesFromA4[note_C]       = -9;
+    __mSemitonesFromA4[note_C_sharp] = -8;
+    __mSemitonesFromA4[note_D]       = -7;
+    __mSemitonesFromA4[note_D_sharp] = -6;
+    __mSemitonesFromA4[note_E]       = -5;
+    __mSemitonesFromA4[note_F]       = -4;
+    __mSemitonesFromA4[note_F_sharp] = -3;
+    __mSemitonesFromA4[note_G]       = -2;
+    __mSemitonesFromA4[note_G_sharp] = -1;
+    __mSemitonesFromA4[note_A]       = -0;
+    __mSemitonesFromA4[note_A_sharp] = 1;
+    __mSemitonesFromA4[note_B]       = 2;
 
     __initPitches();
 }
@@ -48,12 +72,34 @@ void PitchDetector::__initPitches()
         double n = i + SEMITONES_A0_TO_A4;
         __mPitches[i] = pow(2, (n / SEMITONES_PER_OCTAVE)) * FREQ_A4;
         __mPitches[i] = Helpers::stdRound<freq_hz_t>(__mPitches[i], FREQ_PRECISION);
+        if(__mPitches[i] == FREQ_A4) {
+            __mPitchIdxA4 = i;
+        }
     }
+
+    //TODO: add assert if __mPitchIdxA4 == 0
 }
 
-bool PitchDetector::__isPitch(freq_hz_t freq)
+freq_hz_t PitchDetector::getPitchByInterval(freq_hz_t pitch, double n)
+{
+    int16_t pitchIdx = __getPitchIdx(pitch);
+
+    if (pitchIdx < 0) {
+        return FREQ_INVALID;
+    }
+
+    freq_hz_t p;
+    int16_t semitonesFromA4 = n - __mPitchIdxA4;
+    p = pow(2, (semitonesFromA4 / SEMITONES_PER_OCTAVE)) * FREQ_A4;
+    p = Helpers::stdRound<freq_hz_t>(p, FREQ_PRECISION);
+
+    return p;
+}
+
+int16_t PitchDetector::__getPitchIdx(freq_hz_t freq)
 {
     uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
+    int16_t idx = -1;
 
     freq = Helpers::stdRound(freq, FREQ_PRECISION);
 
@@ -65,11 +111,17 @@ bool PitchDetector::__isPitch(freq_hz_t freq)
         } else if (__mPitches[mid] > freq) {
             end = mid - 1;
         } else {
-            return true;
+            idx = mid;
+            break;
         }
     }
 
-    return false;
+    return idx;
+}
+
+bool PitchDetector::__isPitch(freq_hz_t freq)
+{
+    return (__getPitchIdx(freq) >= 0);
 }
 
 /* TODO: reuse delta mechanism used in getPitch */
@@ -138,7 +190,7 @@ freq_hz_t PitchDetector::getPitch(amplitude_t *freqDomain, uint32_t len,
 note_t PitchDetector::pitchToNote(freq_hz_t freq)
 {
     if (!__isPitch(freq)) {
-        throw std::invalid_argument("Invalid argument");
+        throw std::invalid_argument("Invalid frequency - pitch is expected");
     }
 
     int32_t semitonesFromA4 = (int32_t)Helpers::stdRound(SEMITONES_PER_OCTAVE *
@@ -146,4 +198,20 @@ note_t PitchDetector::pitchToNote(freq_hz_t freq)
 
     return (__mNotesFromA4.find(semitonesFromA4) != __mNotesFromA4.end() ?
             __mNotesFromA4[semitonesFromA4] : note_Unknown);
+}
+
+freq_hz_t PitchDetector::noteToPitch(note_t note, octave_t octave)
+{
+    if ((note < note_Min) || (note > note_Max)) {
+        throw std::invalid_argument("Invalid note");
+    }
+    if ((octave < OCTAVE_MIN) || (octave > OCTAVE_MAX)) {
+        throw std::invalid_argument("Invalid octave");
+    }
+
+    int16_t semitonesFromA4 = ((octave - OCTAVE_4) * SEMITONES_PER_OCTAVE) + __mSemitonesFromA4[note];
+
+    // TODO: add check for idx < 0 or > than array size
+
+    return __mPitches[__mPitchIdxA4 + semitonesFromA4];
 }

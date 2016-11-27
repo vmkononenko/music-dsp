@@ -13,6 +13,7 @@
 #define SEMITONES_A0_TO_A4      -48 // TODO: define proper values and notes
 #define SEMITONES_A4_TO_C8      200 // TODO: define proper values and notes
 #define SEMITONES_TOTAL         (SEMITONES_A4_TO_C8 - SEMITONES_A0_TO_A4)
+#define FREQ_A4                 ((freq_hz_t) 440)
 
 #ifndef PITCH_DETECTOR_TEST_FRIENDS
 #define PITCH_DETECTOR_TEST_FRIENDS
@@ -24,7 +25,9 @@ PITCH_DETECTOR_TEST_FRIENDS;
 
 private:
     freq_hz_t                   *__mPitches;
+    int16_t                     __mPitchIdxA4;
     std::map<int8_t, note_t>    __mNotesFromA4;
+    std::map<note_t, int8_t>    __mSemitonesFromA4;
 
     void __initPitches();
 
@@ -44,6 +47,14 @@ private:
      */
     freq_hz_t __getTonic(amplitude_t *freqDomain, uint32_t len, uint32_t fftSize,
                          uint32_t sampleRate);
+
+    /**
+     * Find sequential number of the pitch in __mPitches
+     *
+     * @param   freq    pitch frequency
+     * @return  index in __mPitches array
+     */
+    int16_t __getPitchIdx(freq_hz_t freq);
 
 public:
     /**
@@ -77,11 +88,28 @@ public:
     note_t pitchToNote(freq_hz_t freq);
 
     /**
+     * Find pitch corresponding to the note
+     *
+     * @param   note    note to get pitch for
+     * @param   octave  octave to get pitch for
+     * @return  pitch frequency
+     */
+    freq_hz_t noteToPitch(note_t note, octave_t octave);
+
+    /**
      * Find octave corresponding to the given pitch
      *
      * @param   pitch frequency in Hz
      * @return  octave number corresponding to the given pitch
      */
     note_t pitchToOctave(freq_hz_t freq);
-};
 
+    /**
+     * Calculate pitch frequency at n semitones interval from given pitch
+     *
+     * @param   pitch   base frequency to calculate from
+     * @param   n       number of semitones from pitch
+     * @return corresponding calculated pitch frequency
+     */
+    freq_hz_t getPitchByInterval(freq_hz_t pitch, double n);
+};

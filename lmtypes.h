@@ -12,7 +12,6 @@
 typedef double amplitude_t;
 typedef double freq_hz_t;
 typedef std::complex<amplitude_t> complex_t;
-typedef uint8_t octave_t;
 
 typedef enum {
     note_C,
@@ -20,7 +19,6 @@ typedef enum {
     note_D,
     note_D_sharp,
     note_E,
-    note_E_sharp,
     note_F,
     note_F_sharp,
     note_G,
@@ -28,6 +26,20 @@ typedef enum {
     note_A,
     note_A_sharp,
     note_B,
-    note_B_sharp,
-    note_Unknown
+    note_Unknown,
+    note_Min = note_C,
+    note_Max = note_B
 } note_t;
+
+typedef enum : int32_t {
+    OCTAVE_1,
+    OCTAVE_2,
+    OCTAVE_3,
+    OCTAVE_4,
+    OCTAVE_5,
+    OCTAVE_6,
+    OCTAVE_7,
+    OCTAVE_8,
+    OCTAVE_MIN = OCTAVE_1,
+    OCTAVE_MAX = OCTAVE_8
+} octave_t;
