@@ -111,5 +111,5 @@ public:
      * @param   n       number of semitones from pitch
      * @return corresponding calculated pitch frequency
      */
-    freq_hz_t getPitchByInterval(freq_hz_t pitch, double n);
+    freq_hz_t getPitchByInterval(freq_hz_t pitch, uint16_t n);
 };

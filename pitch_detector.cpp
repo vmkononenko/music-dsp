@@ -18,6 +18,7 @@
 
 PitchDetector::PitchDetector()
 {
+    // TODO: apply properly -12 to math in pitchToNote() to make this map shorter
     __mNotesFromA4[-11] = note_A_sharp;
     __mNotesFromA4[-10] = note_B;
     __mNotesFromA4[-9] = note_C;
@@ -41,7 +42,6 @@ PitchDetector::PitchDetector()
     __mNotesFromA4[9] = note_F_sharp;
     __mNotesFromA4[10] = note_G;
     __mNotesFromA4[11] = note_G_sharp;
-
 
     __mSemitonesFromA4[note_C]       = -9;
     __mSemitonesFromA4[note_C_sharp] = -8;
@@ -80,20 +80,19 @@ void PitchDetector::__initPitches()
     //TODO: add assert if __mPitchIdxA4 == 0
 }
 
-freq_hz_t PitchDetector::getPitchByInterval(freq_hz_t pitch, double n)
+freq_hz_t PitchDetector::getPitchByInterval(freq_hz_t pitch, uint16_t n)
 {
     int16_t pitchIdx = __getPitchIdx(pitch);
+    int16_t retIdx;
 
     if (pitchIdx < 0) {
         return FREQ_INVALID;
     }
 
-    freq_hz_t p;
-    int16_t semitonesFromA4 = n - __mPitchIdxA4;
-    p = pow(2, (semitonesFromA4 / SEMITONES_PER_OCTAVE)) * FREQ_A4;
-    p = Helpers::stdRound<freq_hz_t>(p, FREQ_PRECISION);
+    retIdx = pitchIdx + n;
 
-    return p;
+    return ((retIdx >= 0) && (retIdx < SEMITONES_TOTAL) ?
+            __mPitches[pitchIdx + n]  : FREQ_INVALID);
 }
 
 int16_t PitchDetector::__getPitchIdx(freq_hz_t freq)
