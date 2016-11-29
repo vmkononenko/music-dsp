@@ -18,7 +18,7 @@ using namespace std;
 ChordDetector::ChordDetector()
 {
     __mFft = new FFT();
-    __mPitchDetector = new PitchDetector();
+    __mPitchCalculator = new PitchCalculator();
 }
 
 void ChordDetector::__attLowFreq(amplitude_t *freqDomain, uint32_t len,
@@ -66,19 +66,19 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     __mFft->forward(x);
 
     // TODO: check for +/-1 error
-    firstPointsCnt = __cutoffHighIdx(FREQ_C6, sampleRate, fftSize);
+    firstPointsCnt = __cutoffHighIdx(FREQ_C8, sampleRate, fftSize);
     freqDomain = new amplitude_t[firstPointsCnt];
     // TODO: check for returned length
     __mFft->toPolar(x, freqDomain, firstPointsCnt);
     __attLowFreq(freqDomain, firstPointsCnt, FREQ_A0, fftSize, sampleRate);
 
-    pitchFreq = __mPitchDetector->getPitch(freqDomain, firstPointsCnt, fftSize,
+    pitchFreq = __mPitchCalculator->getPitch(freqDomain, firstPointsCnt, fftSize,
                                            sampleRate);
     if (pitchFreq == FREQ_INVALID) {
         goto err;
     }
 
-    chord.mainNote = __mPitchDetector->pitchToNote(pitchFreq);
+    chord.mainNote = __mPitchCalculator->pitchToNote(pitchFreq);
 
     return chord;
 
@@ -99,10 +99,10 @@ vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMajor)
     freq_hz_t pitch;
 
     scale.push_back(mainNote);
-    pitch = __mPitchDetector->noteToPitch(mainNote, OCTAVE_4);
+    pitch = __mPitchCalculator->noteToPitch(mainNote, OCTAVE_4);
     for (uint8_t i = 0; i < 7; /* size of formula */ i++) {
-        pitch = __mPitchDetector->getPitchByInterval(pitch, formula[i]);
-        scale.push_back(__mPitchDetector->pitchToNote(pitch));
+        pitch = __mPitchCalculator->getPitchByInterval(pitch, formula[i]);
+        scale.push_back(__mPitchCalculator->pitchToNote(pitch));
     }
 
     return scale;

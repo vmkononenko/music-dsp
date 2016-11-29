@@ -1,22 +1,23 @@
 /*
- * pitch_detector.h
+ * pitch_calculator.cpp
  *
- * Implementation of the pitch detection mechanism
+ * Implementation of various pitch calculation functions
  */
+
+#include "pitch_calculator.h"
 
 #include <stdexcept>
 #include <iostream>
 
 #include "lmtypes.h"
 #include "lmhelpers.h"
-#include "pitch_detector.h"
 
 #define FREQ_PRECISION          4
 #define OCTAVES_CNT             9   /* from 0 to 8 */
 #define SEMITONES_PER_OCTAVE    ((int32_t)12)
 
 
-PitchDetector::PitchDetector()
+PitchCalculator::PitchCalculator()
 {
     // TODO: apply properly -12 to math in pitchToNote() to make this map shorter
     __mNotesFromA4[-11] = note_A_sharp;
@@ -59,12 +60,12 @@ PitchDetector::PitchDetector()
     __initPitches();
 }
 
-PitchDetector::~PitchDetector()
+PitchCalculator::~PitchCalculator()
 {
     delete __mPitches;
 }
 
-void PitchDetector::__initPitches()
+void PitchCalculator::__initPitches()
 {
     __mPitches = new freq_hz_t[SEMITONES_TOTAL];
 
@@ -80,7 +81,7 @@ void PitchDetector::__initPitches()
     //TODO: add assert if __mPitchIdxA4 == 0
 }
 
-freq_hz_t PitchDetector::getPitchByInterval(freq_hz_t pitch, uint16_t n)
+freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, uint16_t n)
 {
     int16_t pitchIdx = __getPitchIdx(pitch);
     int16_t retIdx;
@@ -95,7 +96,7 @@ freq_hz_t PitchDetector::getPitchByInterval(freq_hz_t pitch, uint16_t n)
             __mPitches[pitchIdx + n]  : FREQ_INVALID);
 }
 
-int16_t PitchDetector::__getPitchIdx(freq_hz_t freq)
+int16_t PitchCalculator::__getPitchIdx(freq_hz_t freq)
 {
     uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
     int16_t idx = -1;
@@ -118,13 +119,13 @@ int16_t PitchDetector::__getPitchIdx(freq_hz_t freq)
     return idx;
 }
 
-bool PitchDetector::__isPitch(freq_hz_t freq)
+bool PitchCalculator::__isPitch(freq_hz_t freq)
 {
     return (__getPitchIdx(freq) >= 0);
 }
 
 /* TODO: reuse delta mechanism used in getPitch */
-freq_hz_t PitchDetector::__getTonic(amplitude_t *freqDomain, uint32_t len,
+freq_hz_t PitchCalculator::__getTonic(amplitude_t *freqDomain, uint32_t len,
                                     uint32_t fftSize, uint32_t sampleRate)
 {
     if (freqDomain == NULL || sampleRate == 0) {
@@ -148,7 +149,7 @@ freq_hz_t PitchDetector::__getTonic(amplitude_t *freqDomain, uint32_t len,
     return (maxIndex * sampleRate / fftSize);
 }
 
-freq_hz_t PitchDetector::getPitch(amplitude_t *freqDomain, uint32_t len,
+freq_hz_t PitchCalculator::getPitch(amplitude_t *freqDomain, uint32_t len,
                                   uint32_t fftSize, uint32_t sampleRate)
 {
     freq_hz_t freqTonic;                // frequency with the highest amplitude
@@ -186,7 +187,7 @@ freq_hz_t PitchDetector::getPitch(amplitude_t *freqDomain, uint32_t len,
     return freqPitch;
 }
 
-note_t PitchDetector::pitchToNote(freq_hz_t freq)
+note_t PitchCalculator::pitchToNote(freq_hz_t freq)
 {
     if (!__isPitch(freq)) {
         throw std::invalid_argument("Invalid frequency - pitch is expected");
@@ -199,7 +200,7 @@ note_t PitchDetector::pitchToNote(freq_hz_t freq)
             __mNotesFromA4[semitonesFromA4] : note_Unknown);
 }
 
-freq_hz_t PitchDetector::noteToPitch(note_t note, octave_t octave)
+freq_hz_t PitchCalculator::noteToPitch(note_t note, octave_t octave)
 {
     if ((note < note_Min) || (note > note_Max)) {
         throw std::invalid_argument("Invalid note");

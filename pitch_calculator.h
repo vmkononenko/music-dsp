@@ -1,5 +1,5 @@
 /*
- * pitch_detector.h
+ * pitch_calculator.h
  */
 
 #pragma once
@@ -15,13 +15,13 @@
 #define SEMITONES_TOTAL         (SEMITONES_A4_TO_C8 - SEMITONES_A0_TO_A4)
 #define FREQ_A4                 ((freq_hz_t) 440)
 
-#ifndef PITCH_DETECTOR_TEST_FRIENDS
-#define PITCH_DETECTOR_TEST_FRIENDS
+#ifndef PITCH_CALCULATOR_TEST_FRIENDS
+#define PITCH_CALCULATOR_TEST_FRIENDS
 #endif
 
-class PitchDetector {
+class PitchCalculator {
 
-PITCH_DETECTOR_TEST_FRIENDS;
+PITCH_CALCULATOR_TEST_FRIENDS;
 
 private:
     freq_hz_t                   *__mPitches;
@@ -60,12 +60,12 @@ public:
     /**
      * Constructor
      */
-    PitchDetector();
+    PitchCalculator();
 
     /**
      * Destructor
      */
-    ~PitchDetector();
+    ~PitchCalculator();
 
     /**
      * Detect pitch from the corresponding frequency domain points

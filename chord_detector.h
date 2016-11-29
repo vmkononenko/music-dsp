@@ -11,7 +11,7 @@
 
 #include "fft.h"
 #include "lmtypes.h"
-#include "pitch_detector.h"
+#include "pitch_calculator.h"
 
 #ifndef TEST_FRIENDS
 #define TEST_FRIENDS
@@ -33,7 +33,7 @@ TEST_FRIENDS;
 
 private:
     FFT *__mFft;
-    PitchDetector *__mPitchDetector;
+    PitchCalculator *__mPitchCalculator;
 
     /**
      *  Attenuate frequencies lower than freq to 0
