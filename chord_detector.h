@@ -11,6 +11,7 @@
 
 #include "fft.h"
 #include "lmtypes.h"
+#include "music_scale.h"
 #include "pitch_calculator.h"
 
 #ifndef TEST_FRIENDS
@@ -34,6 +35,7 @@ TEST_FRIENDS;
 private:
     FFT *__mFft;
     PitchCalculator *__mPitchCalculator;
+    MusicScale *__mScales;
 
     /**
      *  Attenuate frequencies lower than freq to 0
@@ -60,6 +62,11 @@ private:
      * @param fftSize      taken FFT length
      */
     uint32_t __cutoffHighIdx(freq_hz_t freq, uint32_t sampleRate, uint32_t fftSize);
+
+    /**
+     * Initialize __mScales
+     */
+    void __initScales();
 
 public:
     ChordDetector();
