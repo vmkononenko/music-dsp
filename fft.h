@@ -57,3 +57,27 @@ public:
      */
     void inverse(std::vector<complex_t> &);
 };
+
+class FftPoint {
+
+private:
+    FftPoint();
+
+public:
+    const uint32_t      sampleNumber;   // index in FFT frequency domain array
+    const amplitude_t   magnitude;      // magnitude value in polar notation
+
+    /**
+     * Constructor
+     *
+     * @param   sn          sample number, corresponding index in FFT frequency
+     *                      domain array
+     *          magnitude   magnitude value in polar notation
+     */
+    FftPoint(uint32_t sn, amplitude_t m) : sampleNumber(sn), magnitude(m) {}
+
+    bool operator<(const FftPoint& point)
+    {
+        return (this->magnitude < point.magnitude);
+    }
+};
