@@ -6,17 +6,27 @@
 
 #pragma once
 
+#include <vector>
+
 #include "lmtypes.h"
 
-#define NOTES_IN_SCALE  ((uint8_t)7)
 
+typedef std::pair<note_t, uint8_t> note_pair_t;
 
 class MusicScale {
 
 private:
-    note_t  *__mNotesUnsorted;  // array of notes in the original order
-    note_t  *__mNotesSorted;    // array of sorted notes to perform quick search
-    bool    __mIsMinor;         // indicates if the scale is major or minor
+    std::vector<note_pair_t>  __mNotes;
+    note_t __mTonic;    // main note of the scale
+    bool __mIsMinor;    // indicates if the scale is major or minor
+
+    /**
+     * Comparison function for std::sort
+     *
+     * @param   p1, p2  pair of <note, sequence number in scale>
+     * @return true if note numeric value of p1 is < than note in p2
+     */
+    static bool __sortByNote(note_pair_t p1, note_pair_t p2);
 
 public:
 
@@ -27,10 +37,23 @@ public:
      * @param   len     length of the notes array
      * @param   isMinor indicates if the scale is major or minor
      */
-    MusicScale(note_t *notes, bool isMinor);
+    MusicScale(std::vector<note_t> &notes, bool isMinor);
+
+    /**
+     * Destructor
+     */
+    ~MusicScale();
 
     /**
      * Get main note of the scale (first degree)
      */
     note_t getTonic();
+
+    /**
+     * Check if note is present in scale
+     *
+     * @param   note    note to be checked
+     * @return  true if note is present
+     */
+    bool hasNote(note_t note);
 };

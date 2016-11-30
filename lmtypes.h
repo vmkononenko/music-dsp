@@ -28,7 +28,8 @@ typedef enum {
     note_B,
     note_Unknown,
     note_Min = note_C,
-    note_Max = note_B
+    note_Max = note_B,
+    notes_Total = note_Max - note_Min + 1
 } note_t;
 
 typedef enum : int32_t {

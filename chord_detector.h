@@ -35,7 +35,7 @@ TEST_FRIENDS;
 private:
     FFT *__mFft;
     PitchCalculator *__mPitchCalculator;
-    MusicScale *__mScales;
+    std::vector<MusicScale *> __mScales;
 
     /**
      *  Attenuate frequencies lower than freq to 0
@@ -69,7 +69,15 @@ private:
     void __initScales();
 
 public:
+    /**
+     * Constructor
+     */
     ChordDetector();
+
+    /**
+     * Destructor
+     */
+    ~ChordDetector();
 
     /**
      * Detect chord corresponding to the given time domain
@@ -85,7 +93,7 @@ public:
      * Build major or minor scale from the main note
      *
      * @param   mainNote    main note to build the scale from
-     * @param   isMajor     specifies major or minor scale
+     * @param   isMinor     specifies major or minor scale
      * @return  requested scale
      */
     std::vector<note_t> getScale(note_t, bool);

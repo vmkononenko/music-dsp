@@ -4,8 +4,6 @@
  *  Chord recognition implementation
  */
 
-#include <iostream> // TODO remove when __cutoffFreq is implemented
-
 #include "chord_detector.h"
 #include "lmhelpers.h"
 
@@ -19,6 +17,31 @@ ChordDetector::ChordDetector()
 {
     __mFft = new FFT();
     __mPitchCalculator = new PitchCalculator();
+    __initScales();
+}
+
+ChordDetector::~ChordDetector()
+{
+    delete __mFft;
+    delete __mPitchCalculator;
+
+    for (uint8_t i = 0; i < __mScales.size(); i++) {
+        delete __mScales[i];
+    }
+}
+
+void ChordDetector::__initScales()
+{
+    for (int n = note_Min; n <= note_Max; n++) {
+        note_t note = (note_t)n;
+        vector<note_t> scale;
+
+        scale = getScale(note, false);
+        __mScales.push_back(new MusicScale(scale, false));
+
+        scale = getScale(note, false);
+        __mScales.push_back(new MusicScale(scale, true));
+    }
 }
 
 void ChordDetector::__attLowFreq(amplitude_t *freqDomain, uint32_t len,
@@ -87,13 +110,13 @@ err:
     return chord;
 }
 
-vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMajor)
+vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMinor)
 {
     /* whole, whole, half, whole, whole, whole, half */
     uint8_t formulaMajor[] = {2, 2, 1, 2, 2, 2, 1};
     /* whole, half, whole, whole, half, whole, whole */
     uint8_t formulaMinor[] = {2, 1, 2, 2, 1, 2, 2};
-    uint8_t *formula = isMajor ? formulaMajor : formulaMinor;
+    uint8_t *formula = isMinor ? formulaMinor : formulaMajor;
 
     vector<note_t> scale;
     freq_hz_t pitch;
