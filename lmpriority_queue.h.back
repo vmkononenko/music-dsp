@@ -8,13 +8,13 @@
 
 #include <queue>
 
-#include "fft_point.h"
 #include "lmtypes.h"
 
+template <typename Item>
 class PriorityQueue {
 
 private:
-    std::priority_queue<FftPoint> *__mQueue;
+    std::priority_queue<Item> *__mQueue;
 
 public:
     /**
@@ -39,21 +39,21 @@ public:
      *
      * @param   item    an item to be inserted
      */
-    void insert(FftPoint item);
+    void insert(Item item);
 
     /**
      * Retrieve the largest item from the queue
      *
      * @return  item with the highest value
      */
-    FftPoint getMax();
+    Item getMax();
 
     /**
      * Retrieve and remove the largest item from the queue
      *
      * @return item with the highest value
      */
-    FftPoint delMax();
+    Item delMax();
 
     /**
      * Is the priority queue empty

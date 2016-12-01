@@ -10,49 +10,41 @@
 
 using namespace std;
 
-template <class Item>
-PriorityQueue<Item>::PriorityQueue()
+PriorityQueue::PriorityQueue()
 {
-    __mQueue = new priority_queue<Item>();
+    __mQueue = new priority_queue<FftPoint>();
 }
 
-template <class Item>
-PriorityQueue<Item>::~PriorityQueue()
+PriorityQueue::~PriorityQueue()
 {
     delete __mQueue;
 }
 
-template <class Item>
-void PriorityQueue<Item>::insert(Item item)
+void PriorityQueue::insert(FftPoint item)
 {
     __mQueue->push(item);
 }
 
-template <class Item>
-Item PriorityQueue<Item>::getMax()
+FftPoint PriorityQueue::getMax()
 {
     return __mQueue->top();
 }
 
-template <class Item>
-Item PriorityQueue<Item>::delMax()
+FftPoint PriorityQueue::delMax()
 {
-    Item max = __mQueue->top();
+    FftPoint max = __mQueue->top();
 
     __mQueue->pop();
 
     return max;
 }
 
-template <class Item>
-bool PriorityQueue<Item>::isEmpty()
+bool PriorityQueue::isEmpty()
 {
     return __mQueue->empty();
 }
 
-template <class Item>
-uint32_t PriorityQueue<Item>::size()
+uint32_t PriorityQueue::size()
 {
     return __mQueue->size();
 }
-

@@ -31,7 +31,7 @@ vector<complex_t> Helpers::timeDomain2ComplexVector(amplitude_t *timeDomain, uin
 //       on stack every time
 string Helpers::noteToString(note_t note)
 {
-    if ((note < note_Min) || (note > note_Max)) {
+    if (((note < note_Min) && (note > note_Max)) && (note != note_Unknown)) {
         throw std::invalid_argument("Invalid note");
     }
 

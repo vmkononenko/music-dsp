@@ -77,8 +77,7 @@ public:
      * @param   sampleRate  sample rate of the analyzed signal
      * @return  detected pitch frequency
      */
-    freq_hz_t getPitch(amplitude_t *freqDomain, uint32_t len, uint32_t fftSize,
-                       uint32_t sampleRate);
+    freq_hz_t getPitch(freq_hz_t freq);
 
     /**
      * Find note corresponding to the given pitch

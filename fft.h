@@ -7,11 +7,14 @@
 #pragma once
 
 #include <vector>
+
+#include "lmpriority_queue.h"
 #include "lmtypes.h"
 
 #ifndef FFT_TEST_FRIENDS
 #define FFT_TEST_FRIENDS
 #endif
+
 
 class FFT {
 
@@ -35,6 +38,9 @@ public:
      */
     void toPolar(std::vector<complex_t> &);
 
+    uint32_t toPolar(std::vector<complex_t> &input,
+                     amplitude_t *freqDomainMagnitudes, uint32_t reqLen);
+
     /**
      * Converts frequency domain from rectangular to polar notation
      *
@@ -48,7 +54,8 @@ public:
      * @param reqLen   convert only first reqLen points
      * @return number of points converted
      */
-    uint32_t toPolar(std::vector<complex_t> &, amplitude_t *, uint32_t);
+    uint32_t toPolar(std::vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,
+                     PriorityQueue *pq, uint32_t reqLen);
 
     /**
      * Inverse DFT calculation
@@ -56,28 +63,4 @@ public:
      * @param input frequency domain in rectangular notation
      */
     void inverse(std::vector<complex_t> &);
-};
-
-class FftPoint {
-
-private:
-    FftPoint();
-
-public:
-    const uint32_t      sampleNumber;   // index in FFT frequency domain array
-    const amplitude_t   magnitude;      // magnitude value in polar notation
-
-    /**
-     * Constructor
-     *
-     * @param   sn          sample number, corresponding index in FFT frequency
-     *                      domain array
-     *          magnitude   magnitude value in polar notation
-     */
-    FftPoint(uint32_t sn, amplitude_t m) : sampleNumber(sn), magnitude(m) {}
-
-    bool operator<(const FftPoint& point)
-    {
-        return (this->magnitude < point.magnitude);
-    }
 };

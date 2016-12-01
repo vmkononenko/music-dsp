@@ -51,4 +51,11 @@ public:
      * @return  true if note is present
      */
     bool hasNote(note_t note);
+
+    /**
+     * Check if scale is minor
+     *
+     * @return true if this scale is minor
+     */
+    bool isMinor();
 };

@@ -77,10 +77,9 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     }
 
     vector<complex_t> x;
-    freq_hz_t pitchFreq;
     uint32_t fftSize;
-    uint32_t firstPointsCnt;
-    amplitude_t *freqDomain;
+    uint32_t firstPointsCnt, lowFreqThreshold;
+    PriorityQueue *pq = new PriorityQueue();
 
     /* TODO: define minimum FFT size for frequency calculation precision */
     fftSize = Helpers::nextPowerOf2(samples);
@@ -89,24 +88,46 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     __mFft->forward(x);
 
     // TODO: check for +/-1 error
-    firstPointsCnt = __cutoffHighIdx(FREQ_C8, sampleRate, fftSize);
-    freqDomain = new amplitude_t[firstPointsCnt];
+    firstPointsCnt = __cutoffHighIdx(FREQ_C6, sampleRate, fftSize);
     // TODO: check for returned length
-    __mFft->toPolar(x, freqDomain, firstPointsCnt);
-    __attLowFreq(freqDomain, firstPointsCnt, FREQ_A0, fftSize, sampleRate);
+    __mFft->toPolar(x, NULL, pq, firstPointsCnt);
 
-    pitchFreq = __mPitchCalculator->getPitch(freqDomain, firstPointsCnt, fftSize,
-                                           sampleRate);
-    if (pitchFreq == FREQ_INVALID) {
-        goto err;
+    /* calculate lowFreqThreshold */
+    double tmpThreshold = FREQ_A0 * fftSize / sampleRate;
+    lowFreqThreshold = floor(tmpThreshold);
+
+    /* main algorithm */
+    vector<uint8_t> scalesIndexes;
+    FftPoint curMax(0, 0);
+    freq_hz_t freq, pitch;
+    note_t pitchNote;
+    for (uint8_t i = 0; i < __mScales.size(); i++) {
+        scalesIndexes.push_back(i);
+    }
+    while (scalesIndexes.size() > 1) {
+        curMax = pq->delMax();
+        if (curMax.sampleNumber < lowFreqThreshold) { continue; }
+        freq = curMax.sampleNumber * sampleRate / fftSize;
+        pitch = __mPitchCalculator->getPitch(freq);
+        pitchNote = __mPitchCalculator->pitchToNote(pitch);
+        for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); ) {
+            if (!__mScales[*it]->hasNote(pitchNote)) {
+                it = scalesIndexes.erase(it);
+            } else {
+                it++;
+            }
+        }
     }
 
-    chord.mainNote = __mPitchCalculator->pitchToNote(pitchFreq);
+    if (scalesIndexes.size() == 1) {
+        chord.mainNote = __mScales[scalesIndexes[0]]->getTonic();
+        chord.isMinor = __mScales[scalesIndexes[0]]->isMinor();
+    } else /* size() == 0 */ {
+        chord.mainNote = note_Unknown;
+        return chord;
+    }
 
-    return chord;
-
-err:
-    chord.mainNote = note_Unknown;
+    delete pq;
     return chord;
 }
 

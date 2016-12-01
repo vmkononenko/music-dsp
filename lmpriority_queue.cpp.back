@@ -1,0 +1,58 @@
+/**
+ * lmpriority_queue.cpp
+ *
+ * Max priority queue implementation. Current is implementation is just a
+ * wrapper around std::priority_queue. Wrapper is used for API unification
+ * across the library with further possibility of optimization
+ */
+
+#include "lmpriority_queue.h"
+
+using namespace std;
+
+template <typename Item>
+PriorityQueue<Item>::PriorityQueue()
+{
+    __mQueue = new priority_queue<Item>();
+}
+
+template <typename Item>
+PriorityQueue<Item>::~PriorityQueue()
+{
+    delete __mQueue;
+}
+
+template <typename Item>
+void PriorityQueue<Item>::insert(Item item)
+{
+    __mQueue->push(item);
+}
+
+template <typename Item>
+Item PriorityQueue<Item>::getMax()
+{
+    return __mQueue->top();
+}
+
+template <typename Item>
+Item PriorityQueue<Item>::delMax()
+{
+    Item max = __mQueue->top();
+
+    __mQueue->pop();
+
+    return max;
+}
+
+template <typename Item>
+bool PriorityQueue<Item>::isEmpty()
+{
+    return __mQueue->empty();
+}
+
+template <typename Item>
+uint32_t PriorityQueue<Item>::size()
+{
+    return __mQueue->size();
+}
+

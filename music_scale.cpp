@@ -21,6 +21,11 @@ MusicScale::MusicScale(vector<note_t> &notes, bool isMinor) : __mIsMinor(isMinor
     sort(__mNotes.begin(), __mNotes.end(), __sortByNote);
 }
 
+MusicScale::~MusicScale()
+{
+    __mNotes.clear();
+}
+
 bool MusicScale::__sortByNote(note_pair_t p1, note_pair_t p2)
 {
     return (p1.first < p2.first);
@@ -50,4 +55,9 @@ bool MusicScale::hasNote(note_t note)
     }
 
     return false;
+}
+
+bool MusicScale::isMinor()
+{
+    return __mIsMinor;
 }

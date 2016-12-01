@@ -149,27 +149,23 @@ freq_hz_t PitchCalculator::__getTonic(amplitude_t *freqDomain, uint32_t len,
     return (maxIndex * sampleRate / fftSize);
 }
 
-freq_hz_t PitchCalculator::getPitch(amplitude_t *freqDomain, uint32_t len,
-                                  uint32_t fftSize, uint32_t sampleRate)
+freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
 {
-    freq_hz_t freqTonic;                // frequency with the highest amplitude
     freq_hz_t freqPitch = FREQ_INVALID; // closest pitch matching freqTonic
     freq_hz_t deltaRight, deltaLeft, deltaMid;
     uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
 
-    freqTonic = __getTonic(freqDomain, len, fftSize, sampleRate);
-
-    if (__isPitch(freqTonic)) {
-        freqPitch = freqTonic;
+    if (__isPitch(freq)) {
+        freqPitch = freq;
         goto ret;
     }
 
     while (start <= end) {
         mid = start + (end - start) / 2;
-        deltaMid = abs(__mPitches[mid] - freqTonic);
+        deltaMid = abs(__mPitches[mid] - freq);
         /* fix index out of range potential bug */
-        deltaLeft = abs(__mPitches[mid - 1] - freqTonic);
-        deltaRight = abs(__mPitches[mid + 1] - freqTonic);
+        deltaLeft = abs(__mPitches[mid - 1] - freq);
+        deltaRight = abs(__mPitches[mid + 1] - freq);
 
         // TODO: check the case - when all values in __mPitches are 0 this
         // loop becomes infinite
@@ -177,7 +173,7 @@ freq_hz_t PitchCalculator::getPitch(amplitude_t *freqDomain, uint32_t len,
             end = mid - 1;
         } else if (deltaRight < deltaMid) {
             start = mid + 1;
-        } else if ((deltaMid < deltaLeft) && (deltaMid < deltaRight)) {
+        } else if ((deltaMid <= deltaLeft) && (deltaMid <= deltaRight)) {
             freqPitch = __mPitches[mid];
             break;
         }

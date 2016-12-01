@@ -131,8 +131,8 @@ void FFT::forward(vector<complex_t> &input)
     __forward(input);
 }
 
-uint32_t FFT::toPolar(std::vector<complex_t> &input,
-                      amplitude_t *freqDomainMagnitudes, uint32_t reqLen)
+uint32_t FFT::toPolar(vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,
+                      PriorityQueue *pq, uint32_t reqLen)
 {
     if (&input == NULL) {
         throw invalid_argument("input is NULL");
@@ -149,10 +149,11 @@ uint32_t FFT::toPolar(std::vector<complex_t> &input,
         double mag = sqrt(im * im + re * re);
         double theta;
 
-        if (freqDomainMagnitudes != NULL) {
+        if (pq != NULL) {
+            pq->insert(FftPoint(i, mag));
+        } else if (freqDomainMagnitudes != NULL) {
             freqDomainMagnitudes[i] = mag;
-        }
-        else {
+        } else {
             if (re == 0) {
                 // if the real part is zero, change it to negligibly
                 // small number to avoid division by 0
@@ -167,9 +168,15 @@ uint32_t FFT::toPolar(std::vector<complex_t> &input,
     return len;
 }
 
-void FFT::toPolar(std::vector<complex_t> &input)
+uint32_t FFT::toPolar(vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,
+                      uint32_t reqLen)
 {
-    toPolar(input, NULL, input.size());
+    return toPolar(input, freqDomainMagnitudes, NULL, reqLen);
+}
+
+void FFT::toPolar(vector<complex_t> &input)
+{
+    toPolar(input, NULL, NULL, input.size());
 }
 
 void FFT::inverse(vector<complex_t> &input)
