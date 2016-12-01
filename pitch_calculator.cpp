@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 #include "lmtypes.h"
 #include "lmhelpers.h"
@@ -240,7 +241,7 @@ double PitchCalculator::octavesDistance(freq_hz_t f1, freq_hz_t f2)
         throw std::invalid_argument("Invalid frequency");
     }
 
-    return log2(f1/f2);
+    return log2(f1 / f2);
 }
 
 int32_t PitchCalculator::semitonesDistance(freq_hz_t f1, freq_hz_t f2)
