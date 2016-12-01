@@ -14,8 +14,8 @@
 #include "music_scale.h"
 #include "pitch_calculator.h"
 
-#ifndef TEST_FRIENDS
-#define TEST_FRIENDS
+#ifndef CHORD_DETECTOR_TEST_FRIENDS
+#define CHORD_DETECTOR_TEST_FRIENDS
 #endif
 
 
@@ -30,7 +30,7 @@ typedef struct Chord {
 
 class ChordDetector {
 
-TEST_FRIENDS;
+CHORD_DETECTOR_TEST_FRIENDS;
 
 private:
     FFT *__mFft;

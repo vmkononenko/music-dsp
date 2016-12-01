@@ -193,8 +193,7 @@ note_t PitchCalculator::pitchToNote(freq_hz_t freq)
         throw std::invalid_argument("Invalid frequency - pitch is expected");
     }
 
-    int32_t semitonesFromA4 = (int32_t)Helpers::stdRound(SEMITONES_PER_OCTAVE *
-            log2(freq / FREQ_A4), 0) % SEMITONES_PER_OCTAVE;
+    int32_t semitonesFromA4 = semitonesDistance(freq, FREQ_A4) % SEMITONES_PER_OCTAVE;
 
     return (__mNotesFromA4.find(semitonesFromA4) != __mNotesFromA4.end() ?
             __mNotesFromA4[semitonesFromA4] : note_Unknown);
@@ -209,9 +208,30 @@ freq_hz_t PitchCalculator::noteToPitch(note_t note, octave_t octave)
         throw std::invalid_argument("Invalid octave");
     }
 
-    int16_t semitonesFromA4 = ((octave - OCTAVE_4) * SEMITONES_PER_OCTAVE) + __mSemitonesFromA4[note];
+    int16_t semitonesFromA4 = (__mSemitonesFromA4[note] +
+                               (octave - OCTAVE_4) * SEMITONES_PER_OCTAVE);
+    int16_t idx = __mPitchIdxA4 + semitonesFromA4;
+    freq_hz_t ret;
 
-    // TODO: add check for idx < 0 or > than array size
+    if ((idx < 0) || (idx >= SEMITONES_TOTAL)) {
+        ret = FREQ_INVALID;
+    } else {
+        ret = __mPitches[idx];
+    }
 
-    return __mPitches[__mPitchIdxA4 + semitonesFromA4];
+    return ret;
+}
+
+double PitchCalculator::octavesDistance(freq_hz_t f1, freq_hz_t f2)
+{
+    if (!IS_FREQ_VALID(f1) || !IS_FREQ_VALID(f2)) {
+        throw std::invalid_argument("Invalid frequency");
+    }
+
+    return log2(f1 / f2);
+}
+
+int32_t PitchCalculator::semitonesDistance(freq_hz_t f1, freq_hz_t f2)
+{
+    return (int32_t)Helpers::stdRound(SEMITONES_PER_OCTAVE * octavesDistance(f1, f2), 0);
 }

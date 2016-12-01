@@ -10,6 +10,7 @@
 #include "lmtypes.h"
 
 #define FREQ_INVALID            ((freq_hz_t) -1)
+#define IS_FREQ_VALID(f)        ((f) > 0)
 #define SEMITONES_A0_TO_A4      -48 // TODO: define proper values and notes
 #define SEMITONES_A4_TO_C8      200 // TODO: define proper values and notes
 #define SEMITONES_TOTAL         (SEMITONES_A4_TO_C8 - SEMITONES_A0_TO_A4)
@@ -112,4 +113,20 @@ public:
      * @return corresponding calculated pitch frequency
      */
     freq_hz_t getPitchByInterval(freq_hz_t pitch, uint16_t n);
+
+    /**
+     * Interval between two frequencies measured in octaves
+     *
+     * @param   f1, f2  frequencies between which measurement is taken
+     * @return   distance in octaves
+     */
+    static double octavesDistance(freq_hz_t f1, freq_hz_t f2);
+
+    /**
+     * Interval between two frequencies measured in semitones
+     *
+     * @param   f1, f2  frequencies between which measurement is taken
+     * @return   distance in semitones
+     */
+    static int32_t semitonesDistance(freq_hz_t f1, freq_hz_t f2);
 };

@@ -6,13 +6,13 @@
 
 #include "lmtypes.h"
 
-#ifndef TEST_FRIENDS
-#define TEST_FRIENDS
+#ifndef WINDOW_FUNCIONS_TEST_FRIENDS
+#define WINDOW_FUNCIONS_TEST_FRIENDS
 #endif
 
 class WindowFunctions {
 
-TEST_FRIENDS;
+WINDOW_FUNCIONS_TEST_FRIENDS;
 
 public:
     static void applyHamming(amplitude_t *, uint32_t);

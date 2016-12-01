@@ -11,13 +11,13 @@
 
 #include "lmtypes.h"
 
-#ifndef TEST_FRIENDS
-#define TEST_FRIENDS
+#ifndef HELPERS_TEST_FRIENDS
+#define HELPERS_TEST_FRIENDS
 #endif
 
 class Helpers {
 
-TEST_FRIENDS;
+HELPERS_TEST_FRIENDS;
 
 public:
     static uint32_t nextPowerOf2(uint32_t);

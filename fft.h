@@ -9,13 +9,13 @@
 #include <vector>
 #include "lmtypes.h"
 
-#ifndef TEST_FRIENDS
-#define TEST_FRIENDS
+#ifndef FFT_TEST_FRIENDS
+#define FFT_TEST_FRIENDS
 #endif
 
 class FFT {
 
-TEST_FRIENDS;
+FFT_TEST_FRIENDS;
 
 private:
     uint32_t __bitReverse(uint32_t, uint8_t);
