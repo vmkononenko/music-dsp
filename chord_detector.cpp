@@ -107,8 +107,9 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     while (scalesIndexes.size() > 1) {
         curMax = pq->delMax();
         if (curMax.sampleNumber < lowFreqThreshold) { continue; }
-        freq = curMax.sampleNumber * sampleRate / fftSize;
+        freq = curMax.sampleNumber * (double)sampleRate / fftSize;
         pitch = __mPitchCalculator->getPitch(freq);
+        if (pitch == FREQ_INVALID) { continue; }
         pitchNote = __mPitchCalculator->pitchToNote(pitch);
         for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); ) {
             if (!__mScales[*it]->hasNote(pitchNote)) {

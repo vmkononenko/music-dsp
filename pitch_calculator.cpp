@@ -15,6 +15,7 @@
 #define FREQ_PRECISION          4
 #define OCTAVES_CNT             9   /* from 0 to 8 */
 #define SEMITONES_PER_OCTAVE    ((int32_t)12)
+#define IS_PITCH_IDX_VALID(idx) (((idx) >= 0) && ((idx) < SEMITONES_TOTAL))
 
 
 PitchCalculator::PitchCalculator()
@@ -92,8 +93,7 @@ freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, uint16_t n)
 
     retIdx = pitchIdx + n;
 
-    return ((retIdx >= 0) && (retIdx < SEMITONES_TOTAL) ?
-            __mPitches[pitchIdx + n]  : FREQ_INVALID);
+    return (IS_PITCH_IDX_VALID(retIdx) ? __mPitches[retIdx]  : FREQ_INVALID);
 }
 
 int16_t PitchCalculator::__getPitchIdx(freq_hz_t freq)
@@ -151,9 +151,9 @@ freq_hz_t PitchCalculator::__getTonic(amplitude_t *freqDomain, uint32_t len,
 
 freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
 {
-    freq_hz_t freqPitch = FREQ_INVALID; // closest pitch matching freqTonic
-    freq_hz_t deltaRight, deltaLeft, deltaMid;
-    uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
+    freq_hz_t freqPitch = FREQ_INVALID; // closest pitch matching freq
+    double deltaRight, deltaLeft, deltaMid;
+    int16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
 
     if (__isPitch(freq)) {
         freqPitch = freq;
@@ -162,19 +162,29 @@ freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
 
     while (start <= end) {
         mid = start + (end - start) / 2;
-        deltaMid = abs(__mPitches[mid] - freq);
-        /* fix index out of range potential bug */
-        deltaLeft = abs(__mPitches[mid - 1] - freq);
-        deltaRight = abs(__mPitches[mid + 1] - freq);
+
+        if (!IS_PITCH_IDX_VALID(mid) || !IS_PITCH_IDX_VALID(start) ||
+            !IS_PITCH_IDX_VALID(end))
+        {
+            goto ret;
+        }
+
+        deltaMid = abs(octavesDistance(__mPitches[mid], freq));
+        deltaLeft = abs(octavesDistance(__mPitches[mid - 1], freq));
+        deltaRight = abs(octavesDistance(__mPitches[mid + 1], freq));
 
         // TODO: check the case - when all values in __mPitches are 0 this
         // loop becomes infinite
         if (deltaLeft < deltaMid) {
             end = mid - 1;
+            freqPitch = __mPitches[end];
         } else if (deltaRight < deltaMid) {
             start = mid + 1;
-        } else if ((deltaMid <= deltaLeft) && (deltaMid <= deltaRight)) {
-            freqPitch = __mPitches[mid];
+            freqPitch = __mPitches[start];
+        } else if ((deltaLeft == deltaMid) || (deltaRight == deltaMid)) {
+            freqPitch = FREQ_INVALID;
+            break;
+        } else if ((deltaMid < deltaLeft) && (deltaMid < deltaRight)) {
             break;
         }
     }
@@ -209,7 +219,7 @@ freq_hz_t PitchCalculator::noteToPitch(note_t note, octave_t octave)
     int16_t idx = __mPitchIdxA4 + semitonesFromA4;
     freq_hz_t ret;
 
-    if ((idx < 0) || (idx >= SEMITONES_TOTAL)) {
+    if (!IS_PITCH_IDX_VALID(idx)) {
         ret = FREQ_INVALID;
     } else {
         ret = __mPitches[idx];
@@ -224,7 +234,8 @@ double PitchCalculator::octavesDistance(freq_hz_t f1, freq_hz_t f2)
         throw std::invalid_argument("Invalid frequency");
     }
 
-    return log2(f1 / f2);
+    double ret = log2(f1/f2);
+    return ret;
 }
 
 int32_t PitchCalculator::semitonesDistance(freq_hz_t f1, freq_hz_t f2)
