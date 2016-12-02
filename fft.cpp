@@ -181,14 +181,14 @@ void FFT::inverse(vector<complex_t> &input)
     unsigned int N = input.size();
 
     /* change the sign of the imaginary part */
-    for (unsigned int k = 1; k < N; k++) {
+    for (uint32_t k = 0; k < N; k++) {
         input[k] = complex_t (real(input[k]), -imag(input[k]));
     }
 
     forward(input);
 
     // divide the time domain by N and change the sign of imaginary part
-    for (unsigned int i = 1; i < N; i++) {
-        input[i] = complex_t (real(input[i]) / N, -imag(input[i]) / N);
+    for (uint32_t i = 0; i < N; i++) {
+       input[i] = complex_t (real(input[i]) / N, -imag(input[i]) / N);
     }
 }
