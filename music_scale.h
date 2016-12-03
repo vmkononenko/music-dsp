@@ -40,6 +40,11 @@ public:
     MusicScale(std::vector<note_t> &notes, bool isMinor);
 
     /**
+     * Destructor
+     */
+    ~MusicScale();
+
+    /**
      * Get main note of the scale (first degree)
      */
     note_t getTonic();

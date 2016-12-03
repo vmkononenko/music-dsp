@@ -6,10 +6,8 @@
 
 #include "pitch_calculator.h"
 
-#include <iostream>
 #include <cmath>
 #include <stdexcept>
-#include <iostream>
 
 #include "lmtypes.h"
 #include "lmhelpers.h"
