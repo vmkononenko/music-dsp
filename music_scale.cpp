@@ -38,7 +38,7 @@ note_t MusicScale::getTonic()
 
 bool MusicScale::hasNote(note_t note)
 {
-    uint8_t start = 0, end = __mNotes.size() - 1, mid;
+    int8_t start = 0, end = __mNotes.size() - 1, mid;
     note_t tmpNote;
 
     while (start <= end) {

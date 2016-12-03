@@ -21,7 +21,7 @@ HELPERS_TEST_FRIENDS;
 
 public:
     static uint32_t nextPowerOf2(uint32_t);
-    static std::vector<complex_t> timeDomain2ComplexVector(amplitude_t *, uint32_t);
+    static std::vector<complex_t> timeDomain2ComplexVector(amplitude_t *, uint32_t, uint32_t);
 
     /**
      * Round number with requested precision

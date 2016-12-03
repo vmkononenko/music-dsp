@@ -39,7 +39,7 @@ void ChordDetector::__initScales()
         scale = getScale(note, false);
         __mScales.push_back(new MusicScale(scale, false));
 
-        scale = getScale(note, false);
+        scale = getScale(note, true);
         __mScales.push_back(new MusicScale(scale, true));
     }
 }
@@ -83,12 +83,12 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
 
     /* TODO: define minimum FFT size for frequency calculation precision */
     fftSize = Helpers::nextPowerOf2(samples);
-    x = Helpers::timeDomain2ComplexVector(timeDomain, fftSize);
+    x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
 
     __mFft->forward(x);
 
     // TODO: check for +/-1 error
-    firstPointsCnt = __cutoffHighIdx(FREQ_C6, sampleRate, fftSize);
+    firstPointsCnt = __cutoffHighIdx(22000, sampleRate, fftSize);
     // TODO: check for returned length
     __mFft->toPolar(x, NULL, pq, firstPointsCnt);
 
@@ -101,18 +101,28 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     FftPoint curMax(0, 0);
     freq_hz_t freq, pitch;
     note_t pitchNote;
+    bool remainingScalesHaveNote = false;
     for (uint8_t i = 0; i < __mScales.size(); i++) {
         scalesIndexes.push_back(i);
     }
-    while (scalesIndexes.size() > 1) {
+    while (scalesIndexes.size() >= 1 && !pq->isEmpty()) {
         curMax = pq->delMax();
         if (curMax.sampleNumber < lowFreqThreshold) { continue; }
         freq = curMax.sampleNumber * (double)sampleRate / fftSize;
         pitch = __mPitchCalculator->getPitch(freq);
         if (pitch == FREQ_INVALID) { continue; }
         pitchNote = __mPitchCalculator->pitchToNote(pitch);
+
+        remainingScalesHaveNote = false;
+        for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); it++) {
+            if (__mScales[*it]->hasNote(pitchNote)) {
+                remainingScalesHaveNote = true;
+                break;
+            }
+        }
+
         for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); ) {
-            if (!__mScales[*it]->hasNote(pitchNote)) {
+            if (!__mScales[*it]->hasNote(pitchNote) && remainingScalesHaveNote) {
                 it = scalesIndexes.erase(it);
             } else {
                 it++;
@@ -120,7 +130,7 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
         }
     }
 
-    if (scalesIndexes.size() == 1) {
+    if (scalesIndexes.size() >= 1) {
         chord.mainNote = __mScales[scalesIndexes[0]]->getTonic();
         chord.isMinor = __mScales[scalesIndexes[0]]->isMinor();
     } else /* size() == 0 */ {

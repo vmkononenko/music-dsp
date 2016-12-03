@@ -24,7 +24,7 @@ typedef struct Chord {
     octave_t    octave;
     bool        isMinor;
 
-    Chord() : mainNote(note_Unknown) {}
+    Chord() : mainNote(note_Unknown), isMinor(false) {}
 } chord_t;
 
 

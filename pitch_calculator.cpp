@@ -6,8 +6,9 @@
 
 #include "pitch_calculator.h"
 
-#include <stdexcept>
 #include <iostream>
+#include <cmath>
+#include <stdexcept>
 
 #include "lmtypes.h"
 #include "lmhelpers.h"
@@ -98,7 +99,7 @@ freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, uint16_t n)
 
 int16_t PitchCalculator::__getPitchIdx(freq_hz_t freq)
 {
-    uint16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
+    int16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
     int16_t idx = -1;
 
     freq = Helpers::stdRound(freq, FREQ_PRECISION);
@@ -169,9 +170,9 @@ freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
             goto ret;
         }
 
-        deltaMid = abs(octavesDistance(__mPitches[mid], freq));
-        deltaLeft = abs(octavesDistance(__mPitches[mid - 1], freq));
-        deltaRight = abs(octavesDistance(__mPitches[mid + 1], freq));
+        deltaMid = fabs(octavesDistance(__mPitches[mid], freq));
+        deltaLeft = fabs(octavesDistance(__mPitches[mid - 1], freq));
+        deltaRight = fabs(octavesDistance(__mPitches[mid + 1], freq));
 
         // TODO: check the case - when all values in __mPitches are 0 this
         // loop becomes infinite
@@ -185,6 +186,11 @@ freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
             freqPitch = FREQ_INVALID;
             break;
         } else if ((deltaMid < deltaLeft) && (deltaMid < deltaRight)) {
+            if (deltaMid < 0.01) {
+                freqPitch = __mPitches[mid];
+            } else {
+                freqPitch = FREQ_INVALID;
+            }
             break;
         }
     }
@@ -234,8 +240,7 @@ double PitchCalculator::octavesDistance(freq_hz_t f1, freq_hz_t f2)
         throw std::invalid_argument("Invalid frequency");
     }
 
-    double ret = log2(f1/f2);
-    return ret;
+    return log2(f1/f2);
 }
 
 int32_t PitchCalculator::semitonesDistance(freq_hz_t f1, freq_hz_t f2)
