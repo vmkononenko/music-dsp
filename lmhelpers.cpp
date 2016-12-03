@@ -60,3 +60,14 @@ string Helpers::noteToString(note_t note)
 
     return string(n2sMap[note]);
 }
+
+uint32_t Helpers::freqToFftIdx(freq_hz_t freq, uint32_t fftSize,
+                               uint32_t sampleRate, double (*roundFunc)(double))
+{
+    return (*roundFunc)(freq * fftSize / sampleRate);
+}
+
+freq_hz_t Helpers::fftIdxToFreq(uint32_t idx, uint32_t fftSize, uint32_t sampleRate)
+{
+    return (idx * (double)sampleRate / fftSize);
+}

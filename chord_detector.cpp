@@ -44,104 +44,6 @@ void ChordDetector::__initScales()
     }
 }
 
-void ChordDetector::__attLowFreq(amplitude_t *freqDomain, uint32_t len,
-        freq_hz_t freq, uint32_t fftSize, uint32_t sampleRate)
-{
-    double cutFromIdx = freq * fftSize / sampleRate;
-
-    cutFromIdx = floor(cutFromIdx);
-
-    if ((cutFromIdx < 0) || (cutFromIdx >= len)) {
-        return;
-    }
-
-    for (uint32_t i = 0; i <= cutFromIdx; i++) {
-        freqDomain[i] = 0;
-    }
-}
-
-uint32_t ChordDetector::__cutoffHighIdx(freq_hz_t freq, uint32_t sampleRate,
-                                        uint32_t fftSize)
-{
-    return ceil(freq * fftSize / sampleRate);
-}
-
-chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
-                                uint32_t sampleRate)
-{
-    chord_t chord;
-
-    if ((timeDomain == NULL) || (samples == 0)) {
-        chord.mainNote = note_Unknown;
-        return chord;
-    }
-
-    vector<complex_t> x;
-    uint32_t fftSize;
-    uint32_t firstPointsCnt, lowFreqThreshold;
-    PriorityQueue *pq = new PriorityQueue();
-
-    /* TODO: define minimum FFT size for frequency calculation precision */
-    fftSize = Helpers::nextPowerOf2(samples);
-    x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
-
-    __mFft->forward(x);
-
-    // TODO: check for +/-1 error
-    firstPointsCnt = __cutoffHighIdx(22000, sampleRate, fftSize);
-    // TODO: check for returned length
-    __mFft->toPolar(x, NULL, pq, firstPointsCnt);
-
-    /* calculate lowFreqThreshold */
-    double tmpThreshold = FREQ_A0 * fftSize / sampleRate;
-    lowFreqThreshold = floor(tmpThreshold);
-
-    /* main algorithm */
-    vector<uint8_t> scalesIndexes;
-    FftPoint curMax(0, 0);
-    freq_hz_t freq, pitch;
-    note_t pitchNote;
-    bool remainingScalesHaveNote = false;
-    for (uint8_t i = 0; i < __mScales.size(); i++) {
-        scalesIndexes.push_back(i);
-    }
-    while (scalesIndexes.size() >= 1 && !pq->isEmpty()) {
-        curMax = pq->delMax();
-        if (curMax.sampleNumber < lowFreqThreshold) { continue; }
-        freq = curMax.sampleNumber * (double)sampleRate / fftSize;
-        pitch = __mPitchCalculator->getPitch(freq);
-        if (pitch == FREQ_INVALID) { continue; }
-        pitchNote = __mPitchCalculator->pitchToNote(pitch);
-
-        remainingScalesHaveNote = false;
-        for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); it++) {
-            if (__mScales[*it]->hasNote(pitchNote)) {
-                remainingScalesHaveNote = true;
-                break;
-            }
-        }
-
-        for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); ) {
-            if (!__mScales[*it]->hasNote(pitchNote) && remainingScalesHaveNote) {
-                it = scalesIndexes.erase(it);
-            } else {
-                it++;
-            }
-        }
-    }
-
-    if (scalesIndexes.size() >= 1) {
-        chord.mainNote = __mScales[scalesIndexes[0]]->getTonic();
-        chord.isMinor = __mScales[scalesIndexes[0]]->isMinor();
-    } else /* size() == 0 */ {
-        chord.mainNote = note_Unknown;
-        return chord;
-    }
-
-    delete pq;
-    return chord;
-}
-
 vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMinor)
 {
     /* whole, whole, half, whole, whole, whole, half */
@@ -162,3 +64,119 @@ vector<note_t> ChordDetector::getScale(note_t mainNote, bool isMinor)
 
     return scale;
 }
+
+void ChordDetector::__attLowFreq(amplitude_t *freqDomain, uint32_t len,
+        freq_hz_t freq, uint32_t fftSize, uint32_t sampleRate)
+{
+    double cutFromIdx = Helpers::freqToFftIdx(freq, fftSize, sampleRate, floor);
+
+    if ((cutFromIdx < 0) || (cutFromIdx >= len)) {
+        return;
+    }
+
+    for (uint32_t i = 0; i <= cutFromIdx; i++) {
+        freqDomain[i] = 0;
+    }
+}
+
+bool ChordDetector::__isNotePresentInScales(vector<uint8_t> &scalesIndexes, note_t note)
+{
+    for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); it++) {
+        if (__mScales[*it]->hasNote(note)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+chord_t ChordDetector::__getChordFromFftResults(PriorityQueue *fftPQ,
+        uint32_t fftSize, uint32_t sampleRate, uint32_t lowFreqThresholdIdx)
+{
+    if (fftPQ == nullptr) {
+        throw std::invalid_argument("fftPQ is NULL");
+    }
+
+    chord_t chord;
+    freq_hz_t freq;         // freq of the FFT point being analyzed
+    freq_hz_t pitch;        // pitch corresponding to freq
+    note_t pitchNote;       // note corresponding to pitch
+    FftPoint curMax(0, 0);  // point with the highest amplitude in fftPQ
+    vector<uint8_t> scalesIndexes;  // indexes in __mScales which are still
+                                    // considered as candidates for the result
+
+    for (uint8_t i = 0; i < __mScales.size(); i++) {
+        scalesIndexes.push_back(i);
+    }
+    while (scalesIndexes.size() >= 1 && !fftPQ->isEmpty()) {
+        curMax = fftPQ->delMax();
+
+        /* skip points above lowFreqThresholdIdx */
+        if (curMax.sampleNumber < lowFreqThresholdIdx) { continue; }
+
+        freq = Helpers::fftIdxToFreq(curMax.sampleNumber, fftSize, sampleRate);
+        pitch = __mPitchCalculator->getPitch(freq);
+
+        /* skip frequencies we cannot rely on */
+        if (pitch == FREQ_INVALID) { continue; }
+        pitchNote = __mPitchCalculator->pitchToNote(pitch);
+
+        /* if note is not contained in any of the remaining scales let's not
+         * give up. Just skip it and pick the next one */
+        if(!__isNotePresentInScales(scalesIndexes, pitchNote)) { continue; }
+
+        for (auto it = scalesIndexes.begin(); it != scalesIndexes.end(); ) {
+            if (!__mScales[*it]->hasNote(pitchNote)) {
+                it = scalesIndexes.erase(it);
+            } else {
+                it++;
+            }
+        }
+    }
+
+    if (scalesIndexes.size() >= 1) {
+        chord.mainNote = __mScales[scalesIndexes[0]]->getTonic();
+        chord.isMinor = __mScales[scalesIndexes[0]]->isMinor();
+    } else /* size() == 0 */ {
+        chord.mainNote = note_Unknown;
+        return chord;
+    }
+
+    return chord;
+}
+
+chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
+                                uint32_t sampleRate)
+{
+    chord_t chord;
+
+    if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0) {
+        chord.mainNote = note_Unknown;
+        return chord;
+    }
+
+    vector<complex_t> x;
+    PriorityQueue *pq = new PriorityQueue();
+    uint32_t highFreqThresholdIdx;  // do not analyze points above this index
+    uint32_t lowFreqThresholdIdx;   // do not analyze points below this index
+    uint32_t fftSize;
+
+    /* TODO: define minimum FFT size for frequency calculation precision */
+    fftSize = Helpers::nextPowerOf2(samples);
+    x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
+
+    __mFft->forward(x);
+
+    // TODO: check for +/-1 error
+    highFreqThresholdIdx = Helpers::freqToFftIdx(sampleRate/2, fftSize, sampleRate, ceil);
+    lowFreqThresholdIdx = Helpers::freqToFftIdx(FREQ_A0, fftSize, sampleRate, floor);
+
+    // TODO: check for returned length
+    __mFft->toPolar(x, NULL, pq, highFreqThresholdIdx);
+
+    chord = __getChordFromFftResults(pq, fftSize, sampleRate, lowFreqThresholdIdx);
+
+    delete pq;
+    return chord;
+}
+
