@@ -71,3 +71,8 @@ freq_hz_t Helpers::fftIdxToFreq(uint32_t idx, uint32_t fftSize, uint32_t sampleR
 {
     return (idx * (double)sampleRate / fftSize);
 }
+
+bool Helpers::isPowerOf2(uint32_t n)
+{
+    return ((n & (n - 1)) != 0);
+}

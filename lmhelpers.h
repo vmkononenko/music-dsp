@@ -28,6 +28,14 @@ public:
      */
     static uint32_t nextPowerOf2(uint32_t n);
 
+    /**
+     * Check if number is a power of 2
+     *
+     * @param   n   number to check
+     * @return true if power of 2, false otherwise
+     */
+    static bool isPowerOf2(uint32_t n);
+
     static std::vector<complex_t> timeDomain2ComplexVector(amplitude_t *, uint32_t, uint32_t);
 
     /**
