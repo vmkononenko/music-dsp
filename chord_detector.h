@@ -6,10 +6,12 @@
 
 #pragma once
 
+#include <iostream>
 #include <stdint.h>
 #include <vector>
 
 #include "fft.h"
+#include "lmhelpers.h"
 #include "lmtypes.h"
 #include "music_scale.h"
 #include "pitch_calculator.h"
@@ -21,10 +23,27 @@
 
 typedef struct Chord {
     note_t      mainNote;
-    octave_t    octave;
     bool        isMinor;
+    octave_t    octave;
 
     Chord() : mainNote(note_Unknown), isMinor(false) {}
+
+    friend bool operator==(const Chord& c1, const Chord& c2)
+    {
+        return ((c1.mainNote == c2.mainNote) &&
+                (c1.isMinor == c2.isMinor));
+    }
+
+    friend bool operator!=(const Chord& c1, const Chord& c2)
+    {
+        return !(c1 == c2);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Chord& c)
+    {
+        os << Helpers::noteToString(c.mainNote) << (c.isMinor ? "m" : "");
+        return os;
+    }
 } chord_t;
 
 
