@@ -11,6 +11,8 @@
 
 #include "lmtypes.h"
 
+#define UNUSED(expr) do { (void)(expr); } while (0)
+
 #ifndef HELPERS_TEST_FRIENDS
 #define HELPERS_TEST_FRIENDS
 #endif

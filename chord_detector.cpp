@@ -5,9 +5,11 @@
  */
 
 #include "chord_detector.h"
+#include "config.h"
 #include "lmhelpers.h"
 
 #define FREQ_A0     ((freq_hz_t)27.5)
+#define FREQ_E2     ((freq_hz_t)82.4)
 #define FREQ_C6     ((freq_hz_t)1046.5)
 #define FREQ_C8     ((freq_hz_t)4186)
 
@@ -150,9 +152,10 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
 {
     chord_t chord;
 
-    if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0) {
-        chord.mainNote = note_Unknown;
-        return chord;
+    if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0 ||
+        (samples > CFG_FFT_SIZE))
+    {
+        throw invalid_argument("getChord() invalid argument");
     }
 
     vector<complex_t> x;
@@ -162,7 +165,8 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     uint32_t fftSize;
 
     /* TODO: define minimum FFT size for frequency calculation precision */
-    fftSize = Helpers::nextPowerOf2(samples);
+    //fftSize = Helpers::nextPowerOf2(samples);
+    fftSize = CFG_FFT_SIZE;
     x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
 
     __mFft->forward(x);

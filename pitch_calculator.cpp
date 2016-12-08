@@ -4,6 +4,7 @@
  * Implementation of various pitch calculation functions
  */
 
+#include "config.h"
 #include "pitch_calculator.h"
 
 #include <cmath>
@@ -185,7 +186,7 @@ freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
             freqPitch = FREQ_INVALID;
             break;
         } else if ((deltaMid < deltaLeft) && (deltaMid < deltaRight)) {
-            if (deltaMid < 0.01) {
+            if (deltaMid <= CFG_PITCH_PRECISION_THRESHOLD) {
                 freqPitch = __mPitches[mid];
             } else {
                 freqPitch = FREQ_INVALID;
