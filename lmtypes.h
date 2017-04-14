@@ -44,3 +44,29 @@ typedef enum : int32_t {
     OCTAVE_MIN = OCTAVE_1,
     OCTAVE_MAX = OCTAVE_8
 } octave_t;
+
+
+typedef struct Chord {
+    note_t      mainNote;
+    bool        isMinor;
+    octave_t    octave;
+
+    Chord() : mainNote(note_Unknown), isMinor(false) {}
+
+    friend bool operator==(const Chord& c1, const Chord& c2)
+    {
+        return ((c1.mainNote == c2.mainNote) &&
+                (c1.isMinor == c2.isMinor));
+    }
+
+    friend bool operator!=(const Chord& c1, const Chord& c2)
+    {
+        return !(c1 == c2);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Chord& c)
+    {
+        //os << Helpers::noteToString(c.mainNote) << (c.isMinor ? "m" : "");
+        return os;
+    }
+} chord_t;
