@@ -51,7 +51,8 @@ public:
      *
      * @param input frequency domain in rectangular notation
      * @param freqDomainMagnitudes
-     * @param reqLen   convert only first reqLen points
+     * @param pq        if non-NULL write results in a form of priority queue
+     * @param reqLen    convert only first reqLen points
      * @return number of points converted
      */
     uint32_t toPolar(std::vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,

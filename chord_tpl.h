@@ -14,20 +14,6 @@
 
 
 typedef enum {
-    cq_Major,
-    cq_Minor,
-    cq_Major_7,
-    cq_Minor_7,
-    cq_Dominant_7,
-    cq_Major_6,
-    cq_Minor_6,
-    cq_Diminished,
-    cq_Augmented,
-    cq_Min = cq_Major,
-    cq_Max = cq_Augmented
-} chord_quality_t;
-
-typedef enum {
     nps_present,
     nps_present_flat,
     nps_present_sharp,
@@ -46,21 +32,25 @@ typedef class ChordTpl {
 private:
     static std::map<chord_quality_t, std::vector<note_presense_state_t>> __mChordQltyTpls;
 
-    note_t              __mNote;
-    chord_quality_t     __mQuality;
-    std::vector<int>    *__mTpl = new std::vector<int>;
+    note_t                  __mRootNote;
+    chord_quality_t         __mQuality;
+    std::vector<uint8_t>    __mTpl;
+
+    void __initTpl(note_t note, chord_quality_t cq);
+
+    tpl_score_t __euclideanDistance(pcp_t *pcp);
 
 public:
     /**
-     *
-     * @param note
-     * @param cq
+     * Constructor
      */
     ChordTpl(note_t note, chord_quality_t cq);
 
     /**
      *
      */
-    tpl_score_t getPCPScore(pcp_t &pcp);
+    tpl_score_t getPCPScore(pcp_t *pcp);
+
+    chord_quality_t getQuality();
 
 } chord_tpl_t;

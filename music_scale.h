@@ -9,58 +9,16 @@
 #include <vector>
 
 #include "lmtypes.h"
+#include "pitch_calculator.h"
 
-
-typedef std::pair<note_t, uint8_t> note_pair_t;
 
 class MusicScale {
 
-private:
-    std::vector<note_pair_t>  __mNotes;
-    note_t __mTonic;    // main note of the scale
-    bool __mIsMinor;    // indicates if the scale is major or minor
-
-    /**
-     * Comparison function for std::sort
-     *
-     * @param   p1, p2  pair of <note, sequence number in scale>
-     * @return true if note numeric value of p1 is < than note in p2
-     */
-    static bool __sortByNote(note_pair_t p1, note_pair_t p2);
-
 public:
-
     /**
-     * Constructor
-     *
-     * @param   notes   array of notes scale is built from
-     * @param   len     length of the notes array
-     * @param   isMinor indicates if the scale is major or minor
+     * Build major scale from the given root note
+     * @param rootNote the note to build from
+     * @return built scale
      */
-    MusicScale(std::vector<note_t> &notes, bool isMinor);
-
-    /**
-     * Destructor
-     */
-    ~MusicScale();
-
-    /**
-     * Get main note of the scale (first degree)
-     */
-    note_t getTonic();
-
-    /**
-     * Check if note is present in scale
-     *
-     * @param   note    note to be checked
-     * @return  true if note is present
-     */
-    bool hasNote(note_t note);
-
-    /**
-     * Check if scale is minor
-     *
-     * @return true if this scale is minor
-     */
-    bool isMinor();
+    static std::vector<note_t> getMajorScale(note_t rootNote);
 };

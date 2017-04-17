@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <vector>
 
+#include "chord_tpl_collection.h"
 #include "fft.h"
 #include "lmhelpers.h"
 #include "lmtypes.h"
@@ -27,8 +28,8 @@ CHORD_DETECTOR_TEST_FRIENDS;
 
 private:
     FFT *__mFft;
-    PitchCalculator *__mPitchCalculator;
-    std::vector<MusicScale *> __mScales;
+    PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
+    ChordTplCollection *__mChordTplColl = new ChordTplCollection();
 
     /**
      *  Attenuate frequencies lower than freq to 0
@@ -45,29 +46,16 @@ private:
     void __attLowFreq(amplitude_t *, uint32_t, freq_hz_t, uint32_t, uint32_t);
 
     /**
-     * Initialize __mScales
-     */
-    void __initScales();
-
-    /**
      * Implementation of the main chord detection algorithm
      *
-     * @param   fftPQ       FFT results in a form of a priority queue
-     * @param   fftSize     size of the FFT
-     * @param   sampleRate  sample rate
-     * @param   lowFreqThresholdIdx do not analyze points below this index
+     * @param   freqDomainMagnitudes    polar magnites from FFT results
+     * @param   fftSize                 size of the FFT
+     * @param   sampleRate              sample rate
+     * @param   pointsCnt               freqDomainMagnitudes length
      * @return detected chord
      */
-    chord_t __getChordFromFftResults(PriorityQueue *fftPQ, uint32_t fftSize,
-                            uint32_t sampleRate, uint32_t lowFreqThresholdIdx);
-
-    /**
-     * Check if scales defined by scalesIndexes contain note
-     *
-     * @param note  note to be checked
-     * @return true if note is present in at least one scale
-     */
-    bool __isNotePresentInScales(std::vector<uint8_t> &scalesIndexes, note_t note);
+    chord_t __getChordFromFftResults(amplitude_t *freqDomainMagnitudes,
+            uint32_t fftSize, uint32_t sampleRate, uint32_t pointsCnt);
 
 public:
     /**

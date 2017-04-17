@@ -30,6 +30,16 @@ private:
     std::map<int8_t, note_t>    __mNotesFromA4;
     std::map<note_t, int8_t>    __mSemitonesFromA4;
 
+    /**
+     * Constructor
+     */
+    PitchCalculator();
+
+    /* We want to make sure they are unacceptable otherwise we may accidentally
+     * get copies of singleton appearing */
+    PitchCalculator(PitchCalculator const&);    // Don't Implement
+    void operator=(PitchCalculator const&);     // Don't implement
+
     void __initPitches();
 
     /**
@@ -58,10 +68,12 @@ private:
     int16_t __getPitchIdx(freq_hz_t freq);
 
 public:
-    /**
-     * Constructor
-     */
-    PitchCalculator();
+    static PitchCalculator& getInstance()
+    {
+        static PitchCalculator instance;
+
+        return instance;
+    }
 
     /**
      * Destructor

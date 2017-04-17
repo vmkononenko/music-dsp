@@ -52,7 +52,7 @@ PitchCalculator::PitchCalculator()
 
 PitchCalculator::~PitchCalculator()
 {
-    delete __mPitches;
+    delete[] __mPitches;
 }
 
 void PitchCalculator::__initPitches()

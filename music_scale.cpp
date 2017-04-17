@@ -10,54 +10,22 @@
 
 using namespace std;
 
-MusicScale::MusicScale(vector<note_t> &notes, bool isMinor) : __mIsMinor(isMinor)
-{
-    __mTonic = notes[0];
 
-    for (uint8_t i = 0; i < notes.size(); i++) {
-        __mNotes.push_back(make_pair(notes[i], i));
+vector<note_t> MusicScale::getMajorScale(note_t rootNote)
+{
+    /* whole, whole, half, whole, whole, whole, half */
+    uint8_t formula[] = {2, 2, 1, 2, 2, 2, 1};
+
+    vector<note_t> scale;
+    PitchCalculator& pc = PitchCalculator::getInstance();
+    freq_hz_t pitch;
+
+    scale.push_back(rootNote);
+    pitch = pc.noteToPitch(rootNote, OCTAVE_4);
+    for (uint8_t i = 0; i < 7; /* size of formula */ i++) {
+        pitch = pc.getPitchByInterval(pitch, formula[i]);
+        scale.push_back(pc.pitchToNote(pitch));
     }
 
-    sort(__mNotes.begin(), __mNotes.end(), __sortByNote);
-}
-
-MusicScale::~MusicScale()
-{
-    __mNotes.clear();
-}
-
-bool MusicScale::__sortByNote(note_pair_t p1, note_pair_t p2)
-{
-    return (p1.first < p2.first);
-}
-
-note_t MusicScale::getTonic()
-{
-    return __mTonic;
-}
-
-bool MusicScale::hasNote(note_t note)
-{
-    int8_t start = 0, end = __mNotes.size() - 1, mid;
-    note_t tmpNote;
-
-    while (start <= end) {
-        mid = start + (end - start) / 2;
-        tmpNote = __mNotes[mid].first;
-
-        if (tmpNote < note) {
-            start = mid + 1;
-        } else if (tmpNote > note) {
-            end = mid - 1;
-        } else {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool MusicScale::isMinor()
-{
-    return __mIsMinor;
+    return scale;
 }

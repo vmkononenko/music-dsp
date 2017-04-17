@@ -39,5 +39,5 @@ public:
      * @param pcp
      * @return
      */
-    chord_t getBestMatch(pcp_t &pcp);
+    chord_t getBestMatch(pcp_t *pcp);
 };
