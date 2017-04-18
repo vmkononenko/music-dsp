@@ -57,7 +57,7 @@ typedef enum {
     cq_Diminished,
     cq_Augmented,
     cq_Min = cq_Major,
-    cq_Max = cq_Minor
+    cq_Max = cq_Augmented
 } chord_quality_t;
 
 
