@@ -27,7 +27,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
         uint32_t fftIdx;
         amplitude_t pitchCls = 0;
         amplitude_t magCur = 0;
-        for (int o = OCTAVE_MIN; o <= OCTAVE_MIN; o++) {
+        for (int o = OCTAVE_MIN; o <= OCTAVE_MAX; o++) {
             octave_t oct = (octave_t)o;
 
             pitchFreq = pc.noteToPitch(note, oct);
