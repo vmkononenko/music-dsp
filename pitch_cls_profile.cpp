@@ -43,7 +43,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
             magMax = max(magCur, magMax);
         }
 
-        __mPCP[note] = pitchCls;
+        __mPCP[note - note_Min] = pitchCls;
     }
 
     __normalize(magMax);
@@ -62,5 +62,5 @@ amplitude_t PitchClsProfile::getPitchCls(note_t note)
         throw std::invalid_argument("Invalid note");
     }
 
-    return __mPCP[note];
+    return __mPCP[note - note_Min];
 }

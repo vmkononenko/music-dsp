@@ -28,7 +28,6 @@ typedef enum {
     note_A,
     note_A_sharp,
     note_B,
-    note_First = note_C,
     note_Min = note_C,
     note_Max = note_B,
     notes_Total = note_Max - note_Min + 1

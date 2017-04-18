@@ -71,7 +71,7 @@ void ChordTpl::__initTpl(note_t rootNote, chord_quality_t cq)
         }
 
         if (note != note_Unknown) {
-            __mTpl[note - note_First] = 1;
+            __mTpl[note - note_Min] = 1;
         }
     }
 }
@@ -83,7 +83,7 @@ tpl_score_t ChordTpl::__euclideanDistance(pcp_t *pcp)
     for (int n = note_Min; n <= note_Max; n++) {
         note_t note = (note_t)n;
 
-        tpl_score_t diff = ((amplitude_t)__mTpl[note] - pcp->getPitchCls(note));
+        tpl_score_t diff = ((amplitude_t)__mTpl[note - note_Min] - pcp->getPitchCls(note));
         sum += diff * diff;
     }
 
