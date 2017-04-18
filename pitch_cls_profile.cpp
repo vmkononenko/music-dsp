@@ -31,8 +31,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
             octave_t oct = (octave_t)o;
 
             pitchFreq = pc.noteToPitch(note, oct);
-            // TODO: replace ceil with the proper round function
-            fftIdx = Helpers::freqToFftIdx(pitchFreq, fftSize, sampleRate, floor);
+            fftIdx = Helpers::freqToFftIdx(pitchFreq, fftSize, sampleRate, round);
 
             if (fftIdx > pointsCnt) {
                 throw runtime_error("fftIdx > pointsCnt");
