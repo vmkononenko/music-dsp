@@ -62,6 +62,11 @@ void ChordTpl::__initTpl(note_t rootNote, chord_quality_t cq)
                 int8_t interval = (presenseState == nps_present_flat) ? -1 : 1;
                 pitch = pc.noteToPitch(scale[i], OCTAVE_4);
                 pitch = pc.getPitchByInterval(pitch, interval);
+
+                if (pitch == FREQ_INVALID) {
+                    throw runtime_error("got pitch value FREQ_INVALID");
+                }
+
                 note = pc.pitchToNote(pitch);
                 break;
             }
