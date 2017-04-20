@@ -45,7 +45,8 @@ typedef enum : int32_t {
     OCTAVE_8,
     OCTAVE_9,
     OCTAVE_MIN = OCTAVE_2,
-    OCTAVE_MAX = OCTAVE_8
+    OCTAVE_MAX = OCTAVE_8,
+    OCTAVES_CNT = OCTAVE_MAX - OCTAVE_MIN + 1
 } octave_t;
 
 typedef enum {

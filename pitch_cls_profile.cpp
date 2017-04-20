@@ -44,14 +44,13 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
 
         __mPCP[note - note_Min] = pitchCls;
     }
-
     __normalize(magMax);
 }
 
 void PitchClsProfile::__normalize(amplitude_t magMax)
 {
     for (uint8_t i = 0; i < __mPCP.size(); i++) {
-        __mPCP[i] = __mPCP[i] / magMax;
+        __mPCP[i] = __mPCP[i] / OCTAVES_CNT / magMax;
     }
 }
 

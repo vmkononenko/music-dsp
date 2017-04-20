@@ -6,7 +6,7 @@
 
 #pragma once
 
-#define CFG_WINDOW_SIZE     ((uint32_t)2048)
+#define CFG_WINDOW_SIZE     ((uint32_t)4096)
 #define CFG_FFT_SIZE        ((uint32_t)16384)
 
 #define CFG_WINDOW_FUNC_BLACKMAN        0
