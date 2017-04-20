@@ -34,6 +34,7 @@ typedef enum {
 } note_t;
 
 typedef enum : int32_t {
+    OCTAVE_0,
     OCTAVE_1,
     OCTAVE_2,
     OCTAVE_3,
@@ -42,7 +43,8 @@ typedef enum : int32_t {
     OCTAVE_6,
     OCTAVE_7,
     OCTAVE_8,
-    OCTAVE_MIN = OCTAVE_1,
+    OCTAVE_9,
+    OCTAVE_MIN = OCTAVE_2,
     OCTAVE_MAX = OCTAVE_8
 } octave_t;
 
