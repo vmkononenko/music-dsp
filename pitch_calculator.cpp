@@ -71,7 +71,7 @@ void PitchCalculator::__initPitches()
     //TODO: add assert if __mPitchIdxA4 == 0
 }
 
-freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, uint16_t n)
+freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, int16_t n)
 {
     int16_t pitchIdx = __getPitchIdx(pitch);
     int16_t retIdx;
