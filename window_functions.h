@@ -16,6 +16,7 @@ WINDOW_FUNCIONS_TEST_FRIENDS;
 
 public:
     static void applyHamming(amplitude_t *, uint32_t);
+    static void applyHann(amplitude_t *, uint32_t);
     static void applyBlackman(amplitude_t *, uint32_t);
     static void applyDefault(amplitude_t *, uint32_t);
 };

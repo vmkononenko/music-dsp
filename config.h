@@ -11,7 +11,8 @@
 
 #define CFG_WINDOW_FUNC_BLACKMAN        0
 #define CFG_WINDOW_FUNC_HAMMING         1
-#define CFG_WINDOW_FUNC_RECTANGULAR     2
+#define CFG_WINDOW_FUNC_HANN            2
+#define CFG_WINDOW_FUNC_RECTANGULAR     3
 #define CFG_WINDOW_FUNC CFG_WINDOW_FUNC_RECTANGULAR
 
 /* Determines pitch detection precision measured in octaves. If validated

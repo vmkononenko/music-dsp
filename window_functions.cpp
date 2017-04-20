@@ -24,6 +24,13 @@ void WindowFunctions::applyBlackman(amplitude_t *points, uint32_t pointsCnt)
     }
 }
 
+void WindowFunctions::applyHann(amplitude_t *points, uint32_t pointsCnt)
+{
+    for (uint32_t i = 0; i < pointsCnt; i++) {
+        points[i] = points[i] * (0.5 * (1 - cos(2 * M_PI * i / (pointsCnt - 1))));
+    }
+}
+
 void WindowFunctions::applyDefault(amplitude_t *points, uint32_t pointsCnt)
 {
 #if !defined(CFG_WINDOW_FUNC) || (CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_RECTANGULAR)
@@ -34,5 +41,7 @@ void WindowFunctions::applyDefault(amplitude_t *points, uint32_t pointsCnt)
     applyBlackman(points, pointsCnt);
 #elif CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_HAMMING
     applyHamming(points, pointsCnt);
+#elif CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_HANN
+    applyHann(points, pointsCnt);
 #endif
 }
