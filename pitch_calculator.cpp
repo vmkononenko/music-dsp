@@ -21,18 +21,6 @@
 
 PitchCalculator::PitchCalculator()
 {
-    // TODO: apply properly -12 to math in pitchToNote() to make this map shorter
-    __mNotesFromA4[-11] = note_A_sharp;
-    __mNotesFromA4[-10] = note_B;
-    __mNotesFromA4[-9] = note_C;
-    __mNotesFromA4[-8] = note_C_sharp;
-    __mNotesFromA4[-7] = note_D;
-    __mNotesFromA4[-6] = note_D_sharp;
-    __mNotesFromA4[-5] = note_E;
-    __mNotesFromA4[-4] = note_F;
-    __mNotesFromA4[-3] = note_F_sharp;
-    __mNotesFromA4[-2] = note_G;
-    __mNotesFromA4[-1] = note_G_sharp;
     __mNotesFromA4[0] = note_A;
     __mNotesFromA4[1] = note_A_sharp;
     __mNotesFromA4[2] = note_B;
@@ -205,7 +193,8 @@ note_t PitchCalculator::pitchToNote(freq_hz_t freq)
         throw std::invalid_argument("Invalid frequency - pitch is expected");
     }
 
-    int32_t semitonesFromA4 = semitonesDistance(freq, FREQ_A4) % SEMITONES_PER_OCTAVE;
+    int32_t semitonesFromA4 = (semitonesDistance(freq, FREQ_A4) % SEMITONES_PER_OCTAVE +
+            SEMITONES_PER_OCTAVE) % SEMITONES_PER_OCTAVE;
 
     return (__mNotesFromA4.find(semitonesFromA4) != __mNotesFromA4.end() ?
             __mNotesFromA4[semitonesFromA4] : note_Unknown);
