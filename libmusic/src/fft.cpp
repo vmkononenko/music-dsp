@@ -9,6 +9,7 @@
 #include <stdexcept>
 
 #include "fft.h"
+#include "lmhelpers.h"
 
 using namespace std;
 
