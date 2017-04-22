@@ -134,9 +134,6 @@ void FFT::forward(vector<complex_t> &input)
 uint32_t FFT::toPolar(vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,
                       PriorityQueue *pq, uint32_t reqLen)
 {
-    if (&input == NULL) {
-        throw invalid_argument("input is NULL");
-    }
     if (input.size() == 0) {
         throw invalid_argument("Empty input");
     }
