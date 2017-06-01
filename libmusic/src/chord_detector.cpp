@@ -61,7 +61,7 @@ chord_t ChordDetector::__getChordFromFftResults(amplitude_t *freqDomainMagnitude
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
-	LOGD("GT.ChordDetector", "getChord()");
+	LMLOGD("GT.ChordDetector", "getChord()");
 
     if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0 ||
         (samples > CFG_FFT_SIZE))

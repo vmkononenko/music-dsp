@@ -52,8 +52,8 @@ public:
 	static void log(log_level_t ll, const char *tag, const char *fmt, ...);
 };
 
-#define LOGE(tag, ...) Logger::log(LL_ERROR,	tag, __VA_ARGS__)
-#define LOGW(tag, ...) Logger::log(LL_WARNING,	tag, __VA_ARGS__)
-#define LOGI(tag, ...) Logger::log(LL_INFO, 	tag, __VA_ARGS__)
-#define LOGD(tag, ...) Logger::log(LL_DEBUG, 	tag, __VA_ARGS__)
-#define LOGV(tag, ...) Logger::log(LL_VERBOSE, 	tag, __VA_ARGS__)
+#define LMLOGE(tag, ...) Logger::log(LL_ERROR,	tag, __VA_ARGS__)
+#define LMLOGW(tag, ...) Logger::log(LL_WARNING,	tag, __VA_ARGS__)
+#define LMLOGI(tag, ...) Logger::log(LL_INFO, 	tag, __VA_ARGS__)
+#define LMLOGD(tag, ...) Logger::log(LL_DEBUG, 	tag, __VA_ARGS__)
+#define LMLOGV(tag, ...) Logger::log(LL_VERBOSE, 	tag, __VA_ARGS__)
