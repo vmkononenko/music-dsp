@@ -19,7 +19,6 @@ void (*Logger::__printFunc)(const char *, const char *) = nullptr;
  */
 void Logger::setLogFunc(void (*printFunc)(const char *, const char *))
 {
-	if (__printFunc != nullptr)
 	__printFunc = printFunc;
 }
 
