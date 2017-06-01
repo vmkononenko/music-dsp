@@ -7,6 +7,7 @@
 #include "chord_detector.h"
 #include "config.h"
 #include "lmhelpers.h"
+#include "lmlogger.h"
 #include "pitch_cls_profile.h"
 
 #define FREQ_A0     ((freq_hz_t)27.5)
@@ -60,6 +61,8 @@ chord_t ChordDetector::__getChordFromFftResults(amplitude_t *freqDomainMagnitude
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
+	LOGD("GT.ChordDetector", "getChord()");
+
     if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0 ||
         (samples > CFG_FFT_SIZE))
     {
