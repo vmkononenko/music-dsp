@@ -15,10 +15,14 @@
 #define FREQ_C6     ((freq_hz_t)1046.5)
 #define FREQ_C8     ((freq_hz_t)4186)
 
+#define LOG_TAG	"GT.ChordDetector"
+
 using namespace std;
 
 ChordDetector::ChordDetector()
 {
+	LOGMSG_D(LOG_TAG, "ChordDetector()");
+
     __mFft = new FFT();
 }
 
@@ -61,8 +65,6 @@ chord_t ChordDetector::__getChordFromFftResults(amplitude_t *freqDomainMagnitude
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
-	LMLOGD("GT.ChordDetector", "getChord()");
-
     if ((timeDomain == nullptr) || (samples == 0) || sampleRate == 0 ||
         (samples > CFG_FFT_SIZE))
     {
