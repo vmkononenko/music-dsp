@@ -39,7 +39,7 @@ void Logger::setLogLevel(log_level_t ll)
  */
 void Logger::log(log_level_t ll, const char *tag, const char *fmt, ...)
 {
-	if ((__printFunc == nullptr) || (ll < __mLogLevel)) {
+	if ((__printFunc == nullptr) || (ll > __mLogLevel)) {
 		return;
 	}
 
