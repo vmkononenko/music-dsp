@@ -4,6 +4,7 @@ set(LIB_SOURCES
     chord_tpl.cpp
     fft.cpp
     lmhelpers.cpp
+    lmlogger.cpp
     lmpriority_queue.cpp
     music_scale.cpp
     pitch_calculator.cpp
