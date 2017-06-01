@@ -10,7 +10,7 @@
 #include "lmlogger.h"
 
 
-log_level_t Logger::__mLogLevel = LL_ERROR;
+log_level_t Logger::__mLogLevel = LL_DEFAULT;
 void (*Logger::__printFunc)(const char *, const char *) = nullptr;
 
 /**

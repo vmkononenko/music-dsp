@@ -12,7 +12,8 @@ typedef enum {
 	LL_DEBUG,
 	LL_VERBOSE,
 	LL_MIN = LL_ERROR,
-	LL_MAX = LL_VERBOSE
+	LL_MAX = LL_VERBOSE,
+	LL_DEFAULT = LL_ERROR
 } log_level_t;
 
 #define LOG_ENTRY_MAX_LEN 1024
