@@ -9,6 +9,7 @@
 #include "lmhelpers.h"
 #include "lmlogger.h"
 #include "pitch_cls_profile.h"
+#include "window_functions.h"
 
 #define FREQ_A0     ((freq_hz_t)27.5)
 #define FREQ_E2     ((freq_hz_t)82.4)
@@ -75,6 +76,8 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     amplitude_t *freqDomain;
     uint32_t highFreqThresholdIdx;  // do not analyze points above this index
     uint32_t fftSize;
+
+    WindowFunctions::applyDefault(timeDomain, samples);
 
     /* TODO: define minimum FFT size for frequency calculation precision */
     //fftSize = Helpers::nextPowerOf2(samples);
