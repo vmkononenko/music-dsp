@@ -22,7 +22,8 @@ using namespace std;
 
 ChordDetector::ChordDetector()
 {
-	LOGMSG_D(LOG_TAG, "ChordDetector()");
+    LOGMSG_D(LOG_TAG, "Using window size %u, FFT size %u",
+             CFG_WINDOW_SIZE, CFG_FFT_SIZE);
 
     __mFft = new FFT();
 }
