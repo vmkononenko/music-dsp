@@ -45,3 +45,32 @@ void WindowFunctions::applyDefault(amplitude_t *points, uint32_t pointsCnt)
     applyHann(points, pointsCnt);
 #endif
 }
+
+const char * WindowFunctions::toString(window_func_t fcode)
+{
+    if ((fcode < WINDOW_FUNC_MIN) || (fcode > WINDOW_FUNC_MAX)) {
+        throw std::invalid_argument("Invalid window function");
+    }
+
+    const char *ret;
+
+    switch(fcode) {
+        case WINDOW_FUNC_RECTANGULAR:
+            ret = "Rectangular";
+            break;
+        case WINDOW_FUNC_BLACKMAN:
+            ret = "Blackman";
+            break;
+        case WINDOW_FUNC_HAMMING:
+            ret = "Hamming";
+            break;
+        case WINDOW_FUNC_HANN:
+            ret = "Hann";
+            break;
+        default:
+            ret = "unknown";
+            break;
+    }
+
+    return ret;
+}
