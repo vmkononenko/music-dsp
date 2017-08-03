@@ -10,6 +10,11 @@
 #include <map>
 #include <stdint.h>
 
+#define CFG_WINDOW_FUNC_BLACKMAN        0
+#define CFG_WINDOW_FUNC_HAMMING         1
+#define CFG_WINDOW_FUNC_HANN            2
+#define CFG_WINDOW_FUNC_RECTANGULAR     3
+
 typedef double amplitude_t;
 typedef double freq_hz_t;
 typedef std::complex<amplitude_t> complex_t;
