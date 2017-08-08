@@ -1,10 +1,15 @@
-/*
- * logger.h
+/**
+ * @file        logger.h
+ * @addtogroup  libmusic
+ * @{
  */
+
 
 #pragma once
 
-
+/**
+ * @brief   Logger log levels
+ */
 typedef enum {
 	LL_ERROR,
 	LL_WARNING,
@@ -20,6 +25,9 @@ typedef enum {
 
 
 /**
+ * @class   Logger
+ * @brief   Logger API
+ *
  * The library does not produce any log output because it is not
  * aware where to produce output to. It fully depends on the client
  * application. If a client application wants to make the library's
@@ -58,3 +66,5 @@ public:
 #define LOGMSG_I(tag, ...) Logger::log(LL_INFO, 	tag, __VA_ARGS__)
 #define LOGMSG_D(tag, ...) Logger::log(LL_DEBUG, 	tag, __VA_ARGS__)
 #define LOGMSG_V(tag, ...) Logger::log(LL_VERBOSE, 	tag, __VA_ARGS__)
+
+/** @} */

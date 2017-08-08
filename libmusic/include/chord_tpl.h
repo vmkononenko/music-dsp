@@ -1,7 +1,8 @@
 /**
- * chord_tpl.h
- *
- * Header file for chord type templates
+ * @file        chord_tpl.h
+ * @brief       Header file for chord type templates
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -26,6 +27,7 @@ typedef enum {
 } note_presense_state_t;
 
 typedef float tpl_score_t;
+
 
 typedef class ChordTpl {
 
@@ -54,3 +56,5 @@ public:
     chord_quality_t getQuality();
 
 } chord_tpl_t;
+
+/** @} */

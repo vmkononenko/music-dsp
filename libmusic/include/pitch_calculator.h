@@ -1,5 +1,8 @@
-/*
- * pitch_calculator.h
+/**
+ * @file        pitch_calculator.h
+ * @brief       PitchCalculator APIs
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -19,6 +22,7 @@
 #ifndef PITCH_CALCULATOR_TEST_FRIENDS
 #define PITCH_CALCULATOR_TEST_FRIENDS
 #endif
+
 
 class PitchCalculator {
 
@@ -43,7 +47,7 @@ private:
     void __initPitches();
 
     /**
-     * @ return true if freq matches one of the pitch frequencies
+     * @return true if freq matches one of the pitch frequencies
      */
     bool __isPitch(freq_hz_t freq);
 
@@ -141,3 +145,5 @@ public:
      */
     static int32_t semitonesDistance(freq_hz_t f1, freq_hz_t f2);
 };
+
+/** @} */

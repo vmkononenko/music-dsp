@@ -1,7 +1,8 @@
-/*
- * config.h
- *
- * Configuration parameters for the library
+/**
+ * @file        config.h
+ * @brief       Configuration parameters for the library
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -19,8 +20,11 @@
 #endif /* CFG_WINDOW_FUNC */
 
 #ifndef CFG_PITCH_PRECISION_THRESHOLD
-/* Determines pitch detection precision measured in octaves. If validated
- * frequency does not fulfill precision requirements, it is treated as
- * invalid (not reliable value) */
+/** @brief Determines pitch detection precision measured in octaves
+ * If validated frequency does not fulfill precision requirements
+ * it is treated as invalid (not reliable value)
+ */
 #define CFG_PITCH_PRECISION_THRESHOLD   ((double)0.35)
 #endif /* CFG_PITCH_PRECISION_THRESHOLD */
+
+/** @} */

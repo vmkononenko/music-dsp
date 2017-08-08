@@ -1,7 +1,8 @@
-/*
- * chord_detector.h
- *
- *  Chord recognition API
+/**
+ * @file        chord_detector.h
+ * @brief       Chord recognition API
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -22,6 +23,9 @@
 #endif
 
 
+/**
+ * @class   ChordDetector
+ */
 class ChordDetector {
 
 CHORD_DETECTOR_TEST_FRIENDS;
@@ -87,3 +91,5 @@ public:
      */
     std::vector<note_t> getScale(note_t mainNote, bool isMinor);
 };
+
+/** @} */

@@ -1,5 +1,7 @@
-/*
- * window_functions.h
+/**
+ * @file        window_functions.h
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -9,6 +11,7 @@
 #ifndef WINDOW_FUNCIONS_TEST_FRIENDS
 #define WINDOW_FUNCIONS_TEST_FRIENDS
 #endif
+
 
 class WindowFunctions {
 
@@ -21,3 +24,5 @@ public:
     static void applyDefault(amplitude_t *, uint32_t);
     static const char * toString(window_func_t);
 };
+
+/** @} */

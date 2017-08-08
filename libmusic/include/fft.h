@@ -1,7 +1,8 @@
-/*
- * fft.h
- *
- *  Fast Fourier Transform API
+/**
+ * @file        fft.h
+ * @brief       Fast Fourier Transform API
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -65,3 +66,5 @@ public:
      */
     void inverse(std::vector<complex_t> &);
 };
+
+/** @} */

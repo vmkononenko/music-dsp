@@ -1,7 +1,8 @@
-/*
- * lmhelpers.h
- *
- * Header file for helpers
+/**
+ * @file        lmhelpers.h
+ * @brief       Header file for helpers
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -15,13 +16,16 @@
 
 // Introduced for cross-compilation for Android because log2 is
 // not defined for all target platforms.
-// TODO: find a proper fix
+/** @TODO: find a proper fix */
 #define log2(x) (log(x) / log(2))
 
 #ifndef HELPERS_TEST_FRIENDS
 #define HELPERS_TEST_FRIENDS
 #endif
 
+/**
+ * @ingroup libmusic
+ */
 class Helpers {
 
 HELPERS_TEST_FRIENDS;
@@ -95,3 +99,5 @@ public:
      */
     static freq_hz_t fftIdxToFreq(uint32_t idx, uint32_t fftSize, uint32_t sampleRate);
 };
+
+/** @} */

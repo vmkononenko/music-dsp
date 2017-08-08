@@ -1,7 +1,8 @@
 /**
- * lmpriority_queue.h
- *
- * Max priority queue API
+ * @file        lmpriority_queue.h
+ * @brief       Max priority queue API
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -10,6 +11,7 @@
 
 #include "fft_point.h"
 #include "lmtypes.h"
+
 
 class PriorityQueue {
 
@@ -69,4 +71,6 @@ public:
      */
     uint32_t size();
 };
+
+/** @} */
 

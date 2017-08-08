@@ -1,7 +1,8 @@
-/*
- * chord_tlp_collection.h
- *
- * Chord template collection
+/**
+ * @file        chord_tpl_collection.h
+ * @brief       Chord template collection
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -41,3 +42,5 @@ public:
      */
     chord_t getBestMatch(pcp_t *pcp);
 };
+
+/** @} */

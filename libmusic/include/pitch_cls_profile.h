@@ -1,7 +1,8 @@
-/*
- * pitch_cls_profile.h
- *
- * Pitch Class Profile header file
+/**
+ * @file        pitch_cls_profile.h
+ * @brief       Pitch Class Profile header file
+ * @addtogroup  libmusic
+ * @{
  */
 
 #pragma once
@@ -9,6 +10,7 @@
 #include <vector>
 
 #include "lmtypes.h"
+
 
 typedef class PitchClsProfile {
 
@@ -36,3 +38,5 @@ public:
      */
     amplitude_t getPitchCls(note_t note);
 } pcp_t;
+
+/** @} */

@@ -1,7 +1,9 @@
-/*
- * lmtypes.h
- *
- *  Defines types specific for libmusic
+/**
+ * @file        lmtypes.h
+ * @brief       Defines types specific for libmusic
+ * @defgroup    libmusic
+ * Library documentation
+ * @{
  */
 
 #pragma once
@@ -147,3 +149,5 @@ public:
         return std::string(q2sMap[quality]);
     }
 } chord_t;
+
+/** @} */
