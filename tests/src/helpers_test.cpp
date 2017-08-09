@@ -5,7 +5,7 @@
 void TestNextPowerOf2::__test()
 {
 	ASSERT_EQUAL(1, Helpers::nextPowerOf2(0));
-	// TODO: check why nextPowerOf2 for 1 is 2
+	/** @TODO check why nextPowerOf2 for 1 is 2 */
 	//ASSERT_EQUAL(1, Helpers::nextPowerOf2(1));
 	ASSERT_EQUAL(2, Helpers::nextPowerOf2(2));
 	ASSERT_EQUAL(4, Helpers::nextPowerOf2(4));

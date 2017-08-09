@@ -104,8 +104,8 @@ int main(int argc, char const *argv[])
 		return -1;
 	}
 
-	// pass 1 as argc otherwise cute produces empty output
-	// TODO: figure out why
+	/** @TODO 1 has to be passed as argc to runTests() otherwise CUTE
+	 *        will produce an empty output */
 	runTests(1, argv, suite, name);
 
 	return 0;

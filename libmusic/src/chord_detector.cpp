@@ -81,19 +81,19 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
 
     WindowFunctions::applyDefault(timeDomain, samples);
 
-    /** @TODO: define minimum FFT size for frequency calculation precision */
+    /** @TODO define minimum FFT size for frequency calculation precision */
     //fftSize = Helpers::nextPowerOf2(samples);
     fftSize = CFG_FFT_SIZE;
     x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
 
     __mFft->forward(x);
 
-    /** @TODO: check for +/-1 error */
+    /** @TODO check for +/-1 error */
     highFreqThresholdIdx = Helpers::freqToFftIdx(sampleRate/2, fftSize, sampleRate, ceil);
 
     freqDomain = new amplitude_t[highFreqThresholdIdx];
 
-    /** @TODO: check for returned length */
+    /** @TODO check for returned length */
     highFreqThresholdIdx = __mFft->toPolar(x, freqDomain, highFreqThresholdIdx);
 
     chord_t ret = __getChordFromFftResults(freqDomain, fftSize,

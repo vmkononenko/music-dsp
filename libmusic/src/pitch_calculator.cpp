@@ -68,7 +68,7 @@ void PitchCalculator::__initPitches()
         }
     }
 
-    //TODO: add assert if __mPitchIdxA4 == 0
+    /** @TODO add assert if __mPitchIdxA4 == 0 */
 }
 
 freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, int16_t n)
@@ -113,7 +113,7 @@ bool PitchCalculator::__isPitch(freq_hz_t freq)
     return (__getPitchIdx(freq) >= 0);
 }
 
-/* TODO: reuse delta mechanism used in getPitch */
+/** @TODO reuse delta mechanism used in getPitch */
 freq_hz_t PitchCalculator::__getTonic(amplitude_t *freqDomain, uint32_t len,
                                     uint32_t fftSize, uint32_t sampleRate)
 {
@@ -125,7 +125,7 @@ freq_hz_t PitchCalculator::__getTonic(amplitude_t *freqDomain, uint32_t len,
     amplitude_t mag;
     uint32_t i = 0, maxIndex = 0;
 
-    /* TODO: replace with faster algorithm than the one with linear complexity */
+    /** @TODO replace with faster algorithm than the one with linear complexity */
     while (i < len) {
         mag = freqDomain[i];
         if (mag > max) {
@@ -162,8 +162,9 @@ freq_hz_t PitchCalculator::getPitch(freq_hz_t freq)
         deltaLeft = fabs(octavesDistance(__mPitches[mid - 1], freq));
         deltaRight = fabs(octavesDistance(__mPitches[mid + 1], freq));
 
-        // TODO: check the case - when all values in __mPitches are 0 this
-        // loop becomes infinite
+        /** @TODO check the case - when all values in __mPitches are 0 this
+                  loop becomes infinite */
+
         if (deltaLeft < deltaMid) {
             end = mid - 1;
             freqPitch = __mPitches[end];
