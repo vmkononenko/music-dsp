@@ -27,12 +27,14 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 option(WITH_CLIENT ON)
 option(WITH_TESTS ON)
 
-if(WITH_CLIENT)
-    add_subdirectory(client)
-endif()
-
 if(WITH_TESTS)
     add_subdirectory(tests)
+endif()
+
+set (CMAKE_CXX_FLAGS "-Werror -Wall -Wextra")
+
+if(WITH_CLIENT)
+    add_subdirectory(client)
 endif()
 
 add_subdirectory(libmusic)
