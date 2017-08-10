@@ -1,8 +1,11 @@
+#ifdef FFT_TEST_FRIENDS
+#undef FFT_TEST_FRIENDS
+#endif
 #define FFT_TEST_FRIENDS \
     friend class TestBitReverse; \
-    friend class TestSortBitReversal; \
+    friend class TestSortBitReversal \
 
-#include "fft.h"
+#include <fft.h>
 
 class TestBitReverse {
 private:

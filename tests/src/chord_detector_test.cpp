@@ -5,11 +5,6 @@
 #include "cute.h"
 #include "window_functions.h"
 
-/* include this header, otherwise includes will go in the following order:
- * chord_detector_test.h -> chord_detector.h -> pitch_calculator.h. Then
- * pitch calculator test friends are defined in pitch_calculator.h before
- * pitch_calculator_test.h is processed by linker*/
-#include "pitch_calculator_test.h"
 #include "chord_detector_test.h"
 
 #define TEST_FILES_DIR_ENV_VAR      "LM_TEST_FILES_DIR"

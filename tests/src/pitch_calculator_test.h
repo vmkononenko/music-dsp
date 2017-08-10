@@ -1,8 +1,11 @@
 #pragma once
 
+#ifdef PITCH_CALCULATOR_TEST_FRIENDS
+#undef PITCH_CALCULATOR_TEST_FRIENDS
+#endif
 #define PITCH_CALCULATOR_TEST_FRIENDS \
     friend class TestIsPitch; \
-    friend class TestA4PitchIdx; \
+    friend class TestA4PitchIdx \
 
 #include <pitch_calculator.h>
 
