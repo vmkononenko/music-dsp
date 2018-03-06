@@ -60,7 +60,7 @@ void Common::testChord(const char *fileName, chord_t &expectedChord)
 void TestChord_C::__test()
 {
     const char *testFile;
-    chord_t expected(note_C, cq_Major);
+    chord_t expected(note_C, cq_major);
 
     testFile = "C_chord_construction_guitarlessonworld.wav";
     Common::testChord(testFile, expected);
@@ -78,7 +78,7 @@ void TestChord_C::__test()
 void TestChord_D::__test()
 {
     const char *testFile;
-    chord_t expected(note_D, cq_Major);
+    chord_t expected(note_D, cq_major);
 
     testFile = "D_the_animals_house_of_the_rising_sun.wav";
     Common::testChord(testFile, expected);
@@ -87,7 +87,7 @@ void TestChord_D::__test()
 void TestChord_Dm::__test()
 {
     const char *testFile;
-    chord_t expected(note_D, cq_Minor);
+    chord_t expected(note_D, cq_minor);
 
     testFile = "Dm_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);
@@ -99,7 +99,7 @@ void TestChord_Dm::__test()
 void TestChord_Em::__test()
 {
     const char *testFile;
-    chord_t expected(note_E, cq_Minor);
+    chord_t expected(note_E, cq_minor);
 
     testFile = "Em_nikolskii_moi_drug_hudozhnik_i_poet_1.wav";
     Common::testChord(testFile, expected);
@@ -114,7 +114,7 @@ void TestChord_Em::__test()
 void TestChord_F::__test()
 {
     const char *testFile;
-    chord_t expected(note_F, cq_Major);
+    chord_t expected(note_F, cq_major);
 
     testFile = "F_the_animals_house_of_the_rising_sun.wav";
     Common::testChord(testFile, expected);
@@ -123,7 +123,7 @@ void TestChord_F::__test()
 void TestChord_G::__test()
 {
     const char *testFile;
-    chord_t expected(note_G, cq_Major);
+    chord_t expected(note_G, cq_major);
 
     testFile = "G_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);
@@ -132,7 +132,7 @@ void TestChord_G::__test()
 void TestChord_Am::__test()
 {
     const char *testFile;
-    chord_t expected(note_A, cq_Minor);
+    chord_t expected(note_A, cq_minor);
 
     testFile = "Am_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);

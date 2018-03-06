@@ -15,17 +15,18 @@ vector<note_t> MusicScale::getMajorScale(note_t rootNote)
 {
     /* whole, whole, half, whole, whole, whole, half */
     uint8_t formula[] = {2, 2, 1, 2, 2, 2, 1};
-
+    uint8_t formulaLen = sizeof(formula) / sizeof(formula[0]);
     vector<note_t> scale;
-    PitchCalculator& pc = PitchCalculator::getInstance();
-    freq_hz_t pitch;
+    note_t note = rootNote;
 
-    scale.push_back(rootNote);
-    pitch = pc.noteToPitch(rootNote, OCTAVE_4);
-    for (uint8_t i = 0; i < 7; /* size of formula */ i++) {
-        pitch = pc.getPitchByInterval(pitch, formula[i]);
-        scale.push_back(pc.pitchToNote(pitch));
+    scale.reserve(formulaLen * 2);
+    scale.push_back(note);
+    for (uint8_t i = 0; i < formulaLen; i++) {
+        note = note + formula[i];
+        scale.push_back(note);
     }
+
+    scale.insert(scale.end(), scale.begin(), scale.end());
 
     return scale;
 }

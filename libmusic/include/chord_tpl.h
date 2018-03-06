@@ -17,13 +17,15 @@
 typedef enum {
     nps_present,
     nps_present_flat,
+    nps_present_flat_flat,
     nps_present_sharp,
     nps_not_present,
     /* introduce acronyms to keep the formulas shorter */
-    nps_P = nps_present,
-    nps_PF = nps_present_flat,
-    nps_PS = nps_present_sharp,
-    nps_NP = nps_not_present
+    nps_P   = nps_present,
+    nps_PF  = nps_present_flat,
+    nps_PFF = nps_present_flat_flat,
+    nps_PS  = nps_present_sharp,
+    nps_NP  = nps_not_present
 } note_presense_state_t;
 
 typedef float tpl_score_t;

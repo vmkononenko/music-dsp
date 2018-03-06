@@ -35,6 +35,8 @@ typedef enum {
     notes_Total = note_Max - note_Min + 1
 } note_t;
 
+note_t& operator+(note_t& note, int32_t term);
+
 typedef enum : int32_t {
     OCTAVE_0,
     OCTAVE_1,
@@ -52,17 +54,25 @@ typedef enum : int32_t {
 } octave_t;
 
 typedef enum {
-    cq_Major,
-    cq_Minor,
-    cq_Major_7,
-    cq_Minor_7,
-    cq_Dominant_7,
-    cq_Major_6,
-    cq_Minor_6,
-    cq_Diminished,
-    cq_Augmented,
-    cq_Min = cq_Major,
-    cq_Max = cq_Augmented
+    cq_major,
+    cq_minor,
+    cq_7th,
+    cq_major_7th,
+    cq_minor_7th,
+    cq_6th,
+    cq_minor_6th,
+    cq_diminished,
+    cq_diminished_7th,
+    cq_half_diminished_7th,
+    cq_9th,
+    cq_major_9th,
+    cq_added_9th,
+    cq_minor_9th,
+    cq_suspended_4th,
+    cq_suspended_2nd,
+    cq_5th,
+    cq_Min = cq_major,
+    cq_Max = cq_5th
 } chord_quality_t;
 
 typedef enum {
@@ -136,15 +146,23 @@ public:
 
         std::map<chord_quality_t, std::string> q2sMap;
 
-        q2sMap[cq_Major]        = "";
-        q2sMap[cq_Minor]        = "m";
-        q2sMap[cq_Major_7]      = "7";
-        q2sMap[cq_Minor_7]      = "m7";
-        q2sMap[cq_Dominant_7]   = "dom7";
-        q2sMap[cq_Major_6]      = "6";
-        q2sMap[cq_Minor_6]      = "m6";
-        q2sMap[cq_Diminished]   = "dim";
-        q2sMap[cq_Augmented]    = "aug";
+        q2sMap[cq_major]                = "";
+        q2sMap[cq_minor]                = "m";
+        q2sMap[cq_7th]                  = "7";
+        q2sMap[cq_major_7th]            = "maj7";
+        q2sMap[cq_minor_7th]            = "m7";
+        q2sMap[cq_6th]                  = "6";
+        q2sMap[cq_minor_6th]            = "m6";
+        q2sMap[cq_diminished]           = "dim";
+        q2sMap[cq_diminished_7th]       = "dim7";
+        q2sMap[cq_half_diminished_7th]  = "m7b5";
+        q2sMap[cq_9th]                  = "9";
+        q2sMap[cq_major_9th]            = "maj9";
+        q2sMap[cq_added_9th]            = "add9";
+        q2sMap[cq_minor_9th]            = "m9";
+        q2sMap[cq_suspended_4th]        = "sus4";
+        q2sMap[cq_suspended_2nd]        = "sus2";
+        q2sMap[cq_5th]                  = "5";
 
         return std::string(q2sMap[quality]);
     }

@@ -5,21 +5,30 @@
  */
 
 #include "chord_tpl.h"
+#include "lmhelpers.h"
 #include "music_scale.h"
 
 
 using namespace std;
 
 map<chord_quality_t, vector<note_presense_state_t>> ChordTpl::__mChordQltyTpls = {
-    {cq_Major,      {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP}},
-    {cq_Minor,      {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_NP}},
-    {cq_Major_7,    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_P}},
-    {cq_Minor_7,    {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_PF}},
-    {cq_Dominant_7, {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_PF}},
-    {cq_Major_6,    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_P,  nps_NP}},
-    {cq_Minor_6,    {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_P,  nps_NP}},
-    {cq_Diminished, {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_NP}},
-    {cq_Augmented,  {nps_P, nps_NP, nps_P,  nps_NP, nps_PS, nps_NP, nps_NP}}
+    {cq_major,                  {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_minor,                  {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_7th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_NP}},
+    {cq_major_7th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_P,   nps_NP, nps_NP}},
+    {cq_minor_7th,              {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_NP}},
+    {cq_6th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_P,  nps_NP,  nps_NP, nps_NP}},
+    {cq_minor_6th,              {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_P,  nps_NP,  nps_NP, nps_NP}},
+    {cq_diminished,             {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_diminished_7th,         {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_PFF, nps_NP, nps_NP}},
+    {cq_half_diminished_7th,    {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_PF,  nps_NP, nps_NP}},
+    {cq_9th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_P }},
+    {cq_major_9th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_P,   nps_NP, nps_P }},
+    {cq_added_9th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_P }},
+    {cq_minor_9th,              {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_P }},
+    {cq_suspended_4th,          {nps_P, nps_NP, nps_NP, nps_P,  nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_suspended_2nd,          {nps_P, nps_P,  nps_NP, nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_5th,                    {nps_P, nps_NP, nps_NP, nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
 };
 
 
@@ -45,11 +54,9 @@ ChordTpl::ChordTpl(note_t rootNote, chord_quality_t cq)
 void ChordTpl::__initTpl(note_t rootNote, chord_quality_t cq)
 {
     vector<note_t> scale = MusicScale::getMajorScale(rootNote);
-    PitchCalculator& pc = PitchCalculator::getInstance();
 
     for (uint8_t i = 0; i < __mChordQltyTpls[cq].size(); i++) {
-        note_t note;
-        freq_hz_t pitch;
+        note_t note = note_Unknown;
         note_presense_state_t presenseState = __mChordQltyTpls[cq][i];
 
         switch(presenseState) {
@@ -57,17 +64,21 @@ void ChordTpl::__initTpl(note_t rootNote, chord_quality_t cq)
                 note = scale[i];
                 break;
             case nps_present_flat:
+            case nps_present_flat_flat:
             case nps_present_sharp:
             {
-                int8_t interval = (presenseState == nps_present_flat) ? -1 : 1;
-                pitch = pc.noteToPitch(scale[i], OCTAVE_4);
-                pitch = pc.getPitchByInterval(pitch, interval);
+                int8_t interval;
 
-                if (pitch == FREQ_INVALID) {
-                    throw runtime_error("got pitch value FREQ_INVALID");
+                if (presenseState == nps_present_flat) {
+                    interval = -1;
+                } else if (presenseState == nps_present_flat_flat) {
+                    interval = -2;
+                } else {
+                    interval = 1;
                 }
 
-                note = pc.pitchToNote(pitch);
+                note = scale[i] + interval;
+
                 break;
             }
             default:

@@ -6,6 +6,7 @@ set(LIB_SOURCES
     lmhelpers.cpp
     lmlogger.cpp
     lmpriority_queue.cpp
+    lmtypes.cpp
     music_scale.cpp
     pitch_calculator.cpp
     pitch_cls_profile.cpp
