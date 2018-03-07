@@ -17,6 +17,7 @@
 #include "lmtypes.h"
 #include "music_scale.h"
 #include "pitch_calculator.h"
+#include "pitch_cls_profile.h"
 
 #ifndef CHORD_DETECTOR_TEST_FRIENDS
 #define CHORD_DETECTOR_TEST_FRIENDS
@@ -31,6 +32,13 @@ class ChordDetector {
 CHORD_DETECTOR_TEST_FRIENDS;
 
 private:
+    struct FFTResults {
+        amplitude_t *freqDomain;
+        uint32_t    fftSize;
+        uint32_t    sampleRate;
+        uint32_t    highFreqThresholdIdx;
+    };
+
     FFT *__mFft;
     PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
     ChordTplCollection *__mChordTplColl = new ChordTplCollection();
@@ -49,6 +57,8 @@ private:
      */
     void __attLowFreq(amplitude_t *, uint32_t, freq_hz_t, uint32_t, uint32_t);
 
+    FFTResults __getFftResults(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
+
     /**
      * Implementation of the main chord detection algorithm
      *
@@ -58,8 +68,7 @@ private:
      * @param   pointsCnt               freqDomainMagnitudes length
      * @return detected chord
      */
-    chord_t __getChordFromFftResults(amplitude_t *freqDomainMagnitudes,
-            uint32_t fftSize, uint32_t sampleRate, uint32_t pointsCnt);
+    chord_t __getChordFromFftResults(FFTResults& fftRes);
 
 public:
     /**
@@ -90,6 +99,8 @@ public:
      * @return  requested scale
      */
     std::vector<note_t> getScale(note_t mainNote, bool isMinor);
+
+    PitchClsProfile getPCP(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
 };
 
 /** @} */

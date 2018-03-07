@@ -17,13 +17,14 @@ typedef class PitchClsProfile {
 private:
 
     std::vector<amplitude_t> __mPCP;
+    amplitude_t __mMagMax = 0;
 
     /**
      * Normalize obtained PCP amplitudes
      *
      * Because amplitudes in chord type templates are defined as 0 and 1
      */
-    void __normalize(amplitude_t magMax);
+    void __normalize();
 public:
     /**
      * Constructor
@@ -36,7 +37,9 @@ public:
      * @param note  note to get PCP for
      * @return      PCP value
      */
-    amplitude_t getPitchCls(note_t note);
+    amplitude_t getPitchCls(note_t note) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const PitchClsProfile& pcp);
 } pcp_t;
 
 /** @} */

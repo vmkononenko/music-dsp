@@ -72,7 +72,7 @@ typedef enum {
     cq_suspended_2nd,
     cq_5th,
     cq_Min = cq_major,
-    cq_Max = cq_5th
+    cq_Max = cq_suspended_2nd
 } chord_quality_t;
 
 typedef enum {

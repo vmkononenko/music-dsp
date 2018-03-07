@@ -4,6 +4,8 @@
  * Pitch Class Profile implementation
  */
 
+#include <iomanip>
+
 #include "lmhelpers.h"
 #include "pitch_calculator.h"
 #include "pitch_cls_profile.h"
@@ -15,7 +17,6 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
         uint32_t fftSize, uint32_t sampleRate, uint32_t pointsCnt)
 {
     PitchCalculator& pc = PitchCalculator::getInstance();
-    amplitude_t magMax = 0;
 
     __mPCP.reserve(notes_Total);
     __mPCP.assign(notes_Total, 0);
@@ -39,26 +40,49 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
 
             magCur = freqDomainMagnitudes[fftIdx];
             pitchCls += magCur;
-            magMax = max(magCur, magMax);
+            __mMagMax = max(magCur, __mMagMax);
         }
 
         __mPCP[note - note_Min] = pitchCls;
     }
-    __normalize(magMax);
+    __normalize();
 }
 
-void PitchClsProfile::__normalize(amplitude_t magMax)
+void PitchClsProfile::__normalize()
 {
     for (uint8_t i = 0; i < __mPCP.size(); i++) {
-        __mPCP[i] = __mPCP[i] / OCTAVES_CNT / magMax;
+        __mPCP[i] = __mPCP[i] / OCTAVES_CNT / __mMagMax;
     }
 }
 
-amplitude_t PitchClsProfile::getPitchCls(note_t note)
+amplitude_t PitchClsProfile::getPitchCls(note_t note) const
 {
     if ((note < note_Min) || (note > note_Max)) {
         throw std::invalid_argument("Invalid note");
     }
 
     return __mPCP[note - note_Min];
+}
+
+#define PCP_ROWS            10
+#define PCP_SYM_PER_COL     3
+
+ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
+{
+    int percentPerRow = 100 / PCP_ROWS;
+
+    for (int row = 0; row < PCP_ROWS; row++) {
+        for (int n = note_Min; n <= note_Max; n++) {
+            note_t note = static_cast<note_t>(n);
+            uint8_t progress = pcp.getPitchCls(note) * 100;
+            os << std::setw(PCP_SYM_PER_COL) << ((progress >= (100 - percentPerRow * row)) ? '|' : ' ');
+        }
+        os << endl;
+    }
+
+    for (int n = note_Min; n <= note_Max; n++) {
+        os << std::setw(PCP_SYM_PER_COL) << Helpers::noteToString(static_cast<note_t>(n));
+    }
+
+    return os;
 }

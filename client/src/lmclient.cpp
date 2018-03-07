@@ -25,7 +25,7 @@ void usage();
 void printScales();
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, bool);
-void printChordInfo(amplitude_t *, uint32_t, uint32_t);
+void printChordInfo(amplitude_t *, uint32_t, uint32_t, bool);
 void printAudioFileInfo(SF_INFO &);
 
 
@@ -38,7 +38,8 @@ int main(int argc, char* argv[])
     bool printFD = false;           // frequency domain
     bool logScale = false;          // print frequency domain in logarithmic scale
     bool printAFI = false;          // audio file meta information
-    bool detectChord = false;       //
+    bool detectChord = false;       // print detected chord
+    bool printPCP = false;          // print pitch class profile
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-f") == 0) {
@@ -65,6 +66,9 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i], "-s") == 0)) {
             printScales();
             return 0;
+        } else if ((strcmp(argv[i], "--pcp") == 0)) {
+            printPCP = true;
+            minArgCnt++;
         } else if ((strcmp(argv[i], "-h") == 0)) {
             usage();
             return 0;
@@ -112,7 +116,9 @@ int main(int argc, char* argv[])
     } else if (printAFI) {
         printAudioFileInfo(sfinfo);
     } else if (detectChord) {
-        printChordInfo(buf, sfinfo.samplerate, itemsCnt);
+        printChordInfo(buf, sfinfo.samplerate, itemsCnt, false);
+    } else if (printPCP) {
+        printChordInfo(buf, sfinfo.samplerate, itemsCnt, true);
     }
 
     sf_close(sf);
@@ -176,7 +182,8 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
     delete fft;
 }
 
-void printChordInfo(amplitude_t *timeDomain, uint32_t sampleRate, uint32_t samples)
+void printChordInfo(amplitude_t *timeDomain, uint32_t sampleRate,
+		            uint32_t samples, bool printPCP)
 {
     ChordDetector *cd = new ChordDetector();
 
@@ -186,9 +193,14 @@ void printChordInfo(amplitude_t *timeDomain, uint32_t sampleRate, uint32_t sampl
         samples = CFG_WINDOW_SIZE;
     }
     WindowFunctions::applyDefault(timeDomain, CFG_WINDOW_SIZE);
-    chord_t chord = cd->getChord(timeDomain, samples, sampleRate);
 
-    cout << chord << endl;
+    if (printPCP) {
+        PitchClsProfile pcp = cd->getPCP(timeDomain, samples, sampleRate);
+        cout << pcp << endl;
+    } else {
+        chord_t chord = cd->getChord(timeDomain, samples, sampleRate);
+        cout << chord << endl;
+    }
 
     delete cd;
 }
