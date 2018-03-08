@@ -75,7 +75,8 @@ ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
         for (int n = note_Min; n <= note_Max; n++) {
             note_t note = static_cast<note_t>(n);
             uint8_t progress = pcp.getPitchCls(note) * 100;
-            os << std::setw(PCP_SYM_PER_COL) << ((progress >= (100 - percentPerRow * row)) ? '|' : ' ');
+            os << std::setw(PCP_SYM_PER_COL)
+               << ((progress >= round(100 - percentPerRow * row)) ? '|' : ' ');
         }
         os << endl;
     }
