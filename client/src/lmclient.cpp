@@ -234,7 +234,7 @@ void printScales()
 void usage()
 {
     cout << "Usage:\n"
-         << "\tlmclient <-t [i] | -f [-p] [-l] | -c> <filename>\n"
+         << "\tlmclient <-t [i] | -f [-p] [-l] | -c | --pcp> <filename>\n"
          << "\tlmclient -i <filename>\n"
          << endl;
 
@@ -247,7 +247,8 @@ void usage()
          << "\t-l\tdisplay frequency domain in logarithmic scale. Is used with -p\n"
          << "\t-m\tdisplay input audio file information and exit\n"
          << "\t-c\tprint recognized chord information\n"
-         << "\t-s\tprint major scales for all notes"
+         << "\t-s\tprint major scales for all notes\n"
+         << "\t--pcp\tprint Pitch Class Profile"
          << endl;
 
     cout << "\nExamples:\n"
