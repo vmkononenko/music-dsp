@@ -27,7 +27,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
         freq_hz_t pitchFreq;
         uint32_t fftIdx;
         amplitude_t pitchCls = 0;
-        amplitude_t magCur = 0;
+        amplitude_t mag = 0;
         for (int o = OCTAVE_MIN; o <= OCTAVE_MAX; o++) {
             octave_t oct = (octave_t)o;
 
@@ -38,9 +38,9 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
                 throw runtime_error("fftIdx > pointsCnt");
             }
 
-            magCur = freqDomainMagnitudes[fftIdx];
-            pitchCls += magCur;
-            __mMagMax = max(magCur, __mMagMax);
+            mag = freqDomainMagnitudes[fftIdx];
+            pitchCls += mag * mag;
+            __mPitchClsMax = max(pitchCls, __mPitchClsMax);
         }
 
         __mPCP[note - note_Min] = pitchCls;
@@ -51,7 +51,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
 void PitchClsProfile::__normalize()
 {
     for (uint8_t i = 0; i < __mPCP.size(); i++) {
-        __mPCP[i] = __mPCP[i] / OCTAVES_CNT / __mMagMax;
+        __mPCP[i] = __mPCP[i] / __mPitchClsMax;
     }
 }
 

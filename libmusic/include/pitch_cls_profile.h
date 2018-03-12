@@ -17,7 +17,7 @@ typedef class PitchClsProfile {
 private:
 
     std::vector<amplitude_t> __mPCP;
-    amplitude_t __mMagMax = 0;
+    amplitude_t __mPitchClsMax = 0;
 
     /**
      * Normalize obtained PCP amplitudes
