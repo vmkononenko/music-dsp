@@ -36,6 +36,7 @@ typedef enum {
 } note_t;
 
 note_t& operator+(note_t& note, int32_t term);
+std::ostream& operator<<(std::ostream& os, const note_t& n);
 
 typedef enum : int32_t {
     OCTAVE_0,
@@ -75,6 +76,8 @@ typedef enum {
     cq_Max = cq_suspended_2nd
 } chord_quality_t;
 
+std::ostream& operator<<(std::ostream& os, const chord_quality_t& q);
+
 typedef enum {
     WINDOW_FUNC_RECTANGULAR,
     WINDOW_FUNC_BLACKMAN,
@@ -105,66 +108,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Chord& c)
     {
-        os << noteToString(c.__mRootNote) << qualityToString(c.__mQuality);
+        os << c.__mRootNote << c.__mQuality;
         return os;
-    }
-
-    /**
-     * Return string representation of the given note
-     *
-     * @param   note    note for which string representation is requested
-     * @return string representation of the note
-     */
-    static std::string noteToString(note_t note) {
-        if (((note < note_Min) && (note > note_Max)) && (note != note_Unknown)) {
-            throw std::invalid_argument("Invalid note");
-        }
-
-        std::map<note_t, std::string> n2sMap;
-
-        n2sMap[note_C]          = "C";
-        n2sMap[note_C_sharp]    = "C#";
-        n2sMap[note_D]          = "D";
-        n2sMap[note_D_sharp]    = "D#";
-        n2sMap[note_E]          = "E";
-        n2sMap[note_F]          = "F";
-        n2sMap[note_F_sharp]    = "F#";
-        n2sMap[note_G]          = "G";
-        n2sMap[note_G_sharp]    = "G#";
-        n2sMap[note_A]          = "A";
-        n2sMap[note_A_sharp]    = "A#";
-        n2sMap[note_B]          = "B";
-        n2sMap[note_Unknown]    = "??";
-
-        return std::string(n2sMap[note]);
-    }
-
-    static std::string qualityToString(chord_quality_t quality) {
-        if ((quality < cq_Min) && (quality > cq_Max)) {
-            throw std::invalid_argument("Invalid quality");
-        }
-
-        std::map<chord_quality_t, std::string> q2sMap;
-
-        q2sMap[cq_major]                = "";
-        q2sMap[cq_minor]                = "m";
-        q2sMap[cq_7th]                  = "7";
-        q2sMap[cq_major_7th]            = "maj7";
-        q2sMap[cq_minor_7th]            = "m7";
-        q2sMap[cq_6th]                  = "6";
-        q2sMap[cq_minor_6th]            = "m6";
-        q2sMap[cq_diminished]           = "dim";
-        q2sMap[cq_diminished_7th]       = "dim7";
-        q2sMap[cq_half_diminished_7th]  = "m7b5";
-        q2sMap[cq_9th]                  = "9";
-        q2sMap[cq_major_9th]            = "maj9";
-        q2sMap[cq_added_9th]            = "add9";
-        q2sMap[cq_minor_9th]            = "m9";
-        q2sMap[cq_suspended_4th]        = "sus4";
-        q2sMap[cq_suspended_2nd]        = "sus2";
-        q2sMap[cq_5th]                  = "5";
-
-        return std::string(q2sMap[quality]);
     }
 } chord_t;
 

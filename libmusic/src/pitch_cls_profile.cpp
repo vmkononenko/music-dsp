@@ -82,7 +82,7 @@ ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
     }
 
     for (int n = note_Min; n <= note_Max; n++) {
-        os << std::setw(PCP_SYM_PER_COL) << Helpers::noteToString(static_cast<note_t>(n));
+        os << std::setw(PCP_SYM_PER_COL) << static_cast<note_t>(n);
     }
 
     return os;

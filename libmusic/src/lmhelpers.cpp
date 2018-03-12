@@ -34,11 +34,6 @@ vector<complex_t> Helpers::timeDomain2ComplexVector(amplitude_t *timeDomain,
     return x;
 }
 
-string Helpers::noteToString(note_t note)
-{
-    return Chord::noteToString(note);
-}
-
 uint32_t Helpers::freqToFftIdx(freq_hz_t freq, uint32_t fftSize,
                                uint32_t sampleRate, double (*roundFunc)(double))
 {
