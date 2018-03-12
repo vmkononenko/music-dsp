@@ -19,14 +19,14 @@ vector<note_t> MusicScale::getMajorScale(note_t rootNote)
     vector<note_t> scale;
     note_t note = rootNote;
 
-    scale.reserve(formulaLen * 2);
+    scale.reserve(formulaLen * 2 - 1);
     scale.push_back(note);
     for (uint8_t i = 0; i < formulaLen; i++) {
         note = note + formula[i];
         scale.push_back(note);
     }
 
-    scale.insert(scale.end(), scale.begin(), scale.end());
+    scale.insert(scale.end(), scale.begin() + 1, scale.end());
 
     return scale;
 }
