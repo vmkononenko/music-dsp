@@ -216,8 +216,7 @@ void printAudioFileInfo(SF_INFO &sfinfo)
 
 void __printScale(note_t note, vector<note_t> scale)
 {
-    cout << setw(2) << note << ": " << setw(3) << right << note
-         << setw(5) << left << right << "[  ";
+    cout << setw(3) << right << note << setw(5) << left << right << "[  ";
     for (uint8_t i = 0; i < scale.size(); i++) {
         cout << setw(2) << left << scale[i] << "  ";
     }
