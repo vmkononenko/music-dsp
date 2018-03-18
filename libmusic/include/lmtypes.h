@@ -111,6 +111,13 @@ public:
         os << c.__mRootNote << c.__mQuality;
         return os;
     }
+
+    std::string toString()
+    {
+        std::ostringstream ss;
+        ss << __mRootNote << __mQuality;
+        return ss.str();
+    }
 } chord_t;
 
 /** @} */
