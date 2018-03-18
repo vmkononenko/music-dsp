@@ -7,6 +7,7 @@
  *
  */
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <string.h>
@@ -25,7 +26,7 @@ void usage();
 void printScales();
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, bool);
-void printChordInfo(amplitude_t *, uint32_t, uint32_t, bool);
+void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool);
 void printAudioFileInfo(SF_INFO &);
 
 
@@ -40,6 +41,8 @@ int main(int argc, char* argv[])
     bool printAFI = false;          // audio file meta information
     bool detectChord = false;       // print detected chord
     bool printPCP = false;          // print pitch class profile
+    int  n = 0;                     // a number of FFT windows to analyze
+    string refChord;                // reference chord to evaluate against
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-f") == 0) {
@@ -69,6 +72,16 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i], "--pcp") == 0)) {
             printPCP = true;
             minArgCnt++;
+        } else if ((strcmp(argv[i], "-n") == 0)) {
+            i++;
+            if (i >= argc) { usage(); return 1; }
+            n = atoi(argv[i]);
+            minArgCnt++;
+        } else if ((strcmp(argv[i], "-r") == 0)) {
+            i++;
+            if (i >= argc) { usage(); return 1; }
+            refChord = string(argv[i]);
+            minArgCnt++;
         } else if ((strcmp(argv[i], "-h") == 0)) {
             usage();
             return 0;
@@ -82,7 +95,7 @@ int main(int argc, char* argv[])
     if ((argc < minArgCnt) || (argv[argc - 1][0] == '-') ||
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
-        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 3))
+        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5))
     {
         usage();
         return 1;
@@ -115,10 +128,8 @@ int main(int argc, char* argv[])
         printFFT(buf, sfinfo.samplerate, itemsCnt, isPolar, logScale);
     } else if (printAFI) {
         printAudioFileInfo(sfinfo);
-    } else if (detectChord) {
-        printChordInfo(buf, sfinfo.samplerate, itemsCnt, false);
-    } else if (printPCP) {
-        printChordInfo(buf, sfinfo.samplerate, itemsCnt, true);
+    } else if (detectChord || printPCP) {
+        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP);
     }
 
     sf_close(sf);
@@ -159,7 +170,7 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
     vector<complex_t> x;
     uint32_t fftSize = Helpers::nextPowerOf2(samples);
 
-    WindowFunctions::applyHamming(timeDomain, samples);
+    WindowFunctions::applyDefault(timeDomain, samples);
     x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
 
     fft->forward(x);
@@ -182,24 +193,56 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
     delete fft;
 }
 
-void printChordInfo(amplitude_t *timeDomain, uint32_t sampleRate,
-		            uint32_t samples, bool printPCP)
+void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
+                    uint32_t n, string refChord, bool printPCP)
 {
     ChordDetector *cd = new ChordDetector();
+    uint32_t iterMax = itemsCnt / sfinfo.channels / CFG_WINDOW_SIZE;
+    uint32_t iter = 1;
+    uint32_t fails = 0;
 
-    //WindowFunctions::applyHamming(timeDomain, samples);
-    //WindowFunctions::applyBlackman(timeDomain, samples);
-    if (samples > CFG_WINDOW_SIZE) {
-        samples = CFG_WINDOW_SIZE;
+    if (itemsCnt / sfinfo.channels % CFG_WINDOW_SIZE) {
+        iterMax += 1;
     }
-    WindowFunctions::applyDefault(timeDomain, CFG_WINDOW_SIZE);
 
-    if (printPCP) {
-        PitchClsProfile pcp = cd->getPCP(timeDomain, samples, sampleRate);
-        cout << pcp << endl;
-    } else {
-        chord_t chord = cd->getChord(timeDomain, samples, sampleRate);
-        cout << chord << endl;
+    iterMax = (n == 0) ? iterMax : std::min(iterMax, n);
+
+    while (iter <= iterMax) {
+        uint32_t len = (iter * CFG_WINDOW_SIZE <= itemsCnt / sfinfo.channels) ?
+                       CFG_WINDOW_SIZE :
+                       itemsCnt / sfinfo.channels - (iter - 1) * CFG_WINDOW_SIZE;
+        amplitude_t *chanTD = (amplitude_t *) malloc(len * sizeof(amplitude_t));
+
+        /* extract time domain for the first channel */
+        for (uint32_t i = 0; i < len; i++) {
+            uint32_t offset = (iter - 1) * CFG_WINDOW_SIZE;
+            chanTD[i] = timeDomain[offset + i * sfinfo.channels];
+        }
+
+        WindowFunctions::applyDefault(chanTD, CFG_WINDOW_SIZE);
+
+        if (printPCP) {
+            PitchClsProfile pcp = cd->getPCP(chanTD, len, sfinfo.samplerate);
+            cout << pcp << endl;
+        } else {
+            chord_t chord = cd->getChord(chanTD, len, sfinfo.samplerate);
+            if (refChord.empty()) {
+                cout << setw(3) << iter << ": " << chord << endl;
+            } else {
+                if (refChord.compare(chord.toString())) {
+                    fails++;
+                }
+            }
+        }
+
+
+        free(chanTD);
+        iter++;
+    }
+
+    if (!refChord.empty()) {
+        float score = (iterMax - fails) * 100.f / iterMax;
+        cout << fixed << setprecision(2) << score << " %" << endl;
     }
 
     delete cd;
@@ -207,11 +250,12 @@ void printChordInfo(amplitude_t *timeDomain, uint32_t sampleRate,
 
 void printAudioFileInfo(SF_INFO &sfinfo)
 {
-    cout << setw(20) << "Frames (samples):" << setw(10) << sfinfo.frames << "\n"
-         << setw(20) << "Sample rate:" << setw(10) << sfinfo.samplerate << "\n"
-         << setw(20) << "Format:" << setw(10) << sfinfo.format << "\n"
-         << setw(20) << "Sections:" << setw(10) << sfinfo.sections << "\n"
-         << setw(20) << "Seekable:" << setw(10) << sfinfo.seekable << "\n";
+    cout << setw(20) << "Frames:"       << setw(10) << sfinfo.frames << "\n"
+         << setw(20) << "Channels:"     << setw(10) << sfinfo.channels << "\n"
+         << setw(20) << "Sample rate:"  << setw(10) << sfinfo.samplerate << "\n"
+         << setw(20) << "Format:"       << setw(10) << sfinfo.format << "\n"
+         << setw(20) << "Sections:"     << setw(10) << sfinfo.sections << "\n"
+         << setw(20) << "Seekable:"     << setw(10) << sfinfo.seekable << "\n";
 }
 
 void __printScale(note_t note, vector<note_t> scale)
@@ -234,8 +278,8 @@ void printScales()
 void usage()
 {
     cout << "Usage:\n"
-         << "\tlmclient <-t [i] | -f [-p] [-l] | -c | --pcp> <filename>\n"
-         << "\tlmclient -i <filename>\n"
+         << "\tlmclient <-t [i] | -f [-p] [-l]> <filename>\n"
+         << "\tlmclient <-c [-r <reference_chord>] | --pcp> [-n <iterations>] <filename>\n"
          << endl;
 
     cout << "\nOptions:\n"
@@ -246,14 +290,19 @@ void usage()
             "\t\tCan be used with -l to display data in logarithmic scale\n"
          << "\t-l\tdisplay frequency domain in logarithmic scale. Is used with -p\n"
          << "\t-m\tdisplay input audio file information and exit\n"
-         << "\t-c\tprint recognized chord information\n"
          << "\t-s\tprint major scales for all notes\n"
-         << "\t--pcp\tprint Pitch Class Profile"
+         << "\t-c\tprint recognized chord information\n"
+         << "\t-r <rc>\tcalculate precision score. The file has to contain single chord recording.\n"
+         << "\t\tUsed with -c\n"
+         << "\t--pcp\tprint Pitch Class Profile\n"
+         << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
          << endl;
 
     cout << "\nExamples:\n"
          << "\tPrint time domain:\n"
          << "\t\tlmclient -t /path/to/file\n\n"
          << "\tPrint time domain obtained by inverse transform to frequency domain:\n"
-         << "\t\tlmclient -t -i /path/to/file\n\n";
+         << "\t\tlmclient -t -i /path/to/file\n\n"
+         << "\tGet chord precision score fo a file containing single chord recoring:\n"
+         << "\t\tlmclient -c -r Dm /path/to/file/with/Dm\n\n";
 }
