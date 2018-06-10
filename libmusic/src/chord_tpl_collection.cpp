@@ -51,8 +51,8 @@ void ChordTplCollection::__initChordTpls()
 chord_t ChordTplCollection::getBestMatch(pcp_t *pcp)
 {
     tpl_score_t scoreMin = FLT_MAX;
-    note_t winningNote;
-    chord_quality_t winningQuality;
+    note_t winningNote = note_Unknown;
+    chord_quality_t winningQuality = cq_major;
     tpl_score_t score;
 
 
