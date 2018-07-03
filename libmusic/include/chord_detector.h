@@ -23,6 +23,11 @@
 #define CHORD_DETECTOR_TEST_FRIENDS
 #endif
 
+struct segment_t {
+    uint32_t startIdx;
+    uint32_t endIdx;
+    chord_t chord;
+};
 
 /**
  * @class   ChordDetector
@@ -90,6 +95,18 @@ public:
      * @return  detected chord
      */
     chord_t getChord(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
+
+    /**
+    * Given a full set of time domain data, it fills up the 'segments'
+    * vector with the detected sequence of chord segments
+    *
+    * @param   segments    output vector of segments
+    * @param   x           full time domain data
+    * @param   samples     number of samples in x
+    * @param   sampleRate  sample rate of x
+    */
+    void getSegments(std::vector<segment_t>& segments, amplitude_t *x,
+                     uint32_t samples, uint32_t sampleRate);
 
     /**
      * Build major or minor scale from the main note

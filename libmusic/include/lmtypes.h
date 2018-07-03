@@ -95,6 +95,7 @@ private:
 
 public:
     Chord(note_t n, chord_quality_t q) : __mRootNote(n), __mQuality(q) {}
+    Chord() : Chord(note_Unknown, cq_major) {} // Delegate to the other constructor.
 
     friend bool operator==(const Chord& c1, const Chord& c2)
     {

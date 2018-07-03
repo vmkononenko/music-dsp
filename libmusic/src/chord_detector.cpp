@@ -110,6 +110,20 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     return ret;
 }
 
+void ChordDetector::getSegments(std::vector<segment_t>& segments,
+                                amplitude_t *timeDomain, uint32_t samples,
+                                uint32_t sampleRate)
+{
+    for (uint32_t sampleIdx = 0; sampleIdx < samples; sampleIdx += CFG_WINDOW_SIZE) {
+        uint32_t segLen = min(CFG_WINDOW_SIZE, samples - sampleIdx);
+        segment_t segment;
+        segment.chord = getChord(timeDomain + sampleIdx, segLen, sampleRate);
+        segment.startIdx = sampleIdx;
+        segment.endIdx = sampleIdx + segLen - 1;
+        segments.push_back(segment);
+    }
+}
+
 PitchClsProfile ChordDetector::getPCP(amplitude_t *timeDomain, uint32_t samples,
                                       uint32_t sampleRate)
 {
