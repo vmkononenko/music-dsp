@@ -26,7 +26,7 @@ void usage();
 void printScales();
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, bool);
-void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool);
+void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int);
 void printAudioFileInfo(SF_INFO &);
 
 
@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
     bool printPCP = false;          // print pitch class profile
     int  n = 0;                     // a number of FFT windows to analyze
     string refChord;                // reference chord to evaluate against
+    int winSize = 0;                // default window size is set by the lib
 
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-f") == 0) {
@@ -59,6 +60,12 @@ int main(int argc, char* argv[])
             minArgCnt++;
         } else if (strcmp(argv[i], "-c") == 0) {
             detectChord = true;
+            minArgCnt++;
+        } else if (strcmp(argv[i], "-w") == 0) {
+            i++;
+            if (i >= argc) { usage(); return 1; }
+            winSize = atoi(argv[i]);
+            if (winSize <= 0) {usage(); return 1; }
             minArgCnt++;
         } else if (strcmp(argv[i], "-m") == 0) {
             printAFI = true;
@@ -95,7 +102,8 @@ int main(int argc, char* argv[])
     if ((argc < minArgCnt) || (argv[argc - 1][0] == '-') ||
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
-        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5))
+        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5) ||
+        (winSize > 0 && !detectChord && !printPCP))
     {
         usage();
         return 1;
@@ -129,7 +137,7 @@ int main(int argc, char* argv[])
     } else if (printAFI) {
         printAudioFileInfo(sfinfo);
     } else if (detectChord || printPCP) {
-        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP);
+        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize);
     }
 
     sf_close(sf);
@@ -194,32 +202,36 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
 }
 
 void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
-                    uint32_t n, string refChord, bool printPCP)
+                    uint32_t n, string refChord, bool printPCP, int winSize)
 {
     ChordDetector *cd = new ChordDetector();
-    uint32_t iterMax = itemsCnt / sfinfo.channels / CFG_WINDOW_SIZE;
+    uint32_t iterMax;
     uint32_t iter = 1;
     uint32_t fails = 0;
 
-    if (itemsCnt / sfinfo.channels % CFG_WINDOW_SIZE) {
+    if (winSize <= 0) {
+        winSize = CFG_WINDOW_SIZE;
+    }
+
+    iterMax = itemsCnt / sfinfo.channels / winSize;
+    if (itemsCnt / sfinfo.channels % winSize) {
         iterMax += 1;
     }
 
     iterMax = (n == 0) ? iterMax : std::min(iterMax, n);
 
     while (iter <= iterMax) {
-        uint32_t len = (iter * CFG_WINDOW_SIZE <= itemsCnt / sfinfo.channels) ?
-                       CFG_WINDOW_SIZE :
-                       itemsCnt / sfinfo.channels - (iter - 1) * CFG_WINDOW_SIZE;
+        uint32_t len = (iter * winSize <= itemsCnt / sfinfo.channels) ? winSize :
+                       itemsCnt / sfinfo.channels - (iter - 1) * winSize;
         amplitude_t *chanTD = (amplitude_t *) malloc(len * sizeof(amplitude_t));
 
         /* extract time domain for the first channel */
         for (uint32_t i = 0; i < len; i++) {
-            uint32_t offset = (iter - 1) * CFG_WINDOW_SIZE;
+            uint32_t offset = (iter - 1) * winSize;
             chanTD[i] = timeDomain[offset + i * sfinfo.channels];
         }
 
-        WindowFunctions::applyDefault(chanTD, CFG_WINDOW_SIZE);
+        WindowFunctions::applyDefault(chanTD, winSize);
 
         if (printPCP) {
             PitchClsProfile pcp = cd->getPCP(chanTD, len, sfinfo.samplerate);
@@ -295,6 +307,8 @@ void usage()
          << "\t-r <rc>\tcalculate precision score. The file has to contain single chord recording.\n"
          << "\t\tUsed with -c\n"
          << "\t--pcp\tprint Pitch Class Profile\n"
+         << "\t-w\twindow size in samples - length of blocks to pass for analysis.\n"
+         << "\t\tUsed with -c and --pcp\n"
          << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
          << endl;
 
