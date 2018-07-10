@@ -44,7 +44,7 @@ if(WITH_TESTS)
     add_subdirectory(tests)
 endif()
 
-set (CMAKE_CXX_FLAGS "-Werror -Wall -Wextra")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
 if(WITH_CLIENT)
     add_subdirectory(client)
