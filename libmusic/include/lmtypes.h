@@ -12,6 +12,13 @@
 #include <map>
 #include <stdint.h>
 
+#define WINDOW_FUNC_RECTANGULAR     1
+#define WINDOW_FUNC_BLACKMAN        2
+#define WINDOW_FUNC_HAMMING         3
+#define WINDOW_FUNC_HANN            4
+#define WINDOW_FUNC_MIN             WINDOW_FUNC_RECTANGULAR
+#define WINDOW_FUNC_MAX             WINDOW_FUNC_HANN
+
 typedef double amplitude_t;
 typedef double freq_hz_t;
 typedef std::complex<amplitude_t> complex_t;
@@ -77,15 +84,6 @@ typedef enum {
 } chord_quality_t;
 
 std::ostream& operator<<(std::ostream& os, const chord_quality_t& q);
-
-typedef enum {
-    WINDOW_FUNC_RECTANGULAR,
-    WINDOW_FUNC_BLACKMAN,
-    WINDOW_FUNC_HAMMING,
-    WINDOW_FUNC_HANN,
-    WINDOW_FUNC_MIN = WINDOW_FUNC_RECTANGULAR,
-    WINDOW_FUNC_MAX = WINDOW_FUNC_HANN
-} window_func_t;
 
 typedef struct Chord {
 

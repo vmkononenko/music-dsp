@@ -33,20 +33,20 @@ void WindowFunctions::applyHann(amplitude_t *points, uint32_t pointsCnt)
 
 void WindowFunctions::applyDefault(amplitude_t *points, uint32_t pointsCnt)
 {
-#if !defined(CFG_WINDOW_FUNC) || (CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_RECTANGULAR)
+#if !defined(CFG_WINDOW_FUNC) || (CFG_WINDOW_FUNC == WINDOW_FUNC_RECTANGULAR)
     /* rectangular is a default. Do nothing for it */
     UNUSED(points);
     UNUSED(pointsCnt);
-#elif CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_BLACKMAN
+#elif CFG_WINDOW_FUNC == WINDOW_FUNC_BLACKMAN
     applyBlackman(points, pointsCnt);
-#elif CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_HAMMING
+#elif CFG_WINDOW_FUNC == WINDOW_FUNC_HAMMING
     applyHamming(points, pointsCnt);
-#elif CFG_WINDOW_FUNC == CFG_WINDOW_FUNC_HANN
+#elif CFG_WINDOW_FUNC == WINDOW_FUNC_HANN
     applyHann(points, pointsCnt);
 #endif
 }
 
-const char * WindowFunctions::toString(window_func_t fcode)
+const char * WindowFunctions::toString(uint32_t fcode)
 {
     if ((fcode < WINDOW_FUNC_MIN) || (fcode > WINDOW_FUNC_MAX)) {
         throw std::invalid_argument("Invalid window function");

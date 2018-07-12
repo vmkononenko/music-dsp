@@ -22,7 +22,7 @@ public:
     static void applyHann(amplitude_t *, uint32_t);
     static void applyBlackman(amplitude_t *, uint32_t);
     static void applyDefault(amplitude_t *, uint32_t);
-    static const char * toString(window_func_t);
+    static const char * toString(uint32_t);
 };
 
 /** @} */
