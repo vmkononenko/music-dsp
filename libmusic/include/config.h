@@ -27,4 +27,11 @@
 #define CFG_PITCH_PRECISION_THRESHOLD   ((double)0.35)
 #endif /* CFG_PITCH_PRECISION_THRESHOLD */
 
+#ifndef CFG_MA_FILT_DF_DEFAULT
+/**
+ * @brief Default downsampling factor for the MAFilter
+ */
+#define CFG_MA_FILT_DF_DEFAULT    15
+#endif /* CFG_MA_FILT_DF_DEFAULT */
+
 /** @} */

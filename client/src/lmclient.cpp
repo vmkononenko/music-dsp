@@ -16,6 +16,7 @@
 
 #include "chord_detector.h"
 #include "config.h"
+#include "envelope.h"
 #include "fft.h"
 #include "lmhelpers.h"
 #include "window_functions.h"
@@ -24,6 +25,7 @@ using namespace std;
 
 void usage();
 void printScales();
+void printSigEnvelope(amplitude_t *, uint32_t);
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, bool);
 void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int);
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
     bool printAFI = false;          // audio file meta information
     bool detectChord = false;       // print detected chord
     bool printPCP = false;          // print pitch class profile
+    bool printEnvelope = false;     // print signal envelope
     int  n = 0;                     // a number of FFT windows to analyze
     string refChord;                // reference chord to evaluate against
     int winSize = 0;                // default window size is set by the lib
@@ -51,6 +54,9 @@ int main(int argc, char* argv[])
             minArgCnt++;
         } else if (strcmp(argv[i], "-t") == 0) {
             printTD = true;
+            minArgCnt++;
+        } else if ((strcmp(argv[i], "-e") == 0)) {
+            printEnvelope = true;
             minArgCnt++;
         } else if (strcmp(argv[i], "-i") == 0) {
             tdViaInverseDFT = true;
@@ -103,7 +109,7 @@ int main(int argc, char* argv[])
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
         (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5) ||
-        (winSize > 0 && !detectChord && !printPCP))
+        (winSize > 0 && !detectChord && !printPCP) || (printEnvelope && minArgCnt > 3))
     {
         usage();
         return 1;
@@ -138,6 +144,8 @@ int main(int argc, char* argv[])
         printAudioFileInfo(sfinfo);
     } else if (detectChord || printPCP) {
         printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize);
+    } else if (printEnvelope) {
+        printSigEnvelope(buf, itemsCnt);
     }
 
     sf_close(sf);
@@ -158,6 +166,15 @@ void printTimeDomain(amplitude_t *timeDomain, uint32_t samples, bool tdViaInvers
     for (uint32_t i = 0; i < samples; i++) {
         cout << i << "," << real(x[i]) << endl;
     }
+}
+
+
+void printSigEnvelope(amplitude_t *timeDomain, uint32_t samples) {
+    Envelope *e = new Envelope(timeDomain, samples);
+
+    cout << *e;
+
+    delete e;
 }
 
 double max_amplitude(std::vector<complex_t> x) {
@@ -296,6 +313,7 @@ void usage()
 
     cout << "\nOptions:\n"
          << "\t-t\tprint time domain data\n"
+         << "\t-e\tprint signal envelope\n"
          << "\t-i\tprint time domain obtained by inverse transform to frequency domain\n"
          << "\t-f\tprint frequency domain data\n"
          << "\t-p\tused with -f. Output frequency domain in polar format.\n"
