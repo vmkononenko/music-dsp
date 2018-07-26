@@ -1,4 +1,5 @@
 set(LIB_SOURCES
+    beat_detector.cpp
     cheby1_filter.cpp
     chord_detector.cpp
     chord_tpl_collection.cpp

@@ -14,6 +14,7 @@
 #include <sndfile.h>
 #include <stdlib.h>
 
+#include "beat_detector.h"
 #include "chord_detector.h"
 #include "config.h"
 #include "envelope.h"
@@ -27,9 +28,10 @@ void usage();
 void printScales();
 void printSigEnvelope(amplitude_t *, uint32_t);
 void printFFT(double *, int, uint32_t, bool, bool);
-void printTimeDomain(double *, uint32_t, bool);
+void printTimeDomain(double *, uint32_t, uint32_t, bool, bool);
 void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int);
 void printAudioFileInfo(SF_INFO &);
+void printBPM(amplitude_t *, uint32_t, uint32_t);
 
 
 int main(int argc, char* argv[])
@@ -44,6 +46,7 @@ int main(int argc, char* argv[])
     bool detectChord = false;       // print detected chord
     bool printPCP = false;          // print pitch class profile
     bool printEnvelope = false;     // print signal envelope
+    bool detectBeat = false;        // print beats per minute
     int  n = 0;                     // a number of FFT windows to analyze
     string refChord;                // reference chord to evaluate against
     int winSize = 0;                // default window size is set by the lib
@@ -57,6 +60,9 @@ int main(int argc, char* argv[])
             minArgCnt++;
         } else if ((strcmp(argv[i], "-e") == 0)) {
             printEnvelope = true;
+            minArgCnt++;
+        } else if ((strcmp(argv[i], "-b") == 0)) {
+            detectBeat = true;
             minArgCnt++;
         } else if (strcmp(argv[i], "-i") == 0) {
             tdViaInverseDFT = true;
@@ -109,7 +115,10 @@ int main(int argc, char* argv[])
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
         (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5) ||
-        (winSize > 0 && !detectChord && !printPCP) || (printEnvelope && minArgCnt > 3))
+        (winSize > 0 && !detectChord && !printPCP) ||
+        (printEnvelope && minArgCnt > 3) ||
+        (detectBeat && !printTD && minArgCnt > 3) ||
+        (detectBeat && printTD && minArgCnt > 4))
     {
         usage();
         return 1;
@@ -137,7 +146,7 @@ int main(int argc, char* argv[])
     }
 
     if (printTD) {
-        printTimeDomain(buf, itemsCnt, tdViaInverseDFT);
+        printTimeDomain(buf, itemsCnt, sfinfo.samplerate, tdViaInverseDFT, detectBeat);
     } else if (printFD) {
         printFFT(buf, sfinfo.samplerate, itemsCnt, isPolar, logScale);
     } else if (printAFI) {
@@ -146,6 +155,8 @@ int main(int argc, char* argv[])
         printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize);
     } else if (printEnvelope) {
         printSigEnvelope(buf, itemsCnt);
+    } else if (detectBeat && !printTD) {
+        printBPM(buf, itemsCnt, sfinfo.samplerate);
     }
 
     sf_close(sf);
@@ -154,8 +165,31 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void printTimeDomain(amplitude_t *timeDomain, uint32_t samples, bool tdViaInverseDFT)
+void printTimeDomain(amplitude_t *timeDomain, uint32_t samples,
+                     uint32_t sampleRate, bool tdViaInverseDFT, bool detectBeat)
 {
+#define PLOT_SAMPLES_MAX    1000000U
+    if (detectBeat) {
+        BeatDetector *bd = new BeatDetector(timeDomain, samples, sampleRate);
+        uint32_t beatOffset = bd->getOffset();
+        uint16_t beatInterval = bd->getIdxInterval();
+        uint32_t plotSamples = min(PLOT_SAMPLES_MAX, samples);
+        amplitude_t ampMax = *max_element(timeDomain, timeDomain + plotSamples);
+        amplitude_t ampMin = *min_element(timeDomain, timeDomain + plotSamples);
+        uint32_t beats = 0;
+
+        for (uint32_t i = 0; i < plotSamples; i++) {
+            amplitude_t beatAmp = ampMin;
+            if (i == beatOffset + beats * beatInterval) {
+                beatAmp = ampMax;
+                beats++;
+            }
+            cout << i << "," << timeDomain[i] << "," << beatAmp << endl;
+        }
+
+        return;
+    }
+
     FFT *fft = new FFT();
     vector<complex_t> x = Helpers::timeDomain2ComplexVector(timeDomain, samples, samples);
 
@@ -168,13 +202,20 @@ void printTimeDomain(amplitude_t *timeDomain, uint32_t samples, bool tdViaInvers
     }
 }
 
-
 void printSigEnvelope(amplitude_t *timeDomain, uint32_t samples) {
     Envelope *e = new Envelope(timeDomain, samples);
 
     cout << *e;
 
     delete e;
+}
+
+void printBPM(amplitude_t *timeDomain, uint32_t samples, uint32_t sampleRate) {
+    BeatDetector *bd = new BeatDetector(timeDomain, samples, sampleRate);
+
+    cout << bd->getBPM() << endl;
+
+    delete bd;
 }
 
 double max_amplitude(std::vector<complex_t> x) {
@@ -328,6 +369,8 @@ void usage()
          << "\t-w\twindow size in samples - length of blocks to pass for analysis.\n"
          << "\t\tUsed with -c and --pcp\n"
          << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
+         << "\t-b\tdetect BPM of the input audio\n"
+         << "\t\tIn combination with -t prints peaks at the beat indices along with time domain."
          << endl;
 
     cout << "\nExamples:\n"
@@ -336,5 +379,7 @@ void usage()
          << "\tPrint time domain obtained by inverse transform to frequency domain:\n"
          << "\t\tlmclient -t -i /path/to/file\n\n"
          << "\tGet chord precision score fo a file containing single chord recoring:\n"
-         << "\t\tlmclient -c -r Dm /path/to/file/with/Dm\n\n";
+         << "\t\tlmclient -c -r Dm /path/to/file/with/Dm\n\n"
+         << "\tPrint detected beat along with time domain:\n"
+         << "\t\tlmclient -b -t /path/to/file\n\n";
 }
