@@ -11,6 +11,8 @@
 #include "fft.h"
 #include "lmhelpers.h"
 
+#define HPS_HARMONICS   3
+
 using namespace std;
 
 
@@ -175,6 +177,15 @@ uint32_t FFT::toPolar(vector<complex_t> &input, amplitude_t *freqDomainMagnitude
 void FFT::toPolar(vector<complex_t> &input)
 {
     toPolar(input, NULL, NULL, input.size());
+}
+
+void FFT::toHPS(amplitude_t *freqDomainMagnitudes, uint32_t len)
+{
+    for (uint8_t m = 1; m < HPS_HARMONICS; m++) {
+        for (uint32_t i = 0; i < len / pow(2, m); i++) {
+            freqDomainMagnitudes[i] *= freqDomainMagnitudes[i * (uint32_t)pow(2, m)];
+        }
+    }
 }
 
 void FFT::inverse(vector<complex_t> &input)

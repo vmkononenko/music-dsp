@@ -59,6 +59,15 @@ public:
     uint32_t toPolar(std::vector<complex_t> &input, amplitude_t *freqDomainMagnitudes,
                      PriorityQueue *pq, uint32_t reqLen);
 
+
+    /**
+     * Convert FFT to harmonic product spectrum
+     *
+     * @param freqDomainMagnitudes  frequency domain
+     * @param len                   length of the \p freqDomainMagnitudes
+     */
+    void toHPS(amplitude_t *freqDomainMagnitudes, uint32_t len);
+
     /**
      * Inverse DFT calculation
      *
