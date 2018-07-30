@@ -29,7 +29,7 @@ void printScales();
 void printSigEnvelope(amplitude_t *, uint32_t);
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, uint32_t, bool, bool);
-void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int);
+void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int, bool);
 void printAudioFileInfo(SF_INFO &);
 void printBPM(amplitude_t *, uint32_t, uint32_t);
 
@@ -47,6 +47,7 @@ int main(int argc, char* argv[])
     bool printPCP = false;          // print pitch class profile
     bool printEnvelope = false;     // print signal envelope
     bool detectBeat = false;        // print beats per minute
+    bool legacy = false;            // legacy version of the feature
     int  n = 0;                     // a number of FFT windows to analyze
     string refChord;                // reference chord to evaluate against
     int winSize = 0;                // default window size is set by the lib
@@ -101,6 +102,9 @@ int main(int argc, char* argv[])
             if (i >= argc) { usage(); return 1; }
             refChord = string(argv[i]);
             minArgCnt++;
+        } else if ((strcmp(argv[i], "--legacy") == 0)) {
+            legacy = true;
+            minArgCnt++;
         } else if ((strcmp(argv[i], "-h") == 0)) {
             usage();
             return 0;
@@ -114,11 +118,12 @@ int main(int argc, char* argv[])
     if ((argc < minArgCnt) || (argv[argc - 1][0] == '-') ||
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
-        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 5) ||
+        (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 6) ||
         (winSize > 0 && !detectChord && !printPCP) ||
+        (detectChord && legacy && (winSize || n > 0)) ||
         (printEnvelope && minArgCnt > 3) ||
         (detectBeat && !printTD && minArgCnt > 3) ||
-        (detectBeat && printTD && minArgCnt > 4))
+        (detectBeat && printTD && minArgCnt > 4) || (legacy && minArgCnt == 3))
     {
         usage();
         return 1;
@@ -152,7 +157,7 @@ int main(int argc, char* argv[])
     } else if (printAFI) {
         printAudioFileInfo(sfinfo);
     } else if (detectChord || printPCP) {
-        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize);
+        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize, legacy);
     } else if (printEnvelope) {
         printSigEnvelope(buf, itemsCnt);
     } else if (detectBeat && !printTD) {
@@ -259,8 +264,9 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
     delete fft;
 }
 
-void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
-                    uint32_t n, string refChord, bool printPCP, int winSize)
+void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
+                            uint32_t itemsCnt, uint32_t n, string refChord,
+                            bool printPCP, int winSize)
 {
     ChordDetector *cd = new ChordDetector();
     uint32_t iterMax;
@@ -289,8 +295,6 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
             chanTD[i] = timeDomain[offset + i * sfinfo.channels];
         }
 
-        WindowFunctions::applyDefault(chanTD, winSize);
-
         if (printPCP) {
             PitchClsProfile pcp = cd->getPCP(chanTD, len, sfinfo.samplerate);
             cout << pcp << endl;
@@ -305,7 +309,6 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
             }
         }
 
-
         free(chanTD);
         iter++;
     }
@@ -317,6 +320,33 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
 
     delete cd;
 }
+
+void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
+                    uint32_t n, string refChord, bool printPCP, int winSize,
+                    bool legacy)
+{
+    if (legacy) {
+        return __printChordInfoLegacy(timeDomain, sfinfo, itemsCnt, n, refChord,
+                                      printPCP, winSize);
+    }
+
+    ChordDetector *cd = new ChordDetector();
+    amplitude_t *channelTD = (amplitude_t *) malloc(itemsCnt / sfinfo.channels * sizeof(amplitude_t));
+    std::vector<segment_t> segments;
+
+    for (uint32_t i = 0; i < itemsCnt/sfinfo.channels; i++) {
+        channelTD[i] = timeDomain[i * sfinfo.channels];
+    }
+
+    cd->getSegments(segments, channelTD, itemsCnt/sfinfo.channels, sfinfo.samplerate);
+    for (uint32_t i = 0; i < segments.size(); i++) {
+        cout << setw(3) << i << ": " << segments[i].chord << endl;
+    }
+
+    free(channelTD);
+    delete cd;
+}
+
 
 void printAudioFileInfo(SF_INFO &sfinfo)
 {
@@ -370,7 +400,8 @@ void usage()
          << "\t\tUsed with -c and --pcp\n"
          << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
          << "\t-b\tdetect BPM of the input audio\n"
-         << "\t\tIn combination with -t prints peaks at the beat indices along with time domain."
+         << "\t\tIn combination with -t prints peaks at the beat indices along with time domain.\n"
+         << "\t--legacy\tuse legacy version of the feature. Can't be used a standalone option."
          << endl;
 
     cout << "\nExamples:\n"
