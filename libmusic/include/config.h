@@ -7,6 +7,10 @@
 
 #pragma once
 
+#ifndef CFG_DYNAMIC_WINDOW
+#define CFG_DYNAMIC_WINDOW
+#endif
+
 #ifndef CFG_WINDOW_SIZE
 #define CFG_WINDOW_SIZE     ((uint32_t)4096)
 #endif /* CFG_WINDOW_SIZE */

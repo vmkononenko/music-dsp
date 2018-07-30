@@ -5,6 +5,7 @@
  * @{
  */
 
+#include "beat_detector.h"
 #include "chord_detector.h"
 #include "config.h"
 #include "lmhelpers.h"
@@ -61,9 +62,7 @@ ChordDetector::FFTResults ChordDetector::__getFftResults(amplitude_t *timeDomain
 
     WindowFunctions::applyDefault(timeDomain, samples);
 
-    /** @TODO define minimum FFT size for frequency calculation precision */
-    //fftSize = Helpers::nextPowerOf2(samples);
-    res.fftSize = CFG_FFT_SIZE;
+    res.fftSize = Helpers::nextPowerOf2(samples);
     x = Helpers::timeDomain2ComplexVector(timeDomain, samples, res.fftSize);
 
     __mFft->forward(x);
@@ -114,8 +113,22 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
                                 amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
-    for (uint32_t sampleIdx = 0; sampleIdx < samples; sampleIdx += CFG_WINDOW_SIZE) {
-        uint32_t segLen = min(CFG_WINDOW_SIZE, samples - sampleIdx);
+    uint32_t winSize, offset;
+
+#ifdef CFG_DYNAMIC_WINDOW
+    BeatDetector *bd = new BeatDetector(timeDomain, samples, sampleRate);
+
+    winSize = bd->getIdxInterval();
+    offset = bd->getOffset();
+
+    delete bd;
+#else
+    winSize = CFG_WINDOW_SIZE;
+    offset = 0;
+#endif
+
+    for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += winSize) {
+        uint32_t segLen = min(winSize, samples - sampleIdx);
         segment_t segment;
         segment.chord = getChord(timeDomain + sampleIdx, segLen, sampleRate);
         segment.startIdx = sampleIdx;
