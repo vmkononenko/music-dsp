@@ -264,6 +264,12 @@ void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
     delete fft;
 }
 
+void __printChordEvalScore(uint32_t total, uint32_t fails)
+{
+    float score = (total - fails) * 100.f / total;
+    cout << fixed << setprecision(2) << score << " %" << endl;
+}
+
 void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
                             uint32_t itemsCnt, uint32_t n, string refChord,
                             bool printPCP, int winSize)
@@ -314,8 +320,7 @@ void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
     }
 
     if (!refChord.empty()) {
-        float score = (iterMax - fails) * 100.f / iterMax;
-        cout << fixed << setprecision(2) << score << " %" << endl;
+        __printChordEvalScore(iterMax, fails);
     }
 
     delete cd;
@@ -333,6 +338,7 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
     ChordDetector *cd = new ChordDetector();
     amplitude_t *channelTD = (amplitude_t *) malloc(itemsCnt / sfinfo.channels * sizeof(amplitude_t));
     std::vector<segment_t> segments;
+    uint32_t fails = 0;
 
     for (uint32_t i = 0; i < itemsCnt/sfinfo.channels; i++) {
         channelTD[i] = timeDomain[i * sfinfo.channels];
@@ -340,7 +346,17 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
 
     cd->getSegments(segments, channelTD, itemsCnt/sfinfo.channels, sfinfo.samplerate);
     for (uint32_t i = 0; i < segments.size(); i++) {
-        cout << setw(3) << i << ": " << segments[i].chord << endl;
+        if (refChord.empty()) {
+            cout << setw(3) << i << ": " << segments[i].chord << endl;
+        } else {
+            if (refChord.compare(segments[i].chord.toString())) {
+                fails++;
+            }
+        }
+    }
+
+    if (!refChord.empty()) {
+        __printChordEvalScore(segments.size(), fails);
     }
 
     free(channelTD);
