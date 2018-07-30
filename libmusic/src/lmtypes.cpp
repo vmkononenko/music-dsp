@@ -61,6 +61,26 @@ std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
     q2sMap[cq_suspended_2nd]        = "sus2";
     q2sMap[cq_5th]                  = "5";
 
+#if 0
+    q2sMap[cq_major]                = "";
+    q2sMap[cq_minor]                = "m";
+    q2sMap[cq_7th]                  = "";
+    q2sMap[cq_major_7th]            = "";
+    q2sMap[cq_minor_7th]            = "m";
+    q2sMap[cq_6th]                  = "";
+    q2sMap[cq_minor_6th]            = "m";
+    q2sMap[cq_diminished]           = "";
+    q2sMap[cq_diminished_7th]       = "";
+    q2sMap[cq_half_diminished_7th]  = "m";
+    q2sMap[cq_9th]                  = "m";
+    q2sMap[cq_major_9th]            = "";
+    q2sMap[cq_added_9th]            = "";
+    q2sMap[cq_minor_9th]            = "m";
+    q2sMap[cq_suspended_4th]        = "sus4";
+    q2sMap[cq_suspended_2nd]        = "sus2";
+    q2sMap[cq_5th]                  = "";
+#endif
+
     os << q2sMap[q];
 
     return os;
