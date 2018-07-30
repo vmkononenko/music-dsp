@@ -68,7 +68,7 @@ ChordDetector::FFTResults ChordDetector::__getFftResults(amplitude_t *timeDomain
     __mFft->forward(x);
 
     /** @TODO check for +/-1 error */
-    res.highFreqThresholdIdx = Helpers::freqToFftIdx(sampleRate/2, res.fftSize,
+    res.highFreqThresholdIdx = Helpers::freqToFftIdx(FREQ_C8, res.fftSize,
                                                      sampleRate, ceil);
 
     res.freqDomain = new amplitude_t[res.highFreqThresholdIdx];

@@ -12,11 +12,11 @@
 #endif
 
 #ifndef CFG_WINDOW_SIZE
-#define CFG_WINDOW_SIZE     ((uint32_t)4096)
+#define CFG_WINDOW_SIZE     ((uint32_t)8192)
 #endif /* CFG_WINDOW_SIZE */
 
 #ifndef CFG_FFT_SIZE
-#define CFG_FFT_SIZE        ((uint32_t)16384)
+#define CFG_FFT_SIZE        ((uint32_t)8192)
 #endif /* CFG_FFT_SIZE */
 
 #ifndef CFG_WINDOW_FUNC
