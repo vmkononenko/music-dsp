@@ -7,7 +7,6 @@
 
 #include "beat_detector.h"
 #include "config.h"
-#include "envelope.h"
 #include "fft.h"
 #include "lmhelpers.h"
 
@@ -19,12 +18,20 @@ using namespace std;
 
 BeatDetector::BeatDetector(amplitude_t *td, uint32_t samples, uint32_t sampleRate)
 {
-    detectBeat(td, samples, sampleRate);
+    Envelope *e = new Envelope(td, samples);
+
+    detectBeat(e, sampleRate);
+
+    delete e;
 }
 
-void BeatDetector::detectBeat(amplitude_t *td, uint32_t samples, uint32_t sampleRate)
+BeatDetector::BeatDetector(Envelope *e, uint32_t sampleRate)
 {
-    Envelope *env = new Envelope(td, samples);
+    detectBeat(e, sampleRate);
+}
+
+void BeatDetector::detectBeat(Envelope *env, uint32_t sampleRate)
+{
     vector<amplitude_t> envDiff = env->diff();
     uint32_t envSampleRate = sampleRate / env->getDownsampleFactor();
     FFT *fft = new FFT();
@@ -61,7 +68,6 @@ void BeatDetector::detectBeat(amplitude_t *td, uint32_t samples, uint32_t sample
             (maxEnvAmpIdx - closestLeftLocalMinIdx) / 2 : maxEnvAmpIdx) % __mBeatIdxInterval;
 
     delete fft;
-    delete env;
 }
 
 void BeatDetector::normalizeInterval()

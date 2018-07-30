@@ -16,6 +16,7 @@
 
 #include <vector>
 
+#include "envelope.h"
 #include "lmtypes.h"
 
 
@@ -26,7 +27,7 @@ private:
     uint32_t __mBeatIdxInterval;
     float __mBPM;
 
-    void detectBeat(amplitude_t *td, uint32_t samples, uint32_t sampleRate);
+    void detectBeat(Envelope *e, uint32_t sampleRate);
 
     /**
      * Generate vector of indices at which attack happens
@@ -53,6 +54,8 @@ private:
 
 public:
     BeatDetector(amplitude_t *td, uint32_t samples, uint32_t sampleRate);
+
+    BeatDetector(Envelope *e, uint32_t sampleRate);
 
     uint32_t getOffset();
 
