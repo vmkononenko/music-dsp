@@ -24,9 +24,10 @@
 #endif
 
 struct segment_t {
-    uint32_t startIdx;
-    uint32_t endIdx;
-    chord_t chord;
+    uint32_t    startIdx;
+    uint32_t    endIdx;
+    chord_t     chord;
+    bool        silence;
 };
 
 /**

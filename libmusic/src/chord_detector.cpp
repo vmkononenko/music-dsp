@@ -8,6 +8,7 @@
 #include "beat_detector.h"
 #include "chord_detector.h"
 #include "config.h"
+#include "envelope.h"
 #include "lmhelpers.h"
 #include "lmlogger.h"
 #include "window_functions.h"
@@ -113,10 +114,11 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
                                 amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
+    Envelope *e = new Envelope(timeDomain, samples);
     uint32_t winSize, offset;
 
 #ifdef CFG_DYNAMIC_WINDOW
-    BeatDetector *bd = new BeatDetector(timeDomain, samples, sampleRate);
+    BeatDetector *bd = new BeatDetector(e, sampleRate);
 
     winSize = bd->getIdxInterval();
     offset = bd->getOffset();
@@ -130,9 +132,12 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
     for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += winSize) {
         uint32_t segLen = min(winSize, samples - sampleIdx);
         segment_t segment;
-        segment.chord = getChord(timeDomain + sampleIdx, segLen, sampleRate);
         segment.startIdx = sampleIdx;
         segment.endIdx = sampleIdx + segLen - 1;
+        segment.silence = e->isSilence(segment.startIdx, segment.endIdx);
+        if (!segment.silence) {
+            segment.chord = getChord(timeDomain + sampleIdx, segLen, sampleRate);
+        }
         segments.push_back(segment);
     }
 }
