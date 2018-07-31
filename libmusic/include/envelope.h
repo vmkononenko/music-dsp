@@ -24,10 +24,15 @@ private:
 
     std::vector<amplitude_t> __mEnvelope;
     uint16_t __mDF = 1;     // total downsampling factor caused by filtering
+    amplitude_t __mMaxAmplitude;
 
     void squareAndDouble(amplitude_t *td, uint32_t samples);
 
     void squareRoot(std::vector<amplitude_t> &input);
+
+    amplitude_t max();
+
+    amplitude_t mean(uint32_t startIdx, uint32_t endIdx);
 
 public:
     Envelope(amplitude_t *td, uint32_t samples);
@@ -35,6 +40,8 @@ public:
     std::vector<amplitude_t> diff();
 
     uint16_t getDownsampleFactor();
+
+    bool isSilence(uint32_t startIdx, uint32_t endIdx);
 
     friend std::ostream& operator<<(std::ostream& os, const Envelope& e);
 
