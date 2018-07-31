@@ -1,6 +1,5 @@
 set(LIB_SOURCES
     beat_detector.cpp
-    cheby1_filter.cpp
     chord_detector.cpp
     chord_tpl_collection.cpp
     chord_tpl.cpp
@@ -14,6 +13,7 @@ set(LIB_SOURCES
     music_scale.cpp
     pitch_calculator.cpp
     pitch_cls_profile.cpp
+    recursive_filter.cpp
     window_functions.cpp
 )
 
