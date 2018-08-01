@@ -336,20 +336,20 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
     }
 
     ChordDetector *cd = new ChordDetector();
-    amplitude_t *channelTD = (amplitude_t *) malloc(itemsCnt / sfinfo.channels * sizeof(amplitude_t));
+    amplitude_t *channelTD = (amplitude_t *) malloc(sfinfo.frames * sizeof(amplitude_t));
     std::vector<segment_t> segments;
     uint32_t fails = 0;
 
-    for (uint32_t i = 0; i < itemsCnt/sfinfo.channels; i++) {
+    for (uint32_t i = 0; i < sfinfo.frames; i++) {
         channelTD[i] = timeDomain[i * sfinfo.channels];
     }
 
-    cd->getSegments(segments, channelTD, itemsCnt/sfinfo.channels, sfinfo.samplerate);
+    cd->getSegments(segments, channelTD, sfinfo.frames, sfinfo.samplerate);
     for (uint32_t i = 0; i < segments.size(); i++) {
         if (refChord.empty()) {
-            cout << setw(3) << i << ": " << segments[i].chord << endl;
+            cout << setw(3) << i << ": " << (segments[i].silence ? "SILENCE" : segments[i].chord.toString()) << endl;
         } else {
-            if (refChord.compare(segments[i].chord.toString())) {
+            if (!segments[i].silence && refChord.compare(segments[i].chord.toString())) {
                 fails++;
             }
         }
