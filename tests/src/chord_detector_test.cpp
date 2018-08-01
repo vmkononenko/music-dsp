@@ -10,12 +10,13 @@
 #define TEST_FILES_DIR_ENV_VAR      "LM_TEST_FILES_DIR"
 #define SEPARATE_CHORDS_DIR         "/chords_separate/"
 
-uint32_t Common::openSoundFile(amplitude_t **buf, const char *filePath,
+uint32_t Common::openSoundFile(amplitude_t **chanBuf, const char *filePath,
                                uint32_t *sampleRate)
 {
     SNDFILE *sf;
     SF_INFO sfinfo;
-    sf_count_t itemsCnt;
+    amplitude_t *buf;
+    sf_count_t itemsTotal;
 
     /* Open input sound file */
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -23,12 +24,22 @@ uint32_t Common::openSoundFile(amplitude_t **buf, const char *filePath,
 
     ASSERTM("Could not open input file", (sf != nullptr));
 
-    itemsCnt = std::min(CFG_WINDOW_SIZE, (uint32_t)(sfinfo.frames * sfinfo.channels));
-    *buf = (double*) malloc(itemsCnt * sizeof(double));
+    itemsTotal = (uint32_t)(sfinfo.frames * sfinfo.channels);
+    buf = (double*) malloc(itemsTotal * sizeof(double));
+
+    sf_read_double(sf, buf, itemsTotal);
 
     *sampleRate = sfinfo.samplerate;
 
-    return sf_read_double(sf, *buf, itemsCnt);
+    *chanBuf = (amplitude_t *) malloc(sfinfo.frames * sizeof(amplitude_t));
+
+    for (uint32_t i = 0; i < sfinfo.frames; i++) {
+        (*chanBuf)[i] = buf[i * sfinfo.channels];
+    }
+
+    free(buf);
+
+    return sfinfo.frames;
 }
 
 void Common::testChord(const char *fileName, chord_t &expectedChord)
@@ -48,10 +59,12 @@ void Common::testChord(const char *fileName, chord_t &expectedChord)
     samplesCnt = Common::openSoundFile(&timeDomain, testFile.c_str(), &sampleRate);
     ASSERTM("Could not read file", (samplesCnt != 0));
 
-    WindowFunctions::applyDefault(timeDomain, samplesCnt);
-    chord_t chord = cd->getChord(timeDomain, samplesCnt, sampleRate);
+    std::vector<segment_t> segments;
+    cd->getSegments(segments, timeDomain, samplesCnt, sampleRate);
 
-    ASSERT_EQUALM(fileName, expectedChord, chord);
+    for (auto s : segments) {
+        ASSERTM(fileName, (s.silence || s.chord == expectedChord));
+    }
 
     free(timeDomain);
     delete cd;
