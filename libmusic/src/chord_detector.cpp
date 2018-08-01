@@ -88,14 +88,18 @@ chord_t ChordDetector::__getChordFromFftResults(FFTResults& fftRes)
         throw std::invalid_argument("freqDomain is NULL");
     }
 
-    PitchClsProfile *pcp = new PitchClsProfile(fftRes.freqDomain, fftRes.fftSize,
-            fftRes.sampleRate, fftRes.highFreqThresholdIdx);
-
+    pcp_t *pcp = __FFT2PCP(fftRes);
     chord_t chord = __mChordTplColl->getBestMatch(pcp);
 
     delete pcp;
 
     return chord;
+}
+
+pcp_t * ChordDetector::__FFT2PCP(FFTResults& fftRes)
+{
+    return new PitchClsProfile(fftRes.freqDomain, fftRes.fftSize,
+                               fftRes.sampleRate, fftRes.highFreqThresholdIdx);
 }
 
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
@@ -110,12 +114,33 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     return ret;
 }
 
+void ChordDetector::processSegment(vector<segment_t>& segments, uint32_t startIdx,
+                                   uint32_t endIdx, bool silence, PCPBuf *pcpBuf)
+{
+    segment_t segment;
+
+    segment.startIdx = startIdx;
+    segment.endIdx = endIdx;
+    segment.silence = silence;
+
+    if (!silence) {
+        pcp_t *pcpCmb = pcpBuf->getCombinedPCP();
+        segment.chord = __mChordTplColl->getBestMatch(pcpCmb);
+        pcpBuf->flush();
+        delete pcpCmb;
+    }
+
+    segments.push_back(segment);
+}
+
 void ChordDetector::getSegments(std::vector<segment_t>& segments,
                                 amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
     Envelope *e = new Envelope(timeDomain, samples);
+    PCPBuf *pcpBuf = new PCPBuf();
     uint32_t winSize, offset;
+    uint32_t nextSegIdx = 0, segEndIdx;
 
 #ifdef CFG_DYNAMIC_WINDOW
     BeatDetector *bd = new BeatDetector(e, sampleRate);
@@ -130,16 +155,32 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
 #endif
 
     for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += winSize) {
-        uint32_t segLen = min(winSize, samples - sampleIdx);
-        segment_t segment;
-        segment.startIdx = sampleIdx;
-        segment.endIdx = sampleIdx + segLen - 1;
-        segment.silence = e->isSilence(segment.startIdx, segment.endIdx);
-        if (!segment.silence) {
-            segment.chord = getChord(timeDomain + sampleIdx, segLen, sampleRate);
+        uint32_t len = min(winSize, samples - sampleIdx);
+
+        segEndIdx = sampleIdx + len - 1;
+
+        if (e->isSilence(sampleIdx, segEndIdx)) {
+            if (pcpBuf->size() > 0) {
+                processSegment(segments, nextSegIdx, sampleIdx - 1, false, pcpBuf);
+            }
+            processSegment(segments, sampleIdx, segEndIdx, true, pcpBuf);
+            nextSegIdx = segEndIdx + 1;
+            continue;
         }
-        segments.push_back(segment);
+
+        FFTResults fftRes = __getFftResults(timeDomain + sampleIdx, len, sampleRate);
+        pcp_t *pcp = __FFT2PCP(fftRes);
+
+        if (pcpBuf->vectorChange(pcp)) {
+            processSegment(segments, nextSegIdx, segEndIdx, false, pcpBuf);
+            nextSegIdx = segEndIdx + 1;
+        }
+
+        pcpBuf->add(pcp);
     }
+
+    delete e;
+    delete pcpBuf;
 }
 
 PitchClsProfile ChordDetector::getPCP(amplitude_t *timeDomain, uint32_t samples,

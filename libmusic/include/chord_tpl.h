@@ -42,8 +42,6 @@ private:
 
     void __initTpl(note_t note, chord_quality_t cq);
 
-    tpl_score_t __euclideanDistance(pcp_t *pcp);
-
 public:
     /**
      * Constructor

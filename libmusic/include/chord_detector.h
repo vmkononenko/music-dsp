@@ -16,6 +16,7 @@
 #include "lmhelpers.h"
 #include "lmtypes.h"
 #include "music_scale.h"
+#include "pcp_buf.h"
 #include "pitch_calculator.h"
 #include "pitch_cls_profile.h"
 
@@ -68,13 +69,15 @@ private:
     /**
      * Implementation of the main chord detection algorithm
      *
-     * @param   freqDomainMagnitudes    polar magnites from FFT results
-     * @param   fftSize                 size of the FFT
-     * @param   sampleRate              sample rate
-     * @param   pointsCnt               freqDomainMagnitudes length
+     * @param   fftRes  reference to FFTResults
      * @return detected chord
      */
     chord_t __getChordFromFftResults(FFTResults& fftRes);
+
+    pcp_t * __FFT2PCP(FFTResults& fftRes);
+
+    void processSegment(std::vector<segment_t>& segments, uint32_t startIdx,
+                        uint32_t endIdx, bool silence, PCPBuf *pcpBuf);
 
 public:
     /**

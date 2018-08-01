@@ -27,8 +27,10 @@ private:
     void __normalize();
 public:
     /**
-     * Constructor
+     * Constructor for creating an empty profile
      */
+    PitchClsProfile();
+
     PitchClsProfile(amplitude_t *freqDomainMagnitudes, uint32_t fftSize,
                     uint32_t sampleRate, uint32_t pointsCnt);
 
@@ -38,6 +40,26 @@ public:
      * @return      PCP value
      */
     amplitude_t getPitchCls(note_t note) const;
+
+    template<typename T> amplitude_t euclideanDistance(std::vector<T> &v)
+    {
+        amplitude_t sum = 0;
+
+        for (int n = note_Min; n <= note_Max; n++) {
+            note_t note = (note_t)n;
+
+            amplitude_t diff = ((amplitude_t)__mPCP[note - note_Min] - v[note - note_Min]);
+            sum += diff * diff;
+        }
+
+        return sqrt(sum);
+    }
+
+    amplitude_t euclideanDistance(PitchClsProfile &pcp);
+
+    PitchClsProfile & operator+=(const PitchClsProfile& pcp);
+
+    PitchClsProfile & operator/=(float denominator);
 
     friend std::ostream& operator<<(std::ostream& os, const PitchClsProfile& pcp);
 } pcp_t;

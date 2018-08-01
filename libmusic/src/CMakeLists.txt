@@ -12,6 +12,7 @@ set(LIB_SOURCES
     ma_filter.cpp
     music_scale.cpp
     pitch_calculator.cpp
+    pcp_buf.cpp
     pitch_cls_profile.cpp
     recursive_filter.cpp
     window_functions.cpp

@@ -13,6 +13,11 @@
 
 using namespace std;
 
+PitchClsProfile::PitchClsProfile()
+{
+    __mPCP.resize(notes_Total);
+}
+
 PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
         uint32_t fftSize, uint32_t sampleRate, uint32_t pointsCnt)
 {
@@ -62,6 +67,30 @@ amplitude_t PitchClsProfile::getPitchCls(note_t note) const
     }
 
     return __mPCP[note - note_Min];
+}
+
+amplitude_t PitchClsProfile::euclideanDistance(PitchClsProfile &pcp)
+{
+    amplitude_t d = euclideanDistance<typeof(__mPCP[0])>(pcp.__mPCP);
+    return d;
+}
+
+PitchClsProfile & PitchClsProfile::operator+=(const PitchClsProfile& pcp)
+{
+    for (uint8_t i = 0; i < __mPCP.size(); i++) {
+        __mPCP[i] += pcp.__mPCP[i];
+    }
+
+    return *this;
+}
+
+PitchClsProfile & PitchClsProfile::operator/=(float denominator)
+{
+    for (uint8_t i = 0; i < __mPCP.size(); i++) {
+        __mPCP[i] /= denominator;
+    }
+
+    return *this;
 }
 
 #define PCP_ROWS            10

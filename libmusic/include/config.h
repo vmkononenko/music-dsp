@@ -8,7 +8,7 @@
 #pragma once
 
 #ifndef CFG_DYNAMIC_WINDOW
-#define CFG_DYNAMIC_WINDOW
+//#define CFG_DYNAMIC_WINDOW
 #endif
 
 #ifndef CFG_WINDOW_SIZE
@@ -39,7 +39,7 @@
 #endif /* CFG_MA_FILT_DF_DEFAULT */
 
 #ifndef CFG_BEAT_INTERVAL_MIN
-#define CFG_BEAT_INTERVAL_MIN 3072
+#define CFG_BEAT_INTERVAL_MIN 4096
 #endif /* CFG_BEAT_INTERVAL_MIN */
 
 #ifndef CFG_BEAT_INTERVAL_MAX
@@ -49,5 +49,9 @@
 #ifndef CFG_SILENCE_THRESHOLD_DB
 #define CFG_SILENCE_THRESHOLD_DB -34
 #endif /* CFG_SILENCE_THRESHOLD_DB */
+
+#ifndef CFG_PCP_CHANGE_THRESHOLD
+#define CFG_PCP_CHANGE_THRESHOLD    1.8f
+#endif
 
 /** @} */
