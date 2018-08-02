@@ -95,17 +95,27 @@ public:
     Chord(note_t n, chord_quality_t q) : __mRootNote(n), __mQuality(q) {}
     Chord() : Chord(note_Unknown, cq_major) {} // Delegate to the other constructor.
 
-    friend bool operator==(const Chord& c1, const Chord& c2)
+    friend bool operator==(const Chord &c1, const Chord &c2)
     {
         return ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality == c2.__mQuality));
     }
 
-    friend bool operator!=(const Chord& c1, const Chord& c2)
+    friend bool operator!=(const Chord &c1, const Chord &c2)
     {
         return !(c1 == c2);
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Chord& c)
+    friend bool operator<(const Chord &c1, const Chord &c2)
+    {
+        if (c1 == c2) {
+            return false;
+        }
+
+        return (((c1.__mRootNote != c2.__mRootNote) && (c1.__mRootNote < c2.__mRootNote)) ||
+                ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality < c2.__mQuality)));
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Chord &c)
     {
         os << c.__mRootNote << c.__mQuality;
         return os;

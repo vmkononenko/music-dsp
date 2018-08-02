@@ -98,6 +98,12 @@ public:
      * @return  frequency in Hz
      */
     static freq_hz_t fftIdxToFreq(uint32_t idx, uint32_t fftSize, uint32_t sampleRate);
+
+    template<typename T1, typename T2>
+    static bool cmpPairBySecond(const std::pair<T1, T2> &p1, const std::pair<T1, T2> &p2)
+    {
+       return p1.second < p2.second;
+    }
 };
 
 /** @} */

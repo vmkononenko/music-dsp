@@ -5,6 +5,8 @@
  * @{
  */
 
+#include <algorithm>
+
 #include "beat_detector.h"
 #include "chord_detector.h"
 #include "config.h"
@@ -114,6 +116,26 @@ chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
     return ret;
 }
 
+chord_t ChordDetector::__getChordFromPCPBuf(PCPBuf *pcpBuf)
+{
+    map<chord_t, uint32_t> counter;
+
+    for (const auto pcp : pcpBuf->getProfiles()) {
+        chord_t c = __mChordTplColl->getBestMatch(pcp);
+        auto it = counter.find(c);
+
+        if (it != counter.end()) {
+            it->second++;
+        } else {
+            counter.insert(pair<chord_t, uint32_t>(c, 1));
+        }
+    }
+
+    auto it = max_element(counter.begin(), counter.end(), Helpers::cmpPairBySecond<chord_t, uint32_t>);
+
+    return it->first;
+}
+
 void ChordDetector::processSegment(vector<segment_t>& segments, uint32_t startIdx,
                                    uint32_t endIdx, bool silence, PCPBuf *pcpBuf)
 {
@@ -124,10 +146,8 @@ void ChordDetector::processSegment(vector<segment_t>& segments, uint32_t startId
     segment.silence = silence;
 
     if (!silence) {
-        pcp_t *pcpCmb = pcpBuf->getCombinedPCP();
-        segment.chord = __mChordTplColl->getBestMatch(pcpCmb);
+        segment.chord = __getChordFromPCPBuf(pcpBuf);
         pcpBuf->flush();
-        delete pcpCmb;
     }
 
     segments.push_back(segment);

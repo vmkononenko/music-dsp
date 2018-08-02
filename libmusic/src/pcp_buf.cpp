@@ -49,6 +49,11 @@ pcp_t * PCPBuf::getCombinedPCP()
     return ret;
 }
 
+std::vector<pcp_t *> PCPBuf::getProfiles()
+{
+    return mProfiles;
+}
+
 size_t PCPBuf::size()
 {
     return mProfiles.size();

@@ -76,6 +76,8 @@ private:
 
     pcp_t * __FFT2PCP(FFTResults& fftRes);
 
+    chord_t __getChordFromPCPBuf(PCPBuf *pcpBuf);
+
     void processSegment(std::vector<segment_t>& segments, uint32_t startIdx,
                         uint32_t endIdx, bool silence, PCPBuf *pcpBuf);
 
@@ -92,6 +94,9 @@ public:
 
     /**
      * Detect chord corresponding to the given time domain
+     *
+     * Performs single chord detection with a fixed window size.
+     * For sequence detection use getSegments().
      *
      * @param   x           time domain data
      * @param   samples     number of samples in x

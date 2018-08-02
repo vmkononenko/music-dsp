@@ -8,7 +8,7 @@
 #pragma once
 
 #ifndef CFG_DYNAMIC_WINDOW
-//#define CFG_DYNAMIC_WINDOW
+#define CFG_DYNAMIC_WINDOW
 #endif
 
 #ifndef CFG_WINDOW_SIZE

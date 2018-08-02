@@ -46,6 +46,8 @@ public:
      */
     pcp_t * getCombinedPCP();
 
+    std::vector<pcp_t *> getProfiles();
+
     std::size_t size();
 
     /**
