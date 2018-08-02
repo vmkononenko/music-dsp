@@ -350,19 +350,18 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
             cout << setw(3) << i << ": " << (segments[i].silence ? "SILENCE" : segments[i].chord.toString()) << endl;
         } else {
             if (!segments[i].silence && refChord.compare(segments[i].chord.toString())) {
-                fails++;
+                fails += (segments[i].endIdx - segments[i].startIdx + 1);
             }
         }
     }
 
     if (!refChord.empty()) {
-        __printChordEvalScore(segments.size(), fails);
+        __printChordEvalScore(sfinfo.frames, fails);
     }
 
     free(channelTD);
     delete cd;
 }
-
 
 void printAudioFileInfo(SF_INFO &sfinfo)
 {
