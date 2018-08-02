@@ -67,7 +67,7 @@ amplitude_t Envelope::max()
 
 amplitude_t Envelope::mean(uint32_t startIdx, uint32_t endIdx)
 {
-    amplitude_t res;
+    amplitude_t res = 0;
 
     for (uint32_t i = startIdx; i <= endIdx; i++) {
         res += __mEnvelope[i];
