@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <math.h>
+#include <string.h>
 
 #include "butterworth_filter.h"
 #include "cheby1_filter.h"
@@ -16,14 +17,17 @@
 
 using namespace std;
 
-Envelope::Envelope(amplitude_t *td, uint32_t samples)
+Envelope::Envelope(const amplitude_t *td, uint32_t samples)
 {
     Filter *f_ma = new MAFilter();
     Filter *f_bw = new ButterworthFilter();
+    amplitude_t *tdCopy = (amplitude_t *) malloc(samples * sizeof(amplitude_t));
 
-    squareAndDouble(td, samples);
+    memcpy(tdCopy, td, samples * sizeof(amplitude_t));
 
-    __mEnvelope = f_ma->process(td, samples);
+    squareAndDouble(tdCopy, samples);
+
+    __mEnvelope = f_ma->process(tdCopy, samples);
     __mDF *= f_ma->getDownsampleFactor();
 
     __mEnvelope = f_bw->process(__mEnvelope.data(), __mEnvelope.size());
@@ -33,6 +37,7 @@ Envelope::Envelope(amplitude_t *td, uint32_t samples)
 
     __mMaxAmplitude = max();
 
+    free(tdCopy);
     delete f_ma;
     delete f_bw;
 }

@@ -35,7 +35,7 @@ private:
     amplitude_t mean(uint32_t startIdx, uint32_t endIdx);
 
 public:
-    Envelope(amplitude_t *td, uint32_t samples);
+    Envelope(const amplitude_t *td, uint32_t samples);
 
     std::vector<amplitude_t> diff();
 
