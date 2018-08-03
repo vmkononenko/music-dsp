@@ -136,8 +136,9 @@ chord_t ChordDetector::__getChordFromPCPBuf(PCPBuf *pcpBuf)
     return it->first;
 }
 
-void ChordDetector::processSegment(vector<segment_t>& segments, uint32_t startIdx,
-                                   uint32_t endIdx, bool silence, PCPBuf *pcpBuf)
+void ChordDetector::__processSegment(vector<segment_t> *segments, uint32_t startIdx,
+                                     uint32_t endIdx, bool silence, PCPBuf *pcpBuf,
+                                     ResultsListener *listener, uint32_t samplesTotal)
 {
     segment_t segment;
 
@@ -150,12 +151,16 @@ void ChordDetector::processSegment(vector<segment_t>& segments, uint32_t startId
         pcpBuf->flush();
     }
 
-    segments.push_back(segment);
+    if (listener == nullptr) {
+        segments->push_back(segment);
+    } else {
+        listener->onChordSegmentProcessed(segment, (endIdx / (float)samplesTotal));
+    }
 }
 
-void ChordDetector::getSegments(std::vector<segment_t>& segments,
-                                amplitude_t *timeDomain, uint32_t samples,
-                                uint32_t sampleRate)
+void ChordDetector::__getSegments(std::vector<segment_t> *segments,
+                                  amplitude_t *timeDomain, uint32_t samples,
+                                  uint32_t sampleRate, ResultsListener *listener)
 {
     Envelope *e = new Envelope(timeDomain, samples);
     PCPBuf *pcpBuf = new PCPBuf();
@@ -174,6 +179,10 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
     offset = 0;
 #endif
 
+    if (listener != nullptr) {
+        listener->onPreprocessingProgress(1);
+    }
+
     for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += winSize) {
         uint32_t len = min(winSize, samples - sampleIdx);
 
@@ -181,9 +190,11 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
 
         if (e->isSilence(sampleIdx, segEndIdx)) {
             if (pcpBuf->size() > 0) {
-                processSegment(segments, nextSegIdx, sampleIdx - 1, false, pcpBuf);
+                __processSegment(segments, nextSegIdx, sampleIdx - 1, false,
+                                 pcpBuf, listener, samples);
             }
-            processSegment(segments, sampleIdx, segEndIdx, true, pcpBuf);
+            __processSegment(segments, sampleIdx, segEndIdx, true, pcpBuf,
+                             listener, samples);
             nextSegIdx = segEndIdx + 1;
             continue;
         }
@@ -192,15 +203,33 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
         pcp_t *pcp = __FFT2PCP(fftRes);
 
         if (pcpBuf->vectorChange(pcp)) {
-            processSegment(segments, nextSegIdx, segEndIdx, false, pcpBuf);
+            __processSegment(segments, nextSegIdx, segEndIdx, false, pcpBuf,
+                             listener, samples);
             nextSegIdx = segEndIdx + 1;
         }
 
         pcpBuf->add(pcp);
     }
 
+    if (listener != nullptr) {
+        listener->onChordAnalysisFinished();
+    }
+
     delete e;
     delete pcpBuf;
+}
+
+void ChordDetector::getSegments(std::vector<segment_t>& segments,
+                                amplitude_t *timeDomain, uint32_t samples,
+                                uint32_t sampleRate)
+{
+    __getSegments(&segments, timeDomain, samples, sampleRate, nullptr);
+}
+
+void ChordDetector::getSegments(amplitude_t *timeDomain, uint32_t samples,
+                                uint32_t sampleRate, ResultsListener *listener)
+{
+    __getSegments(nullptr, timeDomain, samples, sampleRate, listener);
 }
 
 PitchClsProfile ChordDetector::getPCP(amplitude_t *timeDomain, uint32_t samples,
