@@ -140,6 +140,10 @@ void ChordDetector::__processSegment(vector<segment_t> *segments, uint32_t start
                                      uint32_t endIdx, bool silence, PCPBuf *pcpBuf,
                                      ResultsListener *listener, uint32_t samplesTotal)
 {
+    if (startIdx >= endIdx) {
+        throw invalid_argument("__processSegment(): invalid indices");
+    }
+
     segment_t segment;
 
     segment.startIdx = startIdx;
@@ -203,9 +207,9 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
         pcp_t *pcp = __FFT2PCP(fftRes);
 
         if (pcpBuf->vectorChange(pcp)) {
-            __processSegment(segments, nextSegIdx, segEndIdx, false, pcpBuf,
+            __processSegment(segments, nextSegIdx, sampleIdx - 1, false, pcpBuf,
                              listener, samples);
-            nextSegIdx = segEndIdx + 1;
+            nextSegIdx = sampleIdx;
         }
 
         pcpBuf->add(pcp);
