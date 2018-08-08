@@ -5,6 +5,7 @@
  */
 
 #include <iomanip>
+#include <math.h>
 
 #include "lmhelpers.h"
 #include "pitch_calculator.h"
@@ -72,6 +73,21 @@ amplitude_t PitchClsProfile::getPitchCls(note_t note) const
 amplitude_t PitchClsProfile::euclideanDistance(PitchClsProfile &pcp)
 {
     amplitude_t d = euclideanDistance<typeof(__mPCP[0])>(pcp.__mPCP);
+    return d;
+}
+
+amplitude_t PitchClsProfile::divergenceKullbackLeibler(vector<uint8_t> &v)
+{
+    if (v.size() != __mPCP.size()) {
+        throw invalid_argument("divergenceKullbackLeibler(): wrong vector size");
+    }
+
+    amplitude_t d = 0;
+
+    for (uint8_t i = 0; i < __mPCP.size(); i++) {
+        d += __mPCP[i] * log10(__mPCP[i] / v[i]);
+    }
+
     return d;
 }
 

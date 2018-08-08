@@ -57,6 +57,8 @@ public:
 
     amplitude_t euclideanDistance(PitchClsProfile &pcp);
 
+    amplitude_t divergenceKullbackLeibler(std::vector<uint8_t> &v);
+
     PitchClsProfile & operator+=(const PitchClsProfile& pcp);
 
     PitchClsProfile & operator/=(float denominator);
