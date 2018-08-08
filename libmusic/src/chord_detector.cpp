@@ -166,8 +166,10 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
 {
     Envelope *e = new Envelope(timeDomain, samples);
     PCPBuf *pcpBuf = new PCPBuf();
-    uint32_t winSize, offset;
+    PCPBuf *pcpHopsBuf = new PCPBuf();
+    uint32_t winSize, offset, hopSize;
     uint32_t nextSegIdx = 0, segEndIdx;
+    uint32_t winCnt = 0;
 
 #ifdef CFG_DYNAMIC_WINDOW
     BeatDetector *bd = new BeatDetector(e, sampleRate);
@@ -181,11 +183,13 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
     offset = 0;
 #endif
 
+    hopSize = winSize / CFG_HOPS_PER_WINDOW;
+
     if (listener != nullptr) {
         listener->onPreprocessingProgress(1);
     }
 
-    for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += winSize) {
+    for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += hopSize, ++winCnt) {
         uint32_t len = min(winSize, samples - sampleIdx);
 
         segEndIdx = sampleIdx + len - 1;
@@ -204,7 +208,18 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
         FFTResults fftRes = __getFftResults(timeDomain + sampleIdx, len, sampleRate);
         pcp_t *pcp = __FFT2PCP(fftRes);
 
-        if (pcpBuf->vectorChange(pcp)) {
+        if (CFG_HOPS_PER_WINDOW > 1)  {
+            pcpHopsBuf->add(pcp);
+
+            if (winCnt % CFG_HOPS_PER_WINDOW == 0) {
+                pcp = pcpHopsBuf->getCombinedPCP();
+                pcpHopsBuf->flush();
+            } else {
+                continue;
+            }
+        }
+
+        if ((pcpBuf->vectorChange(pcp) && pcpBuf->size() >= 2) || (len < winSize)) {
             __processSegment(segments, nextSegIdx, sampleIdx - 1, false, pcpBuf,
                              listener, samples);
             nextSegIdx = sampleIdx;
@@ -219,6 +234,7 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
 
     delete e;
     delete pcpBuf;
+    delete pcpHopsBuf;
 }
 
 void ChordDetector::getSegments(std::vector<segment_t>& segments,

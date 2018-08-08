@@ -15,6 +15,10 @@
 #define CFG_WINDOW_SIZE     ((uint32_t)8192)
 #endif /* CFG_WINDOW_SIZE */
 
+#ifndef CFG_HOPS_PER_WINDOW
+#define CFG_HOPS_PER_WINDOW 1
+#endif /* CFG_HOPS_PER_WINDOW */
+
 #ifndef CFG_FFT_SIZE
 #define CFG_FFT_SIZE        ((uint32_t)8192)
 #endif /* CFG_FFT_SIZE */
