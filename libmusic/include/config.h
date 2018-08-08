@@ -8,7 +8,7 @@
 #pragma once
 
 #ifndef CFG_DYNAMIC_WINDOW
-#define CFG_DYNAMIC_WINDOW
+//#define CFG_DYNAMIC_WINDOW
 #endif
 
 #ifndef CFG_WINDOW_SIZE
@@ -28,7 +28,7 @@
 #endif /* CFG_FFT_AVG_WINDOW */
 
 #ifndef CFG_WINDOW_FUNC
-#define CFG_WINDOW_FUNC WINDOW_FUNC_RECTANGULAR
+#define CFG_WINDOW_FUNC WINDOW_FUNC_HAMMING
 #endif /* CFG_WINDOW_FUNC */
 
 #ifndef CFG_PITCH_PRECISION_THRESHOLD
@@ -59,7 +59,7 @@
 #endif /* CFG_SILENCE_THRESHOLD_DB */
 
 #ifndef CFG_PCP_CHANGE_THRESHOLD
-#define CFG_PCP_CHANGE_THRESHOLD    1.8f
+#define CFG_PCP_CHANGE_THRESHOLD    1.4f
 #endif
 
 /** @} */
