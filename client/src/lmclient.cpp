@@ -346,11 +346,16 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
 
     cd->getSegments(segments, channelTD, sfinfo.frames, sfinfo.samplerate);
     for (uint32_t i = 0; i < segments.size(); i++) {
+        segment_t *s = &segments[i];
         if (refChord.empty()) {
-            cout << setw(3) << i << ": " << (segments[i].silence ? "SILENCE" : segments[i].chord.toString()) << endl;
+            auto idxToSec = [&](int idx) {
+                return Helpers::stdRound<float>(idx / (float) sfinfo.samplerate, 2);
+            };
+            cout << setw(3) << i << ": " << setw(3) << (s->silence ? "S" : s->chord.toString())
+                 << " [" << idxToSec(s->startIdx) << ", " << idxToSec(s->endIdx) << "]" << endl;
         } else {
-            if (!segments[i].silence && refChord.compare(segments[i].chord.toString())) {
-                fails += (segments[i].endIdx - segments[i].startIdx + 1);
+            if (!s->silence && refChord.compare(s->chord.toString())) {
+                fails += (s->endIdx - s->startIdx + 1);
             }
         }
     }
