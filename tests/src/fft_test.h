@@ -38,3 +38,11 @@ private:
 public:
     void operator()() { __test(); };
 };
+
+class TestAvg {
+private:
+    void __test();
+
+public:
+    void operator()() { __test(); };
+};

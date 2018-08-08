@@ -28,6 +28,7 @@ cute::suite fftTestSuite()
 	s.push_back(TestSortBitReversal());
 	s.push_back(TestForwardTransform());
 	s.push_back(TestInverseTransform());
+	s.push_back(TestAvg());
 
 	return s;
 }

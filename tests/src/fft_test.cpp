@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "cute.h"
 
 #include "fft_test.h"
@@ -163,5 +165,36 @@ void TestInverseTransform::__test() {
 
     ASSERT_EQUAL(src, inverse);
 
+    delete fft;
+}
+
+void TestAvg::__test() {
+    FFT *fft = new FFT();
+    amplitude_t orig[] = { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+    uint8_t origLen = sizeof(orig) / sizeof(orig[0]);
+    amplitude_t *res = (amplitude_t *) malloc(sizeof(orig[0]) * origLen);
+
+    memcpy(res, orig, origLen * sizeof(orig[0]));
+
+    fft->avg(res, origLen, 1);
+
+    for (uint8_t i = 0; i < origLen; i++) {
+        ASSERT_EQUAL(orig[i], res[i]);
+    }
+
+    fft->avg(res, origLen - 3, 4);
+
+    ASSERT_EQUAL(res[0], 25);
+    ASSERT_EQUAL(res[1], 35);
+    ASSERT_EQUAL(res[2], 45);
+    ASSERT_EQUAL(res[3], 55);
+    ASSERT_EQUAL(res[4], 65);
+    ASSERT_EQUAL(res[5], 75);
+    ASSERT_EQUAL(res[6], 85);
+    ASSERT_EQUAL(res[7], 80);
+    ASSERT_EQUAL(res[8], 90);
+    ASSERT_EQUAL(res[9], 100);
+
+    free(res);
     delete fft;
 }
