@@ -12,7 +12,7 @@ using namespace std;
 
 bool PCPBuf::vectorChange(pcp_t *pcp)
 {
-    pcp_t *prev = mProfiles.empty() ? nullptr : mProfiles.back();
+    pcp_t *prev = mProfiles.empty() ? nullptr : mProfiles[0];
 
     if ((prev == nullptr) || ((pcp->euclideanDistance(*prev)) < CFG_PCP_CHANGE_THRESHOLD)) {
         return false;
@@ -21,19 +21,12 @@ bool PCPBuf::vectorChange(pcp_t *pcp)
     return true;
 }
 
-pcpbuf_state_t PCPBuf::add(pcp_t *pcp)
+void PCPBuf::add(pcp_t *pcp)
 {
-    if (mState != PCPBUF_ACCEPTING) {
-        throw logic_error("Not accepting new data - call flush()");
+    if (pcp == nullptr) {
+        throw invalid_argument("PCPBuf::add(): pcp is NULL");
     }
-
-    if (vectorChange(pcp)) {
-        mState = PCPBUF_VECTOR_CHANGE;
-    } else {
-        mProfiles.push_back(pcp);
-    }
-
-    return mState;
+    mProfiles.push_back(pcp);
 }
 
 pcp_t * PCPBuf::getCombinedPCP()
@@ -66,5 +59,4 @@ void PCPBuf::flush()
     }
 
     mProfiles.clear();
-    mState = PCPBUF_ACCEPTING;
 }
