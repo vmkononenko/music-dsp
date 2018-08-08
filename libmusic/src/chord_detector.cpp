@@ -67,15 +67,16 @@ ChordDetector::FFTResults ChordDetector::__getFftResults(amplitude_t *timeDomain
 
     __mFft->forward(x);
 
-    /** @TODO check for +/-1 error */
-    res.highFreqThresholdIdx = Helpers::freqToFftIdx(FREQ_C8, res.fftSize,
-                                                     sampleRate, ceil);
+    res.freqDomainLen = Helpers::freqToFftIdx(FREQ_C8, res.fftSize, sampleRate, ceil) + 1;
 
-    res.freqDomain = new amplitude_t[res.highFreqThresholdIdx];
+    res.freqDomain = new amplitude_t[res.freqDomainLen + CFG_FFT_AVG_WINDOW - 1];
 
     /** @TODO check for returned length */
-    res.highFreqThresholdIdx = __mFft->toPolar(x, res.freqDomain, res.highFreqThresholdIdx);
-
+    res.freqDomainLen = __mFft->toPolar(x, res.freqDomain,
+                                        res.freqDomainLen + CFG_FFT_AVG_WINDOW - 1);
+    __mFft->avg(res.freqDomain, res.freqDomainLen, CFG_FFT_AVG_WINDOW);
+    __mFft->toHPS(res.freqDomain, res.freqDomainLen);
+    __attLowFreq(res, FREQ_E2);
     res.sampleRate = sampleRate;
 
     return res;
@@ -98,7 +99,7 @@ chord_t ChordDetector::__getChordFromFftResults(FFTResults& fftRes)
 pcp_t * ChordDetector::__FFT2PCP(FFTResults& fftRes)
 {
     return new PitchClsProfile(fftRes.freqDomain, fftRes.fftSize,
-                               fftRes.sampleRate, fftRes.highFreqThresholdIdx);
+                               fftRes.sampleRate, fftRes.freqDomainLen);
 }
 
 chord_t ChordDetector::getChord(amplitude_t *timeDomain, uint32_t samples,
@@ -238,7 +239,7 @@ PitchClsProfile ChordDetector::getPCP(amplitude_t *timeDomain, uint32_t samples,
 {
     FFTResults fftRes = __getFftResults(timeDomain, samples, sampleRate);
     PitchClsProfile pcp = PitchClsProfile(fftRes.freqDomain, fftRes.fftSize,
-            fftRes.sampleRate, fftRes.highFreqThresholdIdx);
+            fftRes.sampleRate, fftRes.freqDomainLen);
 
     delete[] fftRes.freqDomain;
 

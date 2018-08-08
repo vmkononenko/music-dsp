@@ -40,7 +40,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
             pitchFreq = pc.noteToPitch(note, oct);
             fftIdx = Helpers::freqToFftIdx(pitchFreq, fftSize, sampleRate, round);
 
-            if (fftIdx > pointsCnt) {
+            if (fftIdx >= pointsCnt) {
                 throw runtime_error("fftIdx > pointsCnt");
             }
 

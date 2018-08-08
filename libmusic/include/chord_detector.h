@@ -68,7 +68,7 @@ private:
         amplitude_t *freqDomain;
         uint32_t    fftSize;
         uint32_t    sampleRate;
-        uint32_t    highFreqThresholdIdx;
+        uint32_t    freqDomainLen;
     };
 
     FFT *__mFft;

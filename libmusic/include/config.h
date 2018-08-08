@@ -19,6 +19,10 @@
 #define CFG_FFT_SIZE        ((uint32_t)8192)
 #endif /* CFG_FFT_SIZE */
 
+#ifndef CFG_FFT_AVG_WINDOW
+#define CFG_FFT_AVG_WINDOW 2
+#endif /* CFG_FFT_AVG_WINDOW */
+
 #ifndef CFG_WINDOW_FUNC
 #define CFG_WINDOW_FUNC WINDOW_FUNC_RECTANGULAR
 #endif /* CFG_WINDOW_FUNC */
