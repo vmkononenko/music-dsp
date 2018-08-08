@@ -103,13 +103,15 @@ bool Envelope::isSilence(uint32_t startIdx, uint32_t endIdx)
         throw invalid_argument("Envelope::mean() invalid argument");
     }
 
+    float silentSamples = 0;
+
     for (uint32_t i = start; i <= end; i++) {
         if (20 * log10(__mEnvelope[i] / __mMaxAmplitude) < CFG_SILENCE_THRESHOLD_DB) {
-            return true;
+            silentSamples++;
         }
     }
 
-    return false;
+    return silentSamples / (end - start + 1) > 1;
 }
 
 ostream& operator<<(ostream& os, const Envelope& e)
