@@ -69,6 +69,17 @@ public:
     void toHPS(amplitude_t *freqDomainMagnitudes, uint32_t len);
 
     /**
+     * Reduce noise in FFT results by applying moving average
+     *
+     * @param freqDomainMagnitudes  frequency domain including padding of
+     *                              \p window - 1
+     * @param len                   length of the \p freqDomainMagnitudes
+     *                              excluding padding
+     * @param window                moving average window size
+     */
+    void avg(amplitude_t *freqDomainMagnitudes, uint32_t len, uint32_t window);
+
+    /**
      * Inverse DFT calculation
      *
      * @param input frequency domain in rectangular notation

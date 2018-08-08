@@ -188,6 +188,19 @@ void FFT::toHPS(amplitude_t *freqDomainMagnitudes, uint32_t len)
     }
 }
 
+void FFT::avg(amplitude_t *freqDomainMagnitudes, uint32_t len, uint32_t window) {
+    if (window == 1) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < len; i++) {
+        for (uint32_t j = 1; j < window; j++) {
+            freqDomainMagnitudes[i] += freqDomainMagnitudes[i+j];
+        }
+        freqDomainMagnitudes[i] /= window;
+    }
+}
+
 void FFT::inverse(vector<complex_t> &input)
 {
     if (input.size() == 0) {
