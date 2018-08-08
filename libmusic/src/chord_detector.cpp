@@ -37,17 +37,14 @@ ChordDetector::~ChordDetector()
     delete __mFft;
 }
 
-void ChordDetector::__attLowFreq(amplitude_t *freqDomain, uint32_t len,
-        freq_hz_t freq, uint32_t fftSize, uint32_t sampleRate)
+void ChordDetector::__attLowFreq(FFTResults& fftRes, freq_hz_t freq)
 {
-    double cutFromIdx = Helpers::freqToFftIdx(freq, fftSize, sampleRate, floor);
+    uint32_t cutFromIdx = Helpers::freqToFftIdx(freq, fftRes.fftSize, fftRes.sampleRate, floor);
 
-    if ((cutFromIdx < 0) || (cutFromIdx >= len)) {
-        return;
-    }
+    cutFromIdx = min(cutFromIdx, fftRes.freqDomainLen);
 
     for (uint32_t i = 0; i <= cutFromIdx; i++) {
-        freqDomain[i] = 0;
+        fftRes.freqDomain[i] = 0;
     }
 }
 

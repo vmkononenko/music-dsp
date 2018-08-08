@@ -81,13 +81,10 @@ private:
      *  Attenuate instead of cutting of the range to be able to do conversion
      *  between frequencies and indexes of FFT points
      *
-     *  @param freqDomain   input frequency domain
-     *  @param len          number of points in freqDomain
-     *  @param freq         frequency to cut from
-     *  @param fftSize      taken FFT length
-     *  @param sampleRate   sample rate of the analyzed signal
+     *  @param fftRes   reference to FFTResults
+     *  @param freq     frequency to cut to
      */
-    void __attLowFreq(amplitude_t *, uint32_t, freq_hz_t, uint32_t, uint32_t);
+    void __attLowFreq(FFTResults& fftRes, freq_hz_t freq);
 
     FFTResults __getFftResults(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
 
