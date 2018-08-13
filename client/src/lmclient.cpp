@@ -170,17 +170,17 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void printTimeDomain(amplitude_t *timeDomain, uint32_t samples,
-                     uint32_t sampleRate, bool tdViaInverseDFT, bool detectBeat)
+void printTimeDomain(amplitude_t *td, uint32_t samples, uint32_t samplerate,
+                     bool td_via_inverse_dft, bool detect_beat)
 {
 #define PLOT_SAMPLES_MAX    1000000U
-    if (detectBeat) {
-        BeatDetector *bd = new BeatDetector(timeDomain, samples, sampleRate);
+    if (detect_beat) {
+        BeatDetector *bd = new BeatDetector(td, samples, samplerate);
         uint32_t beatOffset = bd->getOffset();
         uint16_t beatInterval = bd->getIdxInterval();
         uint32_t plotSamples = min(PLOT_SAMPLES_MAX, samples);
-        amplitude_t ampMax = *max_element(timeDomain, timeDomain + plotSamples);
-        amplitude_t ampMin = *min_element(timeDomain, timeDomain + plotSamples);
+        amplitude_t ampMax = *max_element(td, td + plotSamples);
+        amplitude_t ampMin = *min_element(td, td + plotSamples);
         uint32_t beats = 0;
 
         for (uint32_t i = 0; i < plotSamples; i++) {
@@ -189,22 +189,24 @@ void printTimeDomain(amplitude_t *timeDomain, uint32_t samples,
                 beatAmp = ampMax;
                 beats++;
             }
-            cout << i << "," << timeDomain[i] << "," << beatAmp << endl;
+            cout << i << "," << td[i] << "," << beatAmp << endl;
         }
 
         return;
     }
 
-    FFT *fft = new FFT();
-    vector<complex_t> x = Helpers::timeDomain2ComplexVector(timeDomain, samples, samples);
+    FFT *fft = new FFT(td, samples, samplerate, false);
+    vector<complex_t> *x = fft->GetFreqDomain().r();
 
-    if (tdViaInverseDFT) {
-        fft->forward(x);
-        fft->inverse(x);
+    if (td_via_inverse_dft) {
+        fft->Inverse();
     }
+
     for (uint32_t i = 0; i < samples; i++) {
-        cout << i << "," << real(x[i]) << endl;
+        cout << i << "," << real((*x)[i]) << endl;
     }
+
+    delete fft;
 }
 
 void printSigEnvelope(amplitude_t *timeDomain, uint32_t samples) {
@@ -223,42 +225,35 @@ void printBPM(amplitude_t *timeDomain, uint32_t samples, uint32_t sampleRate) {
     delete bd;
 }
 
-double max_amplitude(std::vector<complex_t> x) {
-    double max = real(x[0]);
-    for (complex_t point : x) {
-        amplitude_t mag = real(point);
-        if (mag > max) {
-            max = mag;
+double max_amplitude(amplitude_t *p, uint32_t len) {
+    double max = p[0];
+    for (uint32_t i = 0; i < len; i++) {
+        if (p[i] > max) {
+            max = p[i];
         }
     }
     return max;
 }
 
-void printFFT(amplitude_t *timeDomain, int sampleRate, uint32_t samples,
-              bool isPolar, bool logScale)
+void printFFT(amplitude_t *td, int samplerate, uint32_t samples,
+              bool polar, bool logScale)
 {
-    FFT *fft = new FFT();
-    vector<complex_t> x;
-    uint32_t fftSize = Helpers::nextPowerOf2(samples);
-
-    WindowFunctions::applyDefault(timeDomain, samples);
-    x = Helpers::timeDomain2ComplexVector(timeDomain, samples, fftSize);
-
-    fft->forward(x);
-    if (isPolar) {
-        fft->toPolar(x);
+    if (!polar) {
+        throw runtime_error("Not implemented");
     }
 
-    if (isPolar) {
-        double magMax = max_amplitude(x);
-        cout << magMax;
-        for (uint32_t i = 0; i < samples / 2; i++) {
-            amplitude_t freq = i * sampleRate / x.size();
-            double mag = logScale ? 10 * log10(real(x[i]) / magMax) : real(x[i]);
-            cout << freq << "," << mag << endl;
-        }
-    } else {
-        cout << "Not implemented" << endl;
+    WindowFunctions::applyDefault(td, samples);
+
+    FFT *fft = new FFT(td, samples, samplerate, polar);
+    amplitude_t *p = fft->GetFreqDomain().p;
+    double mag_max = max_amplitude(p, fft->GetFreqDomainLen());
+
+    cout << mag_max;
+
+    for (uint32_t i = 0; i < fft->GetFreqDomainLen() / 2; i++) {
+        amplitude_t freq = i * samplerate / fft->GetSize();
+        double mag = logScale ? 10 * log10(p[i] / mag_max) : p[i];
+        cout << freq << "," << mag << endl;
     }
 
     delete fft;
@@ -302,8 +297,9 @@ void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
         }
 
         if (printPCP) {
-            PitchClsProfile pcp = cd->getPCP(chanTD, len, sfinfo.samplerate);
-            cout << pcp << endl;
+            pcp_t *pcp = cd->GetPCP(chanTD, len, sfinfo.samplerate);
+            cout << *pcp << endl;
+            delete pcp;
         } else {
             chord_t chord = cd->getChord(chanTD, len, sfinfo.samplerate);
             if (refChord.empty()) {

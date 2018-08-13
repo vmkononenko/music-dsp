@@ -64,39 +64,20 @@ public:
 };
 
 private:
-    struct FFTResults {
-        amplitude_t *freqDomain;
-        uint32_t    fftSize;
-        uint32_t    sampleRate;
-        uint32_t    freqDomainLen;
-    };
-
-    FFT *__mFft;
     PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
     ChordTplCollection *__mChordTplColl = new ChordTplCollection();
 
-    /**
-     *  Attenuate frequencies lower than freq to 0
-     *
-     *  Attenuate instead of cutting of the range to be able to do conversion
-     *  between frequencies and indexes of FFT points
-     *
-     *  @param fftRes   reference to FFTResults
-     *  @param freq     frequency to cut to
-     */
-    void __attLowFreq(FFTResults& fftRes, freq_hz_t freq);
-
-    FFTResults __getFftResults(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
+    FFT * GetFft_(amplitude_t *td, uint32_t samples, uint32_t samplerate);
 
     /**
      * Implementation of the main chord detection algorithm
      *
-     * @param   fftRes  reference to FFTResults
-     * @return detected chord
+     * @param   fft   pointer to FFT
+     * @return  detected chord
      */
-    chord_t __getChordFromFftResults(FFTResults& fftRes);
+    chord_t GetChordFromFft_(FFT *fft);
 
-    pcp_t * __FFT2PCP(FFTResults& fftRes);
+    pcp_t * FFT2PCP_(FFT *fft);
 
     chord_t __getChordFromPCPBuf(PCPBuf *pcpBuf);
 
@@ -125,11 +106,6 @@ public:
      * Constructor
      */
     ChordDetector();
-
-    /**
-     * Destructor
-     */
-    ~ChordDetector();
 
     /**
      * Detect chord corresponding to the given time domain
@@ -165,7 +141,7 @@ public:
      */
     std::vector<note_t> getScale(note_t mainNote, bool isMinor);
 
-    PitchClsProfile getPCP(amplitude_t *x, uint32_t samples, uint32_t sampleRate);
+    pcp_t * GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate);
 };
 
 /** @} */

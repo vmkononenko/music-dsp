@@ -2,8 +2,11 @@
 #undef FFT_TEST_FRIENDS
 #endif
 #define FFT_TEST_FRIENDS \
+    friend class TestAvg; \
     friend class TestBitReverse; \
-    friend class TestSortBitReversal \
+    friend class TestForwardTransform; \
+    friend class TestInverseTransform; \
+    friend class TestSortBitReversal; \
 
 #include <fft.h>
 

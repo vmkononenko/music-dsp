@@ -41,7 +41,7 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
             fftIdx = Helpers::freqToFftIdx(pitchFreq, fftSize, sampleRate, round);
 
             if (fftIdx >= pointsCnt) {
-                throw runtime_error("fftIdx > pointsCnt");
+                throw runtime_error("fftIdx >= pointsCnt");
             }
 
             mag = freqDomainMagnitudes[fftIdx];

@@ -32,34 +32,28 @@ BeatDetector::BeatDetector(Envelope *e, uint32_t sampleRate)
 
 void BeatDetector::detectBeat(Envelope *env, uint32_t sampleRate)
 {
-    vector<amplitude_t> envDiff = env->diff();
-    uint32_t envSampleRate = sampleRate / env->getDownsampleFactor();
-    FFT *fft = new FFT();
-    uint32_t fftSize = Helpers::nextPowerOf2(envDiff.size());
-    vector<complex_t> envDiffComplex = Helpers::timeDomain2ComplexVector(
-            envDiff.data(), envDiff.size(), fftSize);
-    amplitude_t *envFreqDomain = (amplitude_t*) malloc(fftSize / 2 * sizeof(amplitude_t));
+    vector<amplitude_t> env_diff = env->diff();
+    uint32_t env_samplerate = sampleRate / env->getDownsampleFactor();
+    FFT *fft = new FFT(env_diff.data(), env_diff.size(), env_samplerate, 0,
+                       env_samplerate / 2, true, true);
+    amplitude_t *env_fd = fft->GetFreqDomain().p;
     uint32_t maxFFTAmpIdx, maxEnvAmpIdx, closestLeftLocalMinIdx;
-    freq_hz_t beatHz;
+    freq_hz_t beat_hz;
 
-    fft->forward(envDiffComplex);
-    fft->toPolar(envDiffComplex, envFreqDomain, fftSize / 2);
-    fft->toHPS(envFreqDomain, fftSize / 2);
+    maxFFTAmpIdx = max_element(env_fd, env_fd + fft->GetSize() / 2) - env_fd;
 
-    maxFFTAmpIdx = max_element(envFreqDomain, envFreqDomain + fftSize / 2) - envFreqDomain;
+    beat_hz = Helpers::fftIdxToFreq(maxFFTAmpIdx, fft->GetSize() / 2, env_samplerate);
 
-    beatHz = Helpers::fftIdxToFreq(maxFFTAmpIdx, fftSize / 2, envSampleRate);
-
-    __mBeatIdxInterval = sampleRate / beatHz;
+    __mBeatIdxInterval = sampleRate / beat_hz;
     normalizeInterval();
 
-    hz2BPM(beatHz);
+    hz2BPM(beat_hz);
 
-    maxEnvAmpIdx = max_element(envDiff.begin(), envDiff.begin() + envDiff.size()) - envDiff.begin();
+    maxEnvAmpIdx = max_element(env_diff.begin(), env_diff.begin() + env_diff.size()) - env_diff.begin();
 
     // closest local minimum of the envelope to the left of highest peak
     closestLeftLocalMinIdx = maxEnvAmpIdx - 1;
-    while (envDiff[closestLeftLocalMinIdx] > 0) {
+    while (env_diff[closestLeftLocalMinIdx] > 0) {
       closestLeftLocalMinIdx -= 1;
     }
     closestLeftLocalMinIdx++;

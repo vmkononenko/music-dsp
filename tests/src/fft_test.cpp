@@ -11,28 +11,28 @@ void TestBitReverse::__test()
     uint32_t x;
 
     x = 0x2;
-    ASSERT_EQUAL(0x4, fft->__bitReverse(x, 4));
+    ASSERT_EQUAL(0x4, fft->BitReverse_(x, 4));
 
     x = 0x4;
-    ASSERT_EQUAL(0x2, fft->__bitReverse(x, 4));
+    ASSERT_EQUAL(0x2, fft->BitReverse_(x, 4));
 
     x = 0;
-    ASSERT_EQUAL(0, fft->__bitReverse(x, 4));
+    ASSERT_EQUAL(0, fft->BitReverse_(x, 4));
 
     x = 0b011;
-    ASSERT_EQUAL(0b110, fft->__bitReverse(x, 3));
+    ASSERT_EQUAL(0b110, fft->BitReverse_(x, 3));
 
     x = 0xa;
-    ASSERT_EQUAL(0x50000000, fft->__bitReverse(x, 32));
+    ASSERT_EQUAL(0x50000000, fft->BitReverse_(x, 32));
 
     x = 0x83;
-    ASSERT_EQUAL(0xc1000000, fft->__bitReverse(x, 32));
+    ASSERT_EQUAL(0xc1000000, fft->BitReverse_(x, 32));
 
     x = 0xe42;
-    ASSERT_EQUAL(0x42700000, fft->__bitReverse(x, 32));
+    ASSERT_EQUAL(0x42700000, fft->BitReverse_(x, 32));
 
     x = 0xcb035000;
-    ASSERT_EQUAL(0xac0d3, fft->__bitReverse(x, 32));
+    ASSERT_EQUAL(0xac0d3, fft->BitReverse_(x, 32));
 
     delete fft;
 }
@@ -63,7 +63,7 @@ void TestSortBitReversal::__test()
         complex_t c(i, i);
         v2.push_back(c);
     }
-    fft->__sortBitReversal(v2, 0, v2.size() - 1);
+    fft->SortBitReversal_(v2, 0, v2.size() - 1);
 
     ASSERT_EQUAL(v1, v2);
 
@@ -80,7 +80,7 @@ void TestSortBitReversal::__test()
     v1.push_back(complex_t (13, 13));
     v1.push_back(complex_t (15, 15));
 
-    fft->__sortBitReversal(v2, 8, v2.size() - 1);
+    fft->SortBitReversal_(v2, 8, v2.size() - 1);
 
     ASSERT_EQUAL(v1, v2);
 
@@ -110,7 +110,7 @@ void TestForwardTransform::__test()
     expected.push_back(complex_t (1, 0));
     expected.push_back(complex_t (1, 0));
 
-    fft->forward(src);
+    fft->Forward_(src);
     ASSERT_EQUAL(expected, src);
 
     src.clear();
@@ -134,7 +134,7 @@ void TestForwardTransform::__test()
     expected.push_back(complex_t (0, 1));
     expected.push_back(complex_t (0.7071, 0.7071));
 
-    fft->forward(src);
+    fft->Forward_(src);
 
     for (uint32_t i = 0; i < src.size(); i++) {
         src[i] = complex_t (Helpers::stdRound(real(src[i]), 4),
@@ -160,8 +160,8 @@ void TestInverseTransform::__test() {
 
     inverse = src;
 
-    fft->forward(inverse);
-    fft->inverse(inverse);
+    fft->Forward_(inverse);
+    fft->Inverse(inverse);
 
     ASSERT_EQUAL(src, inverse);
 
@@ -176,13 +176,13 @@ void TestAvg::__test() {
 
     memcpy(res, orig, origLen * sizeof(orig[0]));
 
-    fft->avg(res, origLen, 1);
+    fft->Avg_(res, origLen, 1);
 
     for (uint8_t i = 0; i < origLen; i++) {
         ASSERT_EQUAL(orig[i], res[i]);
     }
 
-    fft->avg(res, origLen - 3, 4);
+    fft->Avg_(res, origLen - 3, 4);
 
     ASSERT_EQUAL(res[0], 25);
     ASSERT_EQUAL(res[1], 35);
@@ -198,3 +198,4 @@ void TestAvg::__test() {
     free(res);
     delete fft;
 }
+
