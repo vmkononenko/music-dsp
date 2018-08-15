@@ -298,28 +298,3 @@ void FFT::Inverse()
 {
     Inverse(*fd_.r());
 }
-
-bool FFT::IsPolar()
-{
-    return polar_;
-}
-
-freq_domain_t & FFT::GetFreqDomain()
-{
-    return fd_;
-}
-
-uint32_t FFT::GetFreqDomainLen()
-{
-    return fd_len_;
-}
-
-uint32_t FFT::GetSize()
-{
-    return size_;
-}
-
-uint32_t FFT::GetSampleRate()
-{
-    return samplerate_;
-}

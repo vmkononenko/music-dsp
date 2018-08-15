@@ -10,43 +10,18 @@
 #include <vector>
 
 #include "lmpriority_queue.h"
-#include "lmtypes.h"
+#include "transform.h"
 
 #ifndef FFT_TEST_FRIENDS
 #define FFT_TEST_FRIENDS
 #endif
 
-/* Frequency domain in one of polar or rectangular notation */
-typedef union {
 
-private:
-    void            *rect;  // rectangular notation
-
-public:
-    amplitude_t     *p;     // polar notation
-
-    void set_r(std::vector<complex_t> *v)
-    {
-        rect = static_cast<void *>(v);
-    }
-
-    std::vector<complex_t> * r()
-    {
-        return static_cast<std::vector<complex_t> *>(rect);
-    }
-} freq_domain_t;
-
-class FFT {
+class FFT : public Transform {
 
 FFT_TEST_FRIENDS;
 
 private:
-    freq_domain_t   fd_;        // frequency domain
-    uint32_t        fd_len_;    // frequency domain length
-    uint32_t        size_;
-    uint32_t        samplerate_;
-    bool            polar_;
-
     /**
      * Default constructor
      *
@@ -133,16 +108,6 @@ public:
     FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, bool polar);
 
     ~FFT();
-
-    bool IsPolar();
-
-    freq_domain_t & GetFreqDomain();
-
-    uint32_t GetFreqDomainLen();
-
-    uint32_t GetSize();
-
-    uint32_t GetSampleRate();
 
     /**
      * Same as Inverse(fd_.r)
