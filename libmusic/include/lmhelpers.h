@@ -70,14 +70,6 @@ public:
     }
 
     /**
-     * Return string representation of the given note
-     *
-     * @param   note    note for which string representation is requested
-     * @return string representation of the note
-     */
-    static std::string noteToString(note_t note);
-
-    /**
      * Convert frequency in Hz to point index value in FFT array
      *
      * @param   freq        frequency in Hz
