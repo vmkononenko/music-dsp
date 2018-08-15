@@ -77,8 +77,6 @@ private:
      */
     chord_t GetChordFromFft_(FFT *fft);
 
-    pcp_t * FFT2PCP_(FFT *fft);
-
     chord_t __getChordFromPCPBuf(PCPBuf *pcpBuf);
 
     void __processSegment(std::vector<segment_t> *segments, uint32_t startIdx,

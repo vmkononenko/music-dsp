@@ -42,7 +42,7 @@ void BeatDetector::detectBeat(Envelope *env, uint32_t sampleRate)
 
     maxFFTAmpIdx = max_element(env_fd, env_fd + fft->GetSize() / 2) - env_fd;
 
-    beat_hz = Helpers::fftIdxToFreq(maxFFTAmpIdx, fft->GetSize() / 2, env_samplerate);
+    beat_hz = fft->IdxToFreq(maxFFTAmpIdx);
 
     __mBeatIdxInterval = sampleRate / beat_hz;
     normalizeInterval();

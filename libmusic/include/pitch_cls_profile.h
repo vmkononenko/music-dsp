@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "lmtypes.h"
+#include "transform.h"
 
 
 typedef class PitchClsProfile {
@@ -31,8 +32,7 @@ public:
      */
     PitchClsProfile();
 
-    PitchClsProfile(amplitude_t *freqDomainMagnitudes, uint32_t fftSize,
-                    uint32_t sampleRate, uint32_t pointsCnt);
+    PitchClsProfile(Transform *t);
 
     /**
      * Get pitch class value for the specified note

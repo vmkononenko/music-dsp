@@ -27,10 +27,10 @@ FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, freq_hz_t f_low,
     size_ = (td_len <= CFG_WINDOW_SIZE) ? CFG_WINDOW_SIZE : Helpers::nextPowerOf2(td_len);
     samplerate_ = samplerate;
     polar_ = polar;
-    fd_len_ = Helpers::freqToFftIdx(f_high, size_, samplerate, ceil) + 1;
+    fd_len_ = FreqToIdx(f_high, ceil) + 1;
 
     vector<complex_t> x = Helpers::timeDomain2ComplexVector(td, td_len, size_);
-    uint32_t f_low_idx = (f_low == 0) ? 0 : Helpers::freqToFftIdx(f_low, size_, samplerate, floor);
+    uint32_t f_low_idx = (f_low == 0) ? 0 : FreqToIdx(f_low, floor);
 
     Forward_(x);
 
@@ -297,4 +297,14 @@ void FFT::Inverse(std::vector<complex_t> & input)
 void FFT::Inverse()
 {
     Inverse(*fd_.r());
+}
+
+uint32_t FFT::FreqToIdx(freq_hz_t freq, double (*roundFunc)(double))
+{
+    return (*roundFunc)(freq * size_ / samplerate_);
+}
+
+freq_hz_t FFT::IdxToFreq(uint32_t idx)
+{
+    return (idx * (freq_hz_t)samplerate_ / size_);
 }

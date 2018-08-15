@@ -47,18 +47,12 @@ chord_t ChordDetector::GetChordFromFft_(FFT *fft)
         throw std::invalid_argument("GetChordFromFft_: invalid fft");
     }
 
-    pcp_t *pcp = FFT2PCP_(fft);
+    pcp_t *pcp = new PitchClsProfile(fft);
     chord_t chord = __mChordTplColl->getBestMatch(pcp);
 
     delete pcp;
 
     return chord;
-}
-
-pcp_t * ChordDetector::FFT2PCP_(FFT *fft)
-{
-    return new PitchClsProfile(fft->GetFreqDomain().p, fft->GetSize(),
-                               fft->GetSampleRate(), fft->GetFreqDomainLen());
 }
 
 chord_t ChordDetector::getChord(amplitude_t *td, uint32_t samples,
@@ -165,7 +159,7 @@ void ChordDetector::__getSegments(std::vector<segment_t> *segments,
         }
 
         FFT *fft = GetFft_(timeDomain + sampleIdx, len, sampleRate);
-        pcp_t *pcp = FFT2PCP_(fft);
+        pcp_t *pcp = new PitchClsProfile(fft);
 
         delete fft;
 
@@ -214,7 +208,7 @@ void ChordDetector::getSegments(amplitude_t *timeDomain, uint32_t samples,
 pcp_t * ChordDetector::GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate)
 {
     FFT *fft = GetFft_(x, samples, samplerate);
-    pcp_t *pcp = FFT2PCP_(fft);
+    pcp_t *pcp = new PitchClsProfile(fft);
 
     delete fft;
 

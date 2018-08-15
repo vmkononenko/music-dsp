@@ -49,7 +49,7 @@ private:
      * @param pq            if non-NULL write results in a form of priority queue
      * @param req_len       convert only first reqLen points
      * @param start_idx     ignore first \p start_idx elements during conversion.
-     *                      This is an optimization for cutting off lower frequencies.I
+     *                      This is an optimization for cutting off lower frequencies.
      *                      Instead of calculating values and then setting them
      *                      to zero we just don't calculate them.
      * @return number of points converted
@@ -108,6 +108,10 @@ public:
     FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, bool polar);
 
     ~FFT();
+
+    uint32_t FreqToIdx(freq_hz_t, double (*roundFunc)(double)) override;
+
+    freq_hz_t IdxToFreq(uint32_t) override;
 
     /**
      * Same as Inverse(fd_.r)

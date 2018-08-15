@@ -47,6 +47,23 @@ protected:
 
 public:
 
+    /**
+     * Convert frequency in Hz to bin index in frequency domain array
+     *
+     * @param   freq    frequency in Hz
+     * @param   round_f pointer to function which will perform rounding
+     * @return  index value
+     */
+    virtual uint32_t FreqToIdx(freq_hz_t freq, double (*round_f)(double)) = 0;
+
+    /**
+     * Calculate frequency in Hz from bin index in frequency domain array
+     *
+     * @param   idx bin index in frequency domain array
+     * @return  frequency in Hz
+     */
+    virtual freq_hz_t IdxToFreq(uint32_t idx) = 0;
+
     bool IsPolar();
 
     freq_domain_t & GetFreqDomain();

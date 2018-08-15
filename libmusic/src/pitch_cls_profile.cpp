@@ -19,8 +19,7 @@ PitchClsProfile::PitchClsProfile()
     __mPCP.resize(notes_Total);
 }
 
-PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
-        uint32_t fftSize, uint32_t sampleRate, uint32_t pointsCnt)
+PitchClsProfile::PitchClsProfile(Transform *t)
 {
     PitchCalculator& pc = PitchCalculator::getInstance();
 
@@ -30,26 +29,26 @@ PitchClsProfile::PitchClsProfile(amplitude_t *freqDomainMagnitudes,
     for (int n = note_Min; n <= note_Max; n++) {
         note_t note = (note_t)n;
 
-        freq_hz_t pitchFreq;
-        uint32_t fftIdx;
-        amplitude_t pitchCls = 0;
+        freq_hz_t pitch_freq;
+        uint32_t bin_idx;
+        amplitude_t pitch_cls = 0;
         amplitude_t mag = 0;
         for (int o = OCTAVE_MIN; o <= OCTAVE_MAX; o++) {
             octave_t oct = (octave_t)o;
 
-            pitchFreq = pc.noteToPitch(note, oct);
-            fftIdx = Helpers::freqToFftIdx(pitchFreq, fftSize, sampleRate, round);
+            pitch_freq = pc.noteToPitch(note, oct);
+            bin_idx = t->FreqToIdx(pitch_freq, round);
 
-            if (fftIdx >= pointsCnt) {
+            if (bin_idx >= t->GetFreqDomainLen()) {
                 throw runtime_error("fftIdx >= pointsCnt");
             }
 
-            mag = freqDomainMagnitudes[fftIdx];
-            pitchCls += mag * mag;
-            __mPitchClsMax = max(pitchCls, __mPitchClsMax);
+            mag = t->GetFreqDomain().p[bin_idx];
+            pitch_cls += mag * mag;
+            __mPitchClsMax = max(pitch_cls, __mPitchClsMax);
         }
 
-        __mPCP[note - note_Min] = pitchCls;
+        __mPCP[note - note_Min] = pitch_cls;
     }
     __normalize();
 }
