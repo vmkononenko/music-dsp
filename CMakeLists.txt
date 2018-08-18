@@ -1,9 +1,11 @@
 cmake_minimum_required (VERSION 3.1)
 
-project (MusicDsp CXX)
+project (MusicDsp C CXX)
 
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
     set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -20,8 +22,15 @@ endif()
 set (LMCLIENT_TARGET lmclient)
 set (MUSIC_DSP_TARGET music-dsp)
 set (TESTS_TARGET tests)
+set (EXT_CQTT_TARGET cqtt)
+set (EXT_KISSFFT_TARGET kissfft)
 
-include_directories(${PROJECT_SOURCE_DIR}/libmusic/include)
+include_directories(
+    ${PROJECT_SOURCE_DIR}/libmusic/include
+    ${PROJECT_SOURCE_DIR}/ext/cqtt/include
+    ${PROJECT_SOURCE_DIR}/ext/kissfft
+    ${PROJECT_SOURCE_DIR}/ext/kissfft/tools
+)
 
 if (DEFINED ANDROID_ABI)
     if (${ANDROID_ABI} STREQUAL "x86_64")
@@ -43,6 +52,8 @@ option(WITH_TESTS ON)
 if(WITH_TESTS)
     add_subdirectory(tests)
 endif()
+
+add_subdirectory(ext)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
