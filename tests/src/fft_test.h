@@ -1,14 +1,18 @@
 #ifdef FFT_TEST_FRIENDS
 #undef FFT_TEST_FRIENDS
 #endif
-#define FFT_TEST_FRIENDS \
-    friend class TestAvg; \
-    friend class TestBitReverse; \
-    friend class TestForwardTransform; \
-    friend class TestInverseTransform; \
-    friend class TestSortBitReversal; \
+#define FFT_TEST_FRIENDS                \
+    friend class FftTestHelper;         \
+    friend class TestAvg;               \
+    friend class TestBitReverse;        \
+    friend class TestSortBitReversal;   \
 
 #include <fft.h>
+
+class FftTestHelper {
+public:
+    static void TestTransform(std::vector<complex_t> &, std::vector<complex_t> &);
+};
 
 class TestBitReverse {
 private:
@@ -26,7 +30,7 @@ public:
     void operator()() { __test(); };
 };
 
-class TestForwardTransform {
+class TestForwardTransform01 {
 private:
     void __test();
 
@@ -34,7 +38,15 @@ public:
     void operator()() { __test(); };
 };
 
-class TestInverseTransform {
+class TestForwardTransform02 {
+private:
+    void __test();
+
+public:
+    void operator()() { __test(); };
+};
+
+class TestForwardTransform03 {
 private:
     void __test();
 

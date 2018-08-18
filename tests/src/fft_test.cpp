@@ -5,6 +5,33 @@
 #include "fft_test.h"
 #include "lmhelpers.h"
 
+void FftTestHelper::TestTransform(std::vector<complex_t> &exp,
+                                std::vector<complex_t> &src)
+{
+    FFT *fft = new FFT();
+    std::vector<complex_t> src_orig = src;
+
+    fft->Forward_(src);
+
+    for (uint32_t i = 0; i < src.size(); i++) {
+        src[i] = complex_t (Helpers::stdRound(real(src[i]), 4),
+                            Helpers::stdRound(imag(src[i]), 4));
+    }
+
+    ASSERT_EQUAL(exp, src);
+
+    fft->Inverse(src);
+
+    for (uint32_t i = 0; i < src.size(); i++) {
+        src[i] = complex_t (Helpers::stdRound(real(src[i]), 0),
+                            Helpers::stdRound(imag(src[i]), 0));
+    }
+
+    ASSERT_EQUAL(src_orig, src);
+
+    delete fft;
+}
+
 void TestBitReverse::__test()
 {
     FFT *fft = new FFT();
@@ -87,85 +114,78 @@ void TestSortBitReversal::__test()
     delete fft;
 }
 
-void TestForwardTransform::__test()
+void TestForwardTransform01::__test()
 {
-    FFT *fft = new FFT();
-    std::vector<complex_t> src, expected;
+    std::vector<complex_t> src = {
+            complex_t (1, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+    };
 
-    src.push_back(complex_t (1, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
+    std::vector<complex_t> exp = {
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+            complex_t (1, 0),
+    };
 
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (1, 0));
-
-    fft->Forward_(src);
-    ASSERT_EQUAL(expected, src);
-
-    src.clear();
-    expected.clear();
-
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (1, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-
-    expected.push_back(complex_t (1, 0));
-    expected.push_back(complex_t (0.7071, -0.7071));
-    expected.push_back(complex_t (0, -1));
-    expected.push_back(complex_t (-0.7071, -0.7071));
-    expected.push_back(complex_t (-1, 0));
-    expected.push_back(complex_t (-0.7071, 0.7071));
-    expected.push_back(complex_t (0, 1));
-    expected.push_back(complex_t (0.7071, 0.7071));
-
-    fft->Forward_(src);
-
-    for (uint32_t i = 0; i < src.size(); i++) {
-        src[i] = complex_t (Helpers::stdRound(real(src[i]), 4),
-                            Helpers::stdRound(imag(src[i]), 4));
-    }
-    ASSERT_EQUAL(expected, src);
-
-    delete fft;
+    FftTestHelper::TestTransform(exp, src);
 }
 
-void TestInverseTransform::__test() {
-    FFT *fft = new FFT();
-    std::vector<complex_t> src, inverse;
+void TestForwardTransform02::__test()
+{
+    std::vector<complex_t> src = {
+            complex_t (0, 0),
+            complex_t (1, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+            complex_t (0, 0),
+    };
 
-    src.push_back(complex_t (1, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
-    src.push_back(complex_t (0, 0));
+    std::vector<complex_t> exp = {
+            complex_t (1, 0),
+            complex_t (0.7071, -0.7071),
+            complex_t (0, -1),
+            complex_t (-0.7071, -0.7071),
+            complex_t (-1, 0),
+            complex_t (-0.7071, 0.7071),
+            complex_t (0, 1),
+            complex_t (0.7071, 0.7071),
+    };
 
-    inverse = src;
+    FftTestHelper::TestTransform(exp, src);
+}
 
-    fft->Forward_(inverse);
-    fft->Inverse(inverse);
 
-    ASSERT_EQUAL(src, inverse);
+void TestForwardTransform03::__test()
+{
+    std::vector<complex_t> src = {
+            complex_t (0, 0),
+            complex_t (1, 0),
+            complex_t (0, 0),
+            complex_t (-1, 0),
+    };
 
-    delete fft;
+    std::vector<complex_t> exp = {
+            complex_t (0, 0),
+            complex_t (0, -2),
+            complex_t (0, 0),
+            complex_t (0, 2),
+    };
+
+    FftTestHelper::TestTransform(exp, src);
 }
 
 void TestAvg::__test() {

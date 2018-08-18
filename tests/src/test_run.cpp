@@ -22,15 +22,16 @@ void runTests(int argc, char const *argv[], const cute::suite &suite, const char
 
 cute::suite fftTestSuite()
 {
-	cute::suite s;
+    cute::suite s;
 
-	s.push_back(TestBitReverse());
-	s.push_back(TestSortBitReversal());
-	s.push_back(TestForwardTransform());
-	s.push_back(TestInverseTransform());
-	s.push_back(TestAvg());
+    s.push_back(TestBitReverse());
+    s.push_back(TestSortBitReversal());
+    s.push_back(TestForwardTransform01());
+    s.push_back(TestForwardTransform02());
+    s.push_back(TestForwardTransform03());
+    s.push_back(TestAvg());
 
-	return s;
+    return s;
 }
 
 cute::suite helpersTestSuite()
