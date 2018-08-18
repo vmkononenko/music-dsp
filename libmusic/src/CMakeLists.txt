@@ -20,3 +20,7 @@ set(LIB_SOURCES
 )
 
 add_library(music-dsp SHARED ${LIB_SOURCES})
+
+add_dependencies(${MUSIC_DSP_TARGET} ${EXT_CQTT_TARGET})
+
+target_link_libraries(${MUSIC_DSP_TARGET} ${EXT_CQTT_TARGET})
