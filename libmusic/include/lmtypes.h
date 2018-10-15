@@ -70,7 +70,6 @@ typedef enum {
     cq_6th,
     cq_minor_6th,
     cq_diminished,
-    cq_diminished_7th,
     cq_half_diminished_7th,
     cq_9th,
     cq_major_9th,
@@ -78,6 +77,7 @@ typedef enum {
     cq_minor_9th,
     cq_suspended_4th,
     cq_suspended_2nd,
+    cq_diminished_7th,
     cq_5th,
     cq_Min = cq_major,
     cq_Max = cq_minor

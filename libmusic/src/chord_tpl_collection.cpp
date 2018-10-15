@@ -27,14 +27,9 @@ ChordTplCollection::~ChordTplCollection()
 
 void ChordTplCollection::__clearChordTpls()
 {
-    for (int n = note_Min; n <= note_Max; n++) {
-        note_t note = (note_t)n;
-        for (auto tpl : __mChordTpls[note]) {
-            delete tpl;
-        }
-        __mChordTpls[note].clear();
+    for (auto tpl : tpls_) {
+        delete tpl;
     }
-    __mChordTpls.clear();
 }
 
 void ChordTplCollection::__initChordTpls()
@@ -44,10 +39,27 @@ void ChordTplCollection::__initChordTpls()
 
         for (int q = cq_Min; q <= cq_Max; q++) {
             chord_quality_t cq = (chord_quality_t)q;
-            chord_tpl_t *tpl = new ChordTpl(note, cq);
-            __mChordTpls[note].push_back(tpl);
+            size_t subtypes = ChordTpl::SlashSubtypesCnt(cq);
+            for (uint8_t s = 0; s < subtypes; s++) {
+                chord_tpl_t *tpl = new ChordTpl(note, cq, s);
+                tpls_.push_back(tpl);
+            }
         }
     }
+}
+
+size_t ChordTplCollection::Size()
+{
+    return tpls_.size();
+}
+
+chord_tpl_t * ChordTplCollection::GetTpl(uint32_t idx)
+{
+    if (idx >= tpls_.size()) {
+        throw invalid_argument("ChordTplCollection::GetTpl(): bad index");
+    }
+
+    return tpls_[idx];
 }
 
 chord_t ChordTplCollection::getBestMatch(pcp_t *pcp)
@@ -57,20 +69,14 @@ chord_t ChordTplCollection::getBestMatch(pcp_t *pcp)
     chord_quality_t winningQuality = cq_major;
     tpl_score_t score;
 
+    for (const auto tpl : tpls_) {
+        score = tpl->GetScore(pcp);
 
-    for (const auto &pair : __mChordTpls) {
-        note_t      note = pair.first;
-        vector <chord_tpl_t *> templates = pair.second;
+       if (score > scoreMin) { continue; }
 
-        for (auto tpl : templates) {
-            score = tpl->getPCPScore(pcp);
-
-            if (score > scoreMin) { continue; }
-
-            scoreMin = score;
-            winningNote = note;
-            winningQuality = tpl->getQuality();
-        }
+       scoreMin = score;
+       winningNote = tpl->RootNote();
+       winningQuality = tpl->Quality();
     }
 
     return Chord(winningNote, winningQuality);

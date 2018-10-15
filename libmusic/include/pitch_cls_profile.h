@@ -9,8 +9,9 @@
 
 #include <vector>
 
+#include "fft.h"
 #include "lmtypes.h"
-#include "transform.h"
+#include "q_transform.h"
 
 
 namespace anatomist {
@@ -34,7 +35,9 @@ public:
      */
     PitchClsProfile();
 
-    PitchClsProfile(Transform *t);
+    PitchClsProfile(FFT *fft);
+
+    PitchClsProfile(std::vector<amplitude_t> &fd, QTransform *q_transform);
 
     /**
      * Get pitch class value for the specified note
@@ -43,14 +46,18 @@ public:
      */
     amplitude_t getPitchCls(note_t note) const;
 
+    size_t size();
+
     template<typename T> amplitude_t euclideanDistance(std::vector<T> &v)
     {
+        if (v.size() != __mPCP.size()) {
+            throw std::invalid_argument("euclideanDistance(): wrong vector size");
+        }
+
         amplitude_t sum = 0;
 
-        for (int n = note_Min; n <= note_Max; n++) {
-            note_t note = (note_t)n;
-
-            amplitude_t diff = ((amplitude_t)__mPCP[note - note_Min] - v[note - note_Min]);
+        for (uint16_t i = 0; i < __mPCP.size(); i++) {
+            amplitude_t diff = (__mPCP[i] - v[i]);
             sum += diff * diff;
         }
 
@@ -67,6 +74,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const PitchClsProfile& pcp);
 } pcp_t;
+
+typedef std::vector<pcp_t> chromagram_t;
 
 }
 

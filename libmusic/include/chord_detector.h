@@ -19,6 +19,8 @@
 #include "pcp_buf.h"
 #include "pitch_calculator.h"
 #include "pitch_cls_profile.h"
+#include "q_transform.h"
+#include "viterbi.h"
 
 #ifndef CHORD_DETECTOR_TEST_FRIENDS
 #define CHORD_DETECTOR_TEST_FRIENDS
@@ -67,7 +69,7 @@ public:
 
 private:
     PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
-    ChordTplCollection *__mChordTplColl = new ChordTplCollection();
+    ChordTplCollection *tpl_collection_ = new ChordTplCollection();
 
     FFT * GetFft_(amplitude_t *td, uint32_t samples, uint32_t samplerate);
 
@@ -98,8 +100,16 @@ private:
      * @param   sampleRate  sample rate of x
      * @param   l           listener to report progress to if \p segments is null
      */
-    void __getSegments(std::vector<segment_t> *segments, amplitude_t *x,
-                       uint32_t samples, uint32_t sr, ResultsListener *l);
+    void Process_(std::vector<segment_t> *segments, amplitude_t *x,
+                  uint32_t samples, uint32_t sr, ResultsListener *l,
+                  chromagram_t *c);
+
+    void Tune_(log_spectrogram_t &lsg);
+
+    Viterbi::obs_matrix_t GetScoreMatrix_(chromagram_t &chromagram);
+
+    chromagram_t ChromagramFromSpectrogram_(log_spectrogram_t &lsg,
+                                            QTransform *q_transform);
 
 public:
     /**
@@ -142,6 +152,8 @@ public:
     std::vector<note_t> getScale(note_t mainNote, bool isMinor);
 
     pcp_t * GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate);
+
+    chromagram_t GetChromagram(amplitude_t *x, uint32_t samples, uint32_t samplerate);
 };
 
 }

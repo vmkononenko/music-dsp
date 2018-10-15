@@ -14,6 +14,7 @@ set(LIB_SOURCES
     pitch_calculator.cpp
     pcp_buf.cpp
     pitch_cls_profile.cpp
+    q_transform.cpp
     recursive_filter.cpp
     transform.cpp
     viterbi.cpp
@@ -25,3 +26,4 @@ add_library(music-dsp SHARED ${LIB_SOURCES})
 add_dependencies(${MUSIC_DSP_TARGET} ${EXT_CQTT_TARGET})
 
 target_link_libraries(${MUSIC_DSP_TARGET} ${EXT_CQTT_TARGET})
+

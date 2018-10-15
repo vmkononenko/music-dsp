@@ -36,26 +36,30 @@ typedef float tpl_score_t;
 typedef class ChordTpl {
 
 private:
-    static std::map<chord_quality_t, std::vector<note_presense_state_t>> __mChordQltyTpls;
+    static std::map<chord_quality_t, std::vector<std::vector<note_presense_state_t>>> chord_qlty_tpls_;
 
-    note_t                  __mRootNote;
-    chord_quality_t         __mQuality;
-    std::vector<uint8_t>    __mTpl;
+    note_t                  root_note_;
+    note_t                  bass_note_ = note_Unknown;
+    chord_quality_t         chord_quality_;
+    std::vector<uint8_t>    tpl_;
 
-    void __initTpl(note_t note, chord_quality_t cq);
+    void __initTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
 
 public:
     /**
      * Constructor
      */
-    ChordTpl(note_t note, chord_quality_t cq);
+    ChordTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
 
-    /**
-     *
-     */
-    tpl_score_t getPCPScore(pcp_t *pcp);
+    tpl_score_t GetScore(pcp_t *pcp);
 
-    chord_quality_t getQuality();
+    note_t RootNote();
+
+    note_t BassNote();
+
+    chord_quality_t Quality();
+
+    static size_t SlashSubtypesCnt(chord_quality_t q);
 
 } chord_tpl_t;
 

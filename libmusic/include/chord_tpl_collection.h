@@ -21,7 +21,7 @@ namespace anatomist {
 class ChordTplCollection {
 
 private:
-    std::map<note_t, std::vector <chord_tpl_t *>>   __mChordTpls;
+    std::vector<chord_tpl_t *>  tpls_;
 
     void __clearChordTpls();
     void __initChordTpls();
@@ -36,6 +36,10 @@ public:
      * Destructor
      */
     ~ChordTplCollection();
+
+    size_t Size();
+
+    chord_tpl_t * GetTpl(uint32_t idx);
 
     /**
      *

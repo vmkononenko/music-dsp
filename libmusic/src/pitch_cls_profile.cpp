@@ -4,12 +4,14 @@
  * Pitch Class Profile implementation
  */
 
+#include <algorithm>
 #include <iomanip>
 #include <math.h>
 
 #include "lmhelpers.h"
 #include "pitch_calculator.h"
 #include "pitch_cls_profile.h"
+#include "window_functions.h"
 
 
 using namespace std;
@@ -18,15 +20,15 @@ namespace anatomist {
 
 PitchClsProfile::PitchClsProfile()
 {
-    __mPCP.resize(notes_Total);
+    __mPCP.resize(notes_Total * 2);
+    __mPCP.assign(__mPCP.size(), 0);
 }
 
-PitchClsProfile::PitchClsProfile(Transform *t)
+PitchClsProfile::PitchClsProfile(FFT *fft)
 {
     PitchCalculator& pc = PitchCalculator::getInstance();
 
-    __mPCP.reserve(notes_Total);
-    __mPCP.assign(notes_Total, 0);
+    __mPCP.resize(notes_Total, 0);
 
     for (int n = note_Min; n <= note_Max; n++) {
         note_t note = (note_t)n;
@@ -39,13 +41,13 @@ PitchClsProfile::PitchClsProfile(Transform *t)
             octave_t oct = (octave_t)o;
 
             pitch_freq = pc.noteToPitch(note, oct);
-            bin_idx = t->FreqToIdx(pitch_freq, round);
+            bin_idx = fft->FreqToIdx(pitch_freq, round);
 
-            if (bin_idx >= t->GetFreqDomainLen()) {
+            if (bin_idx >= fft->GetFreqDomainLen()) {
                 throw runtime_error("fftIdx >= pointsCnt");
             }
 
-            mag = t->GetFreqDomain().p[bin_idx];
+            mag = fft->GetFreqDomain().p[bin_idx];
             pitch_cls += mag * mag;
             __mPitchClsMax = max(pitch_cls, __mPitchClsMax);
         }
@@ -55,8 +57,45 @@ PitchClsProfile::PitchClsProfile(Transform *t)
     __normalize();
 }
 
+PitchClsProfile::PitchClsProfile(std::vector<amplitude_t> &fd_mags, QTransform *q_transform)
+{
+    PitchCalculator& pc = PitchCalculator::getInstance();
+    uint8_t bps = q_transform->BinsPerSemitone();
+    int32_t offset = q_transform->FreqToBin(pc.noteToPitch(note_E, OCTAVE_MIN));
+    uint8_t semitones_cnt = fd_mags.size() / bps;
+    freq_hz_t f3 = pc.noteToPitch(note_F, OCTAVE_3);
+    uint32_t f3_idx = q_transform->FreqToBin(f3);
+    uint32_t win_offset = 0; // TODO: calculate
+    vector<amplitude_t> bass_win = WindowFunctions::getHamming(f3_idx / bps, win_offset);
+    vector<amplitude_t> treble_win = WindowFunctions::getHamming(semitones_cnt, win_offset);
+
+    __mPCP.resize(notes_Total * 2, 0);
+
+    for (uint32_t bin = offset; bin < fd_mags.size() - (bps/2+1); bin += bps) {
+        note_t note;
+        amplitude_t tmp = 0;
+        for (int32_t i = -bps/2; i < bps/2+1; i++) {
+            tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (i/2 + 1)));
+        }
+        tmp /= bps;
+
+        note = pc.pitchToNote(pc.getPitch(q_transform->BinToFreq(bin)));
+
+        __mPCP[note - note_Min] += tmp * bass_win[bin / bps];
+        __mPCP[note - note_Min + notes_Total] += tmp * treble_win[bin / bps];
+    }
+
+    __mPitchClsMax = *max_element(__mPCP.begin(), __mPCP.end());
+
+    __normalize();
+}
+
 void PitchClsProfile::__normalize()
 {
+    if (__mPitchClsMax == 0) {
+        return;
+    }
+
     for (uint8_t i = 0; i < __mPCP.size(); i++) {
         __mPCP[i] = __mPCP[i] / __mPitchClsMax;
     }
@@ -69,6 +108,11 @@ amplitude_t PitchClsProfile::getPitchCls(note_t note) const
     }
 
     return __mPCP[note - note_Min];
+}
+
+size_t PitchClsProfile::size()
+{
+    return __mPCP.size();
 }
 
 amplitude_t PitchClsProfile::euclideanDistance(PitchClsProfile &pcp)
@@ -118,17 +162,18 @@ ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
     int percentPerRow = 100 / PCP_ROWS;
 
     for (int row = 0; row < PCP_ROWS; row++) {
-        for (int n = note_Min; n <= note_Max; n++) {
-            note_t note = static_cast<note_t>(n);
-            uint8_t progress = pcp.getPitchCls(note) * 100;
+        for (auto note_amp : pcp.__mPCP) {
+            uint8_t progress = note_amp * 100;
             os << std::setw(PCP_SYM_PER_COL)
                << ((progress >= round(100 - percentPerRow * row)) ? '|' : ' ');
         }
         os << endl;
     }
 
-    for (int n = note_Min; n <= note_Max; n++) {
-        os << std::setw(PCP_SYM_PER_COL) << static_cast<note_t>(n);
+    for (uint8_t i = 0; i < pcp.__mPCP.size() / notes_Total; i++) {
+        for (int n = note_Min; n <= note_Max; n++) {
+            os << std::setw(PCP_SYM_PER_COL) << static_cast<note_t>(n);
+        }
     }
 
     return os;

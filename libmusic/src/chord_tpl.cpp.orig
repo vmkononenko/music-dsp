@@ -13,6 +13,17 @@ using namespace std;
 
 namespace anatomist {
 
+<<<<<<< Updated upstream
+map<chord_quality_t, vector<note_presense_state_t>> ChordTpl::__mChordQltyTpls = {
+    {cq_major,                  {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_minor,                  {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
+    {cq_7th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_NP}},
+    {cq_major_7th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_P,   nps_NP, nps_NP}},
+    {cq_minor_7th,              {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_NP}},
+    {cq_6th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_P,  nps_NP,  nps_NP, nps_NP}},
+    {cq_minor_6th,              {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_P,  nps_NP,  nps_NP, nps_NP}},
+    {cq_diminished,             {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_NP,  nps_NP, nps_NP}},
+=======
 std::map<chord_quality_t, std::vector<std::vector<note_presense_state_t>>> ChordTpl::chord_qlty_tpls_ = {
     {cq_major,                  {
                                     {nps_P,  nps_NP, nps_NP, nps_NP, nps_NP, nps_NP, nps_NP,  nps_NP, nps_NP,
@@ -61,8 +72,8 @@ std::map<chord_quality_t, std::vector<std::vector<note_presense_state_t>>> Chord
                                      nps_P,  nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_PF,  nps_NP, nps_NP}
                                 }},
 #if 0
+>>>>>>> Stashed changes
     {cq_diminished_7th,         {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_PFF, nps_NP, nps_NP}},
-    {cq_half_diminished_7th,    {nps_P, nps_NP, nps_PF, nps_NP, nps_PF, nps_NP, nps_PF,  nps_NP, nps_NP}},
     {cq_9th,                    {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_PF,  nps_NP, nps_P }},
     {cq_major_9th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_P,   nps_NP, nps_P }},
     {cq_added_9th,              {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_P }},
@@ -103,11 +114,10 @@ void ChordTpl::__initTpl(note_t root_note, chord_quality_t cq, uint8_t ss)
         note_t note = note_Unknown;
         note_presense_state_t presenseState = (*qt)[i];
         uint8_t treble_offset = notes_Total;
-        uint8_t scale_idx = i % (qt->size() / 2);
 
         switch(presenseState) {
             case nps_present:
-                note = scale[scale_idx];
+                note = scale[i];
                 break;
             case nps_present_flat:
             case nps_present_flat_flat:
@@ -123,7 +133,7 @@ void ChordTpl::__initTpl(note_t root_note, chord_quality_t cq, uint8_t ss)
                     interval = 1;
                 }
 
-                note = scale[scale_idx] + interval;
+                note = scale[i] + interval;
 
                 break;
             }
@@ -179,6 +189,8 @@ size_t ChordTpl::SlashSubtypesCnt(chord_quality_t q)
     }
 
     return chord_qlty_tpls_[q].size();
+}
+
 }
 
 }
