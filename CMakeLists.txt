@@ -20,9 +20,7 @@ endif()
 set (LMCLIENT_TARGET lmclient)
 set (MUSIC_DSP_TARGET music-dsp)
 set (TESTS_TARGET tests)
-set (EXT_CQTT_TARGET ccqt)
 
-include_directories(${PROJECT_SOURCE_DIR}/ext/cqtt/include)
 include_directories(${PROJECT_SOURCE_DIR}/libmusic/include)
 
 if (DEFINED ANDROID_ABI)
@@ -52,5 +50,4 @@ if(WITH_CLIENT)
     add_subdirectory(client)
 endif()
 
-add_subdirectory(ext/cqtt)
 add_subdirectory(libmusic)
