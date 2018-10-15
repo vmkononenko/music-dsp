@@ -9,10 +9,29 @@
 #include "window_functions.h"
 
 
+using namespace std;
+
+vector<amplitude_t> WindowFunctions::getHamming(uint32_t len, uint32_t offset)
+{
+    if (offset >= len) {
+        throw invalid_argument("getHamming(): offset >= len");
+    }
+
+    vector<amplitude_t> win(len);
+
+    for (uint32_t i = offset; i < len; i++) {
+        win[i] = (0.54 - 0.46 * cos(2 * M_PI * i / (len - 1)));
+    }
+
+    return win;
+}
+
 void WindowFunctions::applyHamming(amplitude_t *points, uint32_t pointsCnt)
 {
+    vector<amplitude_t> win = getHamming(pointsCnt, 0);
+
     for (uint32_t i = 0; i < pointsCnt; i++) {
-        points[i] = points[i] * (0.54 - 0.46 * cos(2 * M_PI * i / (pointsCnt - 1)));
+        points[i] = points[i] * win[i];
     }
 }
 
