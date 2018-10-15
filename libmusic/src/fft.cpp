@@ -15,6 +15,7 @@
 
 using namespace std;
 
+namespace anatomist {
 
 FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, freq_hz_t f_low,
         freq_hz_t f_high, bool polar, bool hps)
@@ -307,4 +308,6 @@ uint32_t FFT::FreqToIdx(freq_hz_t freq, double (*roundFunc)(double))
 freq_hz_t FFT::IdxToFreq(uint32_t idx)
 {
     return (idx * (freq_hz_t)samplerate_ / size_);
+}
+
 }

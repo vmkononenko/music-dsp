@@ -14,6 +14,8 @@
 #include "pitch_cls_profile.h"
 
 
+namespace anatomist {
+
 typedef enum {
     nps_present,
     nps_present_flat,
@@ -56,5 +58,7 @@ public:
     chord_quality_t getQuality();
 
 } chord_tpl_t;
+
+}
 
 /** @} */

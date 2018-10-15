@@ -22,6 +22,7 @@
 #include "lmhelpers.h"
 #include "window_functions.h"
 
+using namespace anatomist;
 using namespace std;
 
 void usage();
@@ -195,7 +196,7 @@ void printTimeDomain(amplitude_t *td, uint32_t samples, uint32_t samplerate,
         return;
     }
 
-    FFT *fft = new FFT(td, samples, samplerate, false);
+    anatomist::FFT *fft = new anatomist::FFT(td, samples, samplerate, false);
     vector<complex_t> *x = fft->GetFreqDomain().r();
 
     if (td_via_inverse_dft) {
@@ -244,7 +245,7 @@ void printFFT(amplitude_t *td, int samplerate, uint32_t samples,
 
     WindowFunctions::applyDefault(td, samples);
 
-    FFT *fft = new FFT(td, samples, samplerate, polar);
+    anatomist::FFT *fft = new anatomist::FFT(td, samples, samplerate, polar);
     amplitude_t *p = fft->GetFreqDomain().p;
     double mag_max = max_amplitude(p, fft->GetFreqDomainLen());
 

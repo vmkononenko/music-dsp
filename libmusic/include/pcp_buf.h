@@ -15,6 +15,7 @@
 
 #include "pitch_cls_profile.h"
 
+namespace anatomist {
 
 class PCPBuf {
 
@@ -47,3 +48,5 @@ public:
      */
     void flush();
 };
+
+}

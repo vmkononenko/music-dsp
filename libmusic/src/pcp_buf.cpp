@@ -10,6 +10,8 @@
 
 using namespace std;
 
+namespace anatomist {
+
 bool PCPBuf::vectorChange(pcp_t *pcp)
 {
     pcp_t *prev = mProfiles.empty() ? nullptr : mProfiles[0];
@@ -59,4 +61,6 @@ void PCPBuf::flush()
     }
 
     mProfiles.clear();
+}
+
 }

@@ -16,6 +16,8 @@
 using namespace std;
 
 
+namespace anatomist {
+
 BeatDetector::BeatDetector(amplitude_t *td, uint32_t samples, uint32_t sampleRate)
 {
     Envelope *e = new Envelope(td, samples);
@@ -98,3 +100,5 @@ float BeatDetector::getBPM()
 }
 
 BeatDetector::~BeatDetector() {}
+
+}

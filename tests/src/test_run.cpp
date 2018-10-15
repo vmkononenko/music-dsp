@@ -11,6 +11,7 @@
 #include "pitch_calculator_test.h"
 
 
+using namespace anatomist;
 using namespace std;
 
 void runTests(int argc, char const *argv[], const cute::suite &suite, const char *name)

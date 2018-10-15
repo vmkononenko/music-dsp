@@ -5,6 +5,9 @@
 #include "fft_test.h"
 #include "lmhelpers.h"
 
+
+namespace anatomist {
+
 void FftTestHelper::TestTransform(std::vector<complex_t> &exp,
                                 std::vector<complex_t> &src)
 {
@@ -217,5 +220,7 @@ void TestAvg::__test() {
 
     free(res);
     delete fft;
+}
+
 }
 

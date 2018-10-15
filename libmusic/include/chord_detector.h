@@ -31,6 +31,8 @@ struct segment_t {
     bool        silence;
 };
 
+namespace anatomist {
+
 /**
  * @class   ChordDetector
  */
@@ -141,5 +143,7 @@ public:
 
     pcp_t * GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate);
 };
+
+}
 
 /** @} */

@@ -13,6 +13,8 @@
 
 using namespace std;
 
+namespace anatomist {
+
 ChordTplCollection::ChordTplCollection()
 {
     __initChordTpls();
@@ -72,4 +74,6 @@ chord_t ChordTplCollection::getBestMatch(pcp_t *pcp)
     }
 
     return Chord(winningNote, winningQuality);
+}
+
 }

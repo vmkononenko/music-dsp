@@ -11,6 +11,8 @@
 
 using namespace std;
 
+namespace anatomist {
+
 map<chord_quality_t, vector<note_presense_state_t>> ChordTpl::__mChordQltyTpls = {
     {cq_major,                  {nps_P, nps_NP, nps_P,  nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
     {cq_minor,                  {nps_P, nps_NP, nps_PF, nps_NP, nps_P,  nps_NP, nps_NP,  nps_NP, nps_NP}},
@@ -100,4 +102,6 @@ tpl_score_t ChordTpl::getPCPScore(pcp_t *pcp)
 chord_quality_t ChordTpl::getQuality()
 {
     return __mQuality;
+}
+
 }

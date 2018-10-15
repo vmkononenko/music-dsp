@@ -16,6 +16,8 @@
 #include "pitch_cls_profile.h"
 
 
+namespace anatomist {
+
 class ChordTplCollection {
 
 private:
@@ -41,6 +43,9 @@ public:
      * @return
      */
     chord_t getBestMatch(pcp_t *pcp);
+
 };
+
+}
 
 /** @} */

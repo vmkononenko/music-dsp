@@ -14,6 +14,8 @@
 
 using namespace std;
 
+namespace anatomist {
+
 PitchClsProfile::PitchClsProfile()
 {
     __mPCP.resize(notes_Total);
@@ -130,4 +132,6 @@ ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
     }
 
     return os;
+}
+
 }

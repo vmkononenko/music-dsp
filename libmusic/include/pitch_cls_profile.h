@@ -13,6 +13,8 @@
 #include "transform.h"
 
 
+namespace anatomist {
+
 typedef class PitchClsProfile {
 
 private:
@@ -65,5 +67,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const PitchClsProfile& pcp);
 } pcp_t;
+
+}
 
 /** @} */

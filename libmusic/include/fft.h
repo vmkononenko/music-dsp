@@ -16,6 +16,7 @@
 #define FFT_TEST_FRIENDS
 #endif
 
+namespace anatomist {
 
 class FFT : public Transform {
 
@@ -118,5 +119,7 @@ public:
      */
     void Inverse();
 };
+
+}
 
 /** @} */

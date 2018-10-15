@@ -10,6 +10,9 @@
 #define TEST_FILES_DIR_ENV_VAR      "LM_TEST_FILES_DIR"
 #define SEPARATE_CHORDS_DIR         "/chords_separate/"
 
+
+using namespace anatomist;
+
 uint32_t Common::openSoundFile(amplitude_t **chanBuf, const char *filePath,
                                uint32_t *sampleRate)
 {

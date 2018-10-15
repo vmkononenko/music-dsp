@@ -22,6 +22,8 @@
 
 using namespace std;
 
+namespace anatomist {
+
 ChordDetector::ChordDetector()
 {
     LOGMSG_D(LOG_TAG, "Using window size %u, FFT size %u and %s window function",
@@ -213,6 +215,8 @@ pcp_t * ChordDetector::GetPCP(amplitude_t *x, uint32_t samples, uint32_t sampler
     delete fft;
 
     return pcp;
+}
+
 }
 
 /** @} */

@@ -9,6 +9,8 @@
 
 #include <fft.h>
 
+namespace anatomist {
+
 class FftTestHelper {
 public:
     static void TestTransform(std::vector<complex_t> &, std::vector<complex_t> &);
@@ -61,3 +63,5 @@ private:
 public:
     void operator()() { __test(); };
 };
+
+}

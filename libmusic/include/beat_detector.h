@@ -20,6 +20,8 @@
 #include "lmtypes.h"
 
 
+namespace anatomist {
+
 class BeatDetector {
 
 private:
@@ -65,3 +67,5 @@ public:
 
     ~BeatDetector();
 };
+
+}
