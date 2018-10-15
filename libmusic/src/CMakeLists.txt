@@ -16,6 +16,7 @@ set(LIB_SOURCES
     pitch_cls_profile.cpp
     recursive_filter.cpp
     transform.cpp
+    viterbi.cpp
     window_functions.cpp
 )
 
