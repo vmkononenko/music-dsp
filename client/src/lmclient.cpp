@@ -341,24 +341,35 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
         channelTD[i] = timeDomain[i * sfinfo.channels];
     }
 
-    cd->getSegments(segments, channelTD, sfinfo.frames, sfinfo.samplerate);
-    for (uint32_t i = 0; i < segments.size(); i++) {
-        segment_t *s = &segments[i];
-        if (refChord.empty()) {
-            auto idxToSec = [&](int idx) {
-                return Helpers::stdRound<float>(idx / (float) sfinfo.samplerate, 2);
-            };
-            cout << setw(3) << i << ": " << setw(3) << (s->silence ? "S" : s->chord.toString())
-                 << " [" << idxToSec(s->startIdx) << ", " << idxToSec(s->endIdx) << "]" << endl;
-        } else {
-            if (!s->silence && refChord.compare(s->chord.toString())) {
-                fails += (s->endIdx - s->startIdx + 1);
+    if (!printPCP) {
+        cd->getSegments(segments, channelTD, sfinfo.frames, sfinfo.samplerate);
+        for (uint32_t i = 0; i < segments.size(); i++) {
+            segment_t *s = &segments[i];
+            if (refChord.empty()) {
+                auto idxToSec = [&](int idx) {
+                    return Helpers::stdRound<float>(idx / (float) sfinfo.samplerate, 2);
+                };
+                cout << setw(3) << i << ": " << setw(3) << (s->silence ? "S" : s->chord.toString())
+                     << " [" << idxToSec(s->startIdx) << ", " << idxToSec(s->endIdx) << "]" << endl;
+            } else {
+                if (!s->silence && refChord.compare(s->chord.toString())) {
+                    fails += (s->endIdx - s->startIdx + 1);
+                }
             }
         }
-    }
 
-    if (!refChord.empty()) {
-        __printChordEvalScore(sfinfo.frames, fails);
+        if (!refChord.empty()) {
+            __printChordEvalScore(sfinfo.frames, fails);
+        }
+    } else {
+        chromagram_t chromagram = cd->GetChromagram(channelTD, sfinfo.frames, sfinfo.samplerate);
+        uint32_t print_cnt = (n == 0) ? chromagram.size() : std::min(static_cast<uint32_t>(chromagram.size()), n);
+
+        for (uint32_t i = 0; i < print_cnt; i++) {
+            cout << chromagram[i] << endl;
+        }
+
+        cout << chromagram.size() << endl;
     }
 
     free(channelTD);
