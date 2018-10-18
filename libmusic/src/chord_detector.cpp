@@ -221,7 +221,7 @@ Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 
     for (uint32_t win_idx = 0; win_idx < chromagram.size(); win_idx++) {
         pcp_t *pcp = &chromagram[win_idx];
-        tpl_score_t sum;
+        tpl_score_t sum = 0;
 
         for (uint32_t tpl_idx = 0; tpl_idx < tpl_collection_->Size(); tpl_idx++) {
             tpl_score_t score = 1 / tpl_collection_->GetTpl(tpl_idx)->GetScore(pcp);
@@ -261,7 +261,7 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
     Viterbi::obs_matrix_t score_mtx;
     vector<uint32_t> mtx_path;
     uint32_t seg_start_idx = 0, prev_path_idx;
-    QTransform *q_transform = new QTransform(samplerate, 36, 1047);
+    QTransform *q_transform = new QTransform(samplerate, 36, 698);
     vector<double> init_p;
     vector<vector<double>> trans_p;
     uint32_t chords_total = tpl_collection_->Size();
@@ -278,6 +278,15 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
     Tune_(lsg);
 
     chromagram = ChromagramFromSpectrogram_(lsg, q_transform);
+
+#if 0
+    for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += hop_size) {
+        uint32_t len = min(win_size, samples - sampleIdx);
+        FFT *fft = GetFft_(td + sampleIdx, len, samplerate);
+        chromagram.push_back(PitchClsProfile(fft));
+        delete fft;
+    }
+#endif
 
     if (c != nullptr) {
         *c = chromagram;
@@ -308,18 +317,19 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
 
     mtx_path = Viterbi::GetPath(score_mtx, init_p, trans_p);
 
-    if (mtx_path.size() != lsg.size()) {
-        throw runtime_error("__getSegments(): mtx_path.size() != lsg.size()");
+    if (mtx_path.size() != chromagram.size()) {
+        throw runtime_error("__getSegments(): mtx_path.size() != chromagram.size()");
     }
 
-    prev_path_idx = 0;
-    for (uint32_t res = 0; res < mtx_path.size(); res++) {
-        if (mtx_path[res] != prev_path_idx) {
+    prev_path_idx = mtx_path[0];
+    for (uint32_t res = 1; res < mtx_path.size(); res++) {
+        if (mtx_path[res] != prev_path_idx || res == mtx_path.size() - 1) {
             chord_tpl_t *tpl = tpl_collection_->GetTpl(prev_path_idx);
             segment_t segment;
 
             segment.startIdx = seg_start_idx;
             segment.chord = Chord(tpl->RootNote(), tpl->Quality());
+            segment.silence = false;
 
             prev_path_idx = mtx_path[res];
             seg_start_idx++;
