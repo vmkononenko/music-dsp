@@ -7,16 +7,51 @@ using namespace std;
 
 typedef pair<uint32_t, double> state_metric_t;
 
+
+bool Viterbi::ValidateProbVector_(const std::vector<double> &v)
+{
+    double p_total = 0;
+
+    for (const auto & p : v) {
+        p_total += p;
+    }
+
+    return Helpers::almostEqual(p_total, 1, (1.0 / 10000));
+}
+
+void Viterbi::ValidateInitProbs_(const std::vector<double> &init_p)
+{
+    if (init_p.empty()) {
+        throw invalid_argument("ValidateInitProbs_(): empty vector of initial probabilities");
+    }
+
+    if (!ValidateProbVector_(init_p)) {
+        throw invalid_argument("ValidateInitProbs_(): total probability is not 1");
+    }
+}
+
+void Viterbi::ValidateMatrix_(const vector<vector<double>> &obs) {
+    if (obs.empty() || obs[0].empty()) {
+        throw invalid_argument("ValidateMatrix_(): observation matrix is empty");
+    }
+
+    size_t states_cnt = obs[0].size();
+    for (const auto & col : obs) {
+        if (col.size() != states_cnt) {
+            throw invalid_argument("ValidateMatrix_(): inconsistent size of columns");
+        }
+        if (!ValidateProbVector_(col)) {
+            throw invalid_argument("ValidateMatrix_(): total column probability is not 1");
+        }
+    }
+}
+
 vector<uint32_t> Viterbi::GetPath(obs_matrix_t &obs, vector<double> init_p,
         vector<vector<double>> trans_p)
 {
-    if (obs.empty() || obs[0].empty()) {
-        throw invalid_argument("GetPath(): observation matrix is empty");
-    }
-
-    if (trans_p.empty() || trans_p[0].empty()) {
-        throw invalid_argument("GetPath(): transition matrix is empty");
-    }
+    ValidateInitProbs_(init_p);
+    ValidateMatrix_(obs);
+    ValidateMatrix_(trans_p);
 
     uint32_t obs_cnt = obs.size();
     uint32_t states_cnt = obs[0].size();
