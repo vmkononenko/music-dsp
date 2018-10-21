@@ -74,6 +74,8 @@ public:
     {
        return p1.second < p2.second;
     }
+
+    static bool almostEqual(double a, double b, double eps);
 };
 
 /** @} */

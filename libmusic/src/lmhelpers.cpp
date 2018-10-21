@@ -38,3 +38,12 @@ bool Helpers::isPowerOf2(uint32_t n)
 {
     return ((n & (n - 1)) != 0);
 }
+
+bool Helpers::almostEqual(double a, double b, double eps)
+{
+    if (abs(a - b) < eps) {
+        return true;
+    }
+
+    return false;
+}
