@@ -9,6 +9,7 @@
 #include "fft_test.h"
 #include "helpers_test.h"
 #include "pitch_calculator_test.h"
+#include "viterbi_test.h"
 
 
 using namespace anatomist;
@@ -73,9 +74,20 @@ cute::suite chordDetectorTestSuite()
     return s;
 }
 
+cute::suite viterbiTestSuite()
+{
+    cute::suite s;
+
+    s.push_back(TestInitProbsEmpty());
+    s.push_back(TestInitProbsBadSum());
+    s.push_back(TestObsEmpty());
+
+    return s;
+}
+
 void usage()
 {
-	cout << "Usage:\r\tlmtests --<all|fft|helpers|chords>" << endl;
+	cout << "Usage:\r\tlmtests --<all|fft|helpers|chords|viterbi>" << endl;
 }
 
 int main(int argc, char const *argv[])
@@ -102,6 +114,9 @@ int main(int argc, char const *argv[])
 	} else if (strcmp(argv[1], "--chords") == 0) {
 	    suite = chordDetectorTestSuite();
 	    name = "Chord Detector Test Suite";
+	} else if (strcmp(argv[1], "--viterbi") == 0) {
+	    suite = viterbiTestSuite();
+	    name = "Viterbi Test Suite";
 	} else {
 		usage();
 		return -1;

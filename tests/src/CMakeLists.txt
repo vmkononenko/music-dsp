@@ -4,6 +4,7 @@ set(SOURCES
     helpers_test.cpp
     pitch_calculator_test.cpp
     test_run.cpp
+    viterbi_test.cpp
 )
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/../cute)
