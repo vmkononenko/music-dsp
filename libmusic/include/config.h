@@ -66,4 +66,12 @@
 #define CFG_PCP_CHANGE_THRESHOLD    1.4f
 #endif
 
+/**
+ * Special value 0 means that self-transition probability (e.g. C -> C) is equal
+ * to transition probability to any other chord
+ */
+#ifndef CFG_CHORD_SELF_TRANSITION_P
+#define CFG_CHORD_SELF_TRANSITION_P 0.0f
+#endif /* CFG_CHORD_SELF_TRANSITION_P */
+
 /** @} */

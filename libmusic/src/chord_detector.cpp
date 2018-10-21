@@ -289,8 +289,20 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
     init_p = vector<double>(chords_total, 1.0 / chords_total);
 
     for (uint32_t i = 0; i < tpl_collection_->Size(); i++) {
-        vector<double> t = vector<double>(chords_total, (1 - 0.1) / chords_total);
-        t[i] = 0.1;
+#ifdef CFG_CHORD_SELF_TRANSITION_P
+        double self_trans_p = CFG_CHORD_SELF_TRANSITION_P;
+#else
+        double self_trans_p = 1 / chords_total;
+#endif /* CFG_CHORD_SELF_TRANSITION_P */
+        double trans_other_p = (1 - self_trans_p) / (chords_total - (self_trans_p == 0 ? 0 : 1));
+        vector<double> t = vector<double>(chords_total, trans_other_p);
+        if (self_trans_p != 0) {
+            if (self_trans_p < trans_other_p) {
+                throw runtime_error("Self-transition probability is less than "
+                        "transition probability to any other chord");
+            }
+            t[i] = self_trans_p;
+        }
         trans_p.push_back(t);
     }
 
