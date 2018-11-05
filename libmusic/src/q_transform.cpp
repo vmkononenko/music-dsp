@@ -14,7 +14,7 @@ QTransform::QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
 {
     CQParameters p(samplerate, f_low, f_high, bpo);
 
-    //p.q = 4;
+    p.q = 1;
 
     cq_spectrogram_ = new CQSpectrogram(p, CQSpectrogram::InterpolateZeros);
 
@@ -42,7 +42,7 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
 
     for (uint32_t sample = offset; sample < td_len; sample += hop_size) {
         uint32_t len = min(win_size, td_len - sample);
-        CQBase::RealSequence input(td, td + len);
+        CQBase::RealSequence input(td + sample, td + sample + len);
         output_block = cq_spectrogram_->process(input);
 
         if (!output_block.empty()) {
@@ -57,9 +57,7 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
         reverse(col.begin(), col.end());
     }
 
-    return output_block;
-
-    //return ConvertRealBlock_(output_block, win_size, hop_size);
+    return ConvertRealBlock_(output, win_size, hop_size);
 }
 
 log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
@@ -90,7 +88,6 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
             col.push_back(row_value / columns);
         }
 
-        reverse(col.begin(), col.end());
         lsg.push_back(col);
     }
 
