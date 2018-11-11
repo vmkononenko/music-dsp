@@ -12,7 +12,7 @@
 #endif
 
 #ifndef CFG_WINDOW_SIZE
-#define CFG_WINDOW_SIZE     ((uint32_t)8192)
+#define CFG_WINDOW_SIZE     ((uint32_t)2048)
 #endif /* CFG_WINDOW_SIZE */
 
 #ifndef CFG_HOPS_PER_WINDOW
@@ -71,7 +71,7 @@
  * to transition probability to any other chord
  */
 #ifndef CFG_CHORD_SELF_TRANSITION_P
-#define CFG_CHORD_SELF_TRANSITION_P 0.0f
+#define CFG_CHORD_SELF_TRANSITION_P 0.1f
 #endif /* CFG_CHORD_SELF_TRANSITION_P */
 
 /** @} */
