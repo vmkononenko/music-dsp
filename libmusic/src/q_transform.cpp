@@ -14,9 +14,15 @@ QTransform::QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
 {
     CQParameters p(samplerate, f_low, f_high, bpo);
 
-    p.q = 1;
+    /*
+     * From the paper:
+     * values q < 1 can be seen to implement oversampling of the frequency axis,
+     * analogously to the use of zero padding when calculating the DFT.
+     * For example q = 0.5 corresponds to oversampling factor of 2.
+     */
+    p.q = 0.5;
 
-    cq_spectrogram_ = new CQSpectrogram(p, CQSpectrogram::InterpolateZeros);
+    cq_spectrogram_ = new CQSpectrogram(p, CQSpectrogram::InterpolateLinear);
 
     if (!cq_spectrogram_->isValid()) {
         throw new runtime_error("Failed to construct a Q-Transform");
@@ -40,6 +46,7 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
 {
     CQBase::RealBlock output_block, output;
 
+#if 0
     for (uint32_t sample = offset; sample < td_len; sample += hop_size) {
         uint32_t len = min(win_size, td_len - sample);
         CQBase::RealSequence input(td + sample, td + sample + len);
@@ -47,13 +54,23 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
 
         if (!output_block.empty()) {
             output.insert(output.end(), output_block.begin(), output_block.end());
+            output_block.clear();
         }
     }
+#else
+    UNUSED(offset);
+    CQBase::RealSequence input(td, td + td_len);
+    output_block = cq_spectrogram_->process(input);
+    output.insert(output.end(), output_block.begin(), output_block.end());
 
     output_block = cq_spectrogram_->getRemainingOutput();
     output.insert(output.end(), output_block.begin(), output_block.end());
+#endif /* 0 */
 
-    for (auto &col : output_block) {
+    output.erase(output.begin(), output.begin() + cq_spectrogram_->getLatency() /
+                                                  cq_spectrogram_->getColumnHop());
+
+    for (auto &col : output) {
         reverse(col.begin(), col.end());
     }
 
@@ -70,7 +87,7 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
     UNUSED(hop_size);
 
     log_spectrogram_t lsg;
-    uint32_t cols_per_window = win_size / cq_spectrogram_->getColumnHop();
+    uint32_t cols_per_window = round(1.0 * win_size / cq_spectrogram_->getColumnHop());
 
     if (cols_per_window <= 1) {
         return block;
