@@ -77,7 +77,6 @@ PitchClsProfile::PitchClsProfile(std::vector<amplitude_t> &fd_mags, QTransform *
         for (int32_t i = -bps/2; i < bps/2+1; i++) {
             tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (i/2 + 1)));
         }
-        tmp /= bps;
 
         note = pc.pitchToNote(pc.getPitch(q_transform->BinToFreq(bin)));
 
@@ -134,6 +133,21 @@ amplitude_t PitchClsProfile::divergenceKullbackLeibler(vector<uint8_t> &v)
     }
 
     return d;
+}
+
+amplitude_t PitchClsProfile::sumProduct(std::vector<uint8_t> &v)
+{
+    if (v.size() != __mPCP.size()) {
+        throw invalid_argument("sumProduct(): wrong vector size");
+    }
+
+    amplitude_t sum = 0;
+
+    for (uint8_t i = 0; i < __mPCP.size(); i++) {
+        sum += __mPCP[i] * v[i];
+    }
+
+    return sum;
 }
 
 PitchClsProfile & PitchClsProfile::operator+=(const PitchClsProfile& pcp)

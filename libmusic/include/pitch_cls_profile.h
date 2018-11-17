@@ -68,6 +68,8 @@ public:
 
     amplitude_t divergenceKullbackLeibler(std::vector<uint8_t> &v);
 
+    amplitude_t sumProduct(std::vector<uint8_t> &v);
+
     PitchClsProfile & operator+=(const PitchClsProfile& pcp);
 
     PitchClsProfile & operator/=(float denominator);
