@@ -156,7 +156,7 @@ void ChordTpl::InitN_()
 tpl_score_t ChordTpl::GetScore(pcp_t *pcp)
 {
     if (pcp->size() == tpl_.size()) {
-        return pcp->euclideanDistance<typeof(tpl_[0])>(tpl_);
+        return pcp->sumProduct(tpl_);
     } else if (pcp->size() == tpl_.size() / 2) { /* no separation between bass and treble */
         vector<typeof(tpl_[0])> treble(tpl_.begin() + notes_Total, tpl_.end());
         return pcp->euclideanDistance<typeof(tpl_[0])>(treble);

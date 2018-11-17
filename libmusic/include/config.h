@@ -12,7 +12,7 @@
 #endif
 
 #ifndef CFG_WINDOW_SIZE
-#define CFG_WINDOW_SIZE     ((uint32_t)2048)
+#define CFG_WINDOW_SIZE     ((uint32_t)4096)
 #endif /* CFG_WINDOW_SIZE */
 
 #ifndef CFG_HOPS_PER_WINDOW
@@ -32,7 +32,7 @@
 #endif /* CFG_FFT_HPS_HARMONICS */
 
 #ifndef CFG_WINDOW_FUNC
-#define CFG_WINDOW_FUNC WINDOW_FUNC_HAMMING
+#define CFG_WINDOW_FUNC WINDOW_FUNC_RECTANGULAR
 #endif /* CFG_WINDOW_FUNC */
 
 #ifndef CFG_PITCH_PRECISION_THRESHOLD

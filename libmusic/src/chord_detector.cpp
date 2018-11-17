@@ -215,6 +215,7 @@ chromagram_t ChordDetector::ChromagramFromSpectrogram_(log_spectrogram_t &lsg,
     return chromagram;
 }
 
+#if 0
 Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 {
     Viterbi::obs_matrix_t score_mtx(chromagram.size());
@@ -236,6 +237,43 @@ Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 
     return score_mtx;
 }
+#else
+Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
+{
+    Viterbi::obs_matrix_t score_mtx(chromagram.size());
+
+    for (uint32_t win_idx = 0; win_idx < chromagram.size(); win_idx++) {
+        pcp_t *pcp = &chromagram[win_idx];
+        tpl_score_t sum = 0;
+
+        for (uint32_t tpl_idx = 0; tpl_idx < tpl_collection_->Size(); tpl_idx++) {
+            tpl_score_t score = tpl_collection_->GetTpl(tpl_idx)->GetScore(pcp);
+
+            if (score < 0) {
+                score = 0;
+            }
+
+            if (tpl_idx == tpl_collection_->Size() - 1) {
+                score *= 0.7;
+            }
+
+            score = pow(1.3, score);
+            score_mtx[win_idx].push_back(score);
+            sum += score;
+        }
+
+        if (sum > 0) {
+            for (auto & score : score_mtx[win_idx]) {
+                score = score / sum;
+            }
+        } else {
+            score_mtx[win_idx][score_mtx[win_idx].size() - 1] = 1;
+        }
+    }
+
+    return score_mtx;
+}
+#endif /* 0 */
 
 void ChordDetector::Process_(std::vector<segment_t> *segments,
                              amplitude_t *td, uint32_t samples,
@@ -295,7 +333,8 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
 
     score_mtx = GetScoreMatrix_(chromagram);
 
-    init_p = vector<double>(chords_total, 1.0 / chords_total);
+    init_p = vector<double>(chords_total, 0);
+    init_p[init_p.size() - 1] = 1;
 
     for (uint32_t i = 0; i < tpl_collection_->Size(); i++) {
 #ifdef CFG_CHORD_SELF_TRANSITION_P
