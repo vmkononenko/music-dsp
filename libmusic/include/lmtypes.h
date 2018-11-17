@@ -62,6 +62,7 @@ typedef enum : int32_t {
 } octave_t;
 
 typedef enum {
+    cq_unknown = 0,
     cq_major,
     cq_minor,
     cq_7th,
@@ -93,7 +94,7 @@ private:
 
 public:
     Chord(note_t n, chord_quality_t q) : __mRootNote(n), __mQuality(q) {}
-    Chord() : Chord(note_Unknown, cq_major) {} // Delegate to the other constructor.
+    Chord() : Chord(note_Unknown, cq_unknown) {} // Delegate to the other constructor.
 
     friend bool operator==(const Chord &c1, const Chord &c2)
     {

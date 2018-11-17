@@ -78,7 +78,12 @@ ChordTpl::ChordTpl(note_t root_note, chord_quality_t cq, uint8_t slash_subtype) 
         root_note_(root_note), chord_quality_(cq)
 {
     if ((root_note < note_Min) || (root_note > note_Max)) {
-        throw std::invalid_argument("ChordTpl(): Invalid note");
+        if ((root_note == note_Unknown) && (cq == cq_unknown)) {
+            InitN_();
+            return;
+        } else {
+            throw std::invalid_argument("ChordTpl(): Invalid note");
+        }
     }
     if ((cq < cq_Min) || (cq > cq_Max) ||
         (chord_qlty_tpls_.find(cq) == chord_qlty_tpls_.end()))
@@ -141,6 +146,11 @@ void ChordTpl::__initTpl(note_t root_note, chord_quality_t cq, uint8_t ss)
             tpl_[note - note_Min + treble_offset] = 1;
         }
     }
+}
+
+void ChordTpl::InitN_()
+{
+    tpl_.resize(notes_Total * 2, 0.005f);
 }
 
 tpl_score_t ChordTpl::GetScore(pcp_t *pcp)

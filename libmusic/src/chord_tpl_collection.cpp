@@ -46,6 +46,8 @@ void ChordTplCollection::__initChordTpls()
             }
         }
     }
+
+    tpls_.push_back(new ChordTpl(note_Unknown, cq_unknown, 0));
 }
 
 size_t ChordTplCollection::Size()

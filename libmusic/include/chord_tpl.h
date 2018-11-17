@@ -45,6 +45,11 @@ private:
 
     void __initTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
 
+    /**
+     * Initialize template instance for N chord
+     */
+    void InitN_();
+
 public:
     /**
      * Constructor
@@ -52,6 +57,8 @@ public:
     ChordTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
 
     tpl_score_t GetScore(pcp_t *pcp);
+
+    tpl_score_t GetSalience(pcp_t *pcp);
 
     note_t RootNote();
 
