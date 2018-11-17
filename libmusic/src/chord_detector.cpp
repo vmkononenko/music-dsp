@@ -260,8 +260,8 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
     log_spectrogram_t lsg;
     Viterbi::obs_matrix_t score_mtx;
     vector<uint32_t> mtx_path;
-    uint32_t seg_start_idx = 0, prev_path_idx;
-    QTransform *q_transform = new QTransform(samplerate, 36, 698);
+    uint32_t seg_start_idx = 0;
+    QTransform *q_transform = new QTransform(samplerate, 36, 698, win_size);
     vector<double> init_p;
     vector<vector<double>> trans_p;
     uint32_t chords_total = tpl_collection_->Size();
@@ -273,7 +273,7 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
         listener->onPreprocessingProgress(1);
     }
 
-    lsg = q_transform->GetSpectrogram(td, samples, win_size, offset, hop_size);
+    lsg = q_transform->GetSpectrogram(td, samples, offset, hop_size);
 
     Tune_(lsg);
 
@@ -321,18 +321,17 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
         throw runtime_error("__getSegments(): mtx_path.size() != chromagram.size()");
     }
 
-    prev_path_idx = mtx_path[0];
     for (uint32_t res = 1; res < mtx_path.size(); res++) {
-        if (mtx_path[res] != prev_path_idx || res == mtx_path.size() - 1) {
-            chord_tpl_t *tpl = tpl_collection_->GetTpl(prev_path_idx);
+        if (mtx_path[res] != mtx_path[seg_start_idx] || res == mtx_path.size() - 1) {
+            chord_tpl_t *tpl = tpl_collection_->GetTpl(mtx_path[seg_start_idx]);
             segment_t segment;
 
-            segment.startIdx = seg_start_idx;
+            segment.startIdx = seg_start_idx * q_transform->SpectrogramInterval();
+            segment.endIdx = min(res * q_transform->SpectrogramInterval(), samples);
             segment.chord = Chord(tpl->RootNote(), tpl->Quality());
             segment.silence = false;
 
-            prev_path_idx = mtx_path[res];
-            seg_start_idx++;
+            seg_start_idx = res;
 
             if (listener == nullptr) {
                 segments->push_back(segment);

@@ -10,7 +10,7 @@
 using namespace std;
 
 QTransform::QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
-                       freq_hz_t f_high)
+                       freq_hz_t f_high, uint32_t win_size)
 {
     CQParameters p(samplerate, f_low, f_high, bpo);
 
@@ -30,10 +30,14 @@ QTransform::QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
 
     f_min_ = cq_spectrogram_->getMinFrequency();
     f_max_ = cq_spectrogram_->getMaxFrequency();
+    interval_ = round(1.0 * win_size / cq_spectrogram_->getColumnHop())
+                * cq_spectrogram_->getColumnHop();
+
 }
 
-QTransform::QTransform(uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high) :
-        QTransform(BINS_PER_OCTAVE_DEFAULT, samplerate, f_low, f_high) {}
+QTransform::QTransform(uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high,
+                       uint32_t win_size) : QTransform(BINS_PER_OCTAVE_DEFAULT,
+                               samplerate, f_low, f_high, win_size) {}
 
 QTransform::~QTransform()
 {
@@ -41,8 +45,7 @@ QTransform::~QTransform()
 }
 
 log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
-                                             uint32_t win_size, uint32_t offset,
-                                             uint32_t hop_size)
+                                             uint32_t offset, uint32_t hop_size)
 {
     CQBase::RealBlock output_block, output;
 
@@ -74,11 +77,11 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
         reverse(col.begin(), col.end());
     }
 
-    return ConvertRealBlock_(output, win_size, hop_size);
+    return ConvertRealBlock_(output, hop_size);
 }
 
 log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
-        uint32_t win_size, uint32_t hop_size)
+                                                uint32_t hop_size)
 {
     if (block.empty()) {
         throw invalid_argument("Empty input block");
@@ -87,7 +90,7 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
     UNUSED(hop_size);
 
     log_spectrogram_t lsg;
-    uint32_t cols_per_window = round(1.0 * win_size / cq_spectrogram_->getColumnHop());
+    uint32_t cols_per_window = interval_ / cq_spectrogram_->getColumnHop();
 
     if (cols_per_window <= 1) {
         return block;
@@ -102,13 +105,18 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
             for (uint32_t c = 0; c < columns; c++) {
                 row_value += block[i + c][j];
             }
-            col.push_back(row_value / columns);
+            col.push_back(row_value);
         }
 
         lsg.push_back(col);
     }
 
     return lsg;
+}
+
+uint32_t QTransform::SpectrogramInterval()
+{
+    return interval_;
 }
 
 uint8_t QTransform::BinsPerSemitone()

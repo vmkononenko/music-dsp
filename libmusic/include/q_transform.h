@@ -25,21 +25,24 @@ private:
     CQSpectrogram   *cq_spectrogram_;
     freq_hz_t       f_min_;
     freq_hz_t       f_max_;
+    uint32_t        interval_;
 
-    log_spectrogram_t ConvertRealBlock_(CQBase::RealBlock &block,
-                                        uint32_t win_size, uint32_t hop_size);
+    log_spectrogram_t ConvertRealBlock_(CQBase::RealBlock &block, uint32_t hop_size);
 
 public:
 
-    QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high);
+    QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
+               freq_hz_t f_high, uint32_t win_size);
 
-    QTransform(uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high);
+    QTransform(uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high,
+               uint32_t win_size);
 
     ~QTransform();
 
     log_spectrogram_t GetSpectrogram(amplitude_t *td, uint32_t td_len,
-                                     uint32_t win_size, uint32_t offset,
-                                     uint32_t hop_size);
+                                     uint32_t offset, uint32_t hop_size);
+
+    uint32_t SpectrogramInterval();
 
     uint8_t BinsPerSemitone();
 
