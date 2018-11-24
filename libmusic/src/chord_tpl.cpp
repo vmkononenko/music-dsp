@@ -94,10 +94,10 @@ ChordTpl::ChordTpl(note_t root_note, chord_quality_t cq, uint8_t slash_subtype) 
         throw std::invalid_argument("ChordTpl(): Invalid slash subtype");
     }
 
-    __initTpl(root_note, cq, slash_subtype);
+    InitTpl_(root_note, cq, slash_subtype);
 }
 
-void ChordTpl::__initTpl(note_t root_note, chord_quality_t cq, uint8_t ss)
+void ChordTpl::InitTpl_(note_t root_note, chord_quality_t cq, uint8_t ss)
 {
     vector<note_t> scale = MusicScale::getMajorScale(root_note);
     vector<note_presense_state_t> *qt = &chord_qlty_tpls_[cq][ss];
@@ -146,11 +146,38 @@ void ChordTpl::__initTpl(note_t root_note, chord_quality_t cq, uint8_t ss)
             tpl_[note - note_Min + treble_offset] = 1;
         }
     }
+
+    for (uint8_t i = 0; i < tpl_.size() / 2; i++) {
+        if (tpl_[i] != 1 && tpl_[i + notes_Total] == 1) {
+            tpl_[i] = 0.5;
+        }
+    }
+
+    PostInit_(1.0f);
 }
 
 void ChordTpl::InitN_()
 {
-    tpl_.resize(notes_Total * 2, 0.005f);
+    typeof(tpl_) treble(notes_Total, 1);
+    tpl_.resize(notes_Total, 0.5);
+    tpl_.insert(tpl_.end(), treble.begin(), treble.end());
+
+    PostInit_(1.1f);
+}
+
+void ChordTpl::PostInit_(float boost)
+{
+    float stand = 0;
+
+    for (const auto & val : tpl_) {
+        stand += pow(abs(val), 2.0) / tpl_.size();
+    }
+
+    stand = powf(stand, 1.0f / 2.0) / boost;
+
+    for (auto & val : tpl_) {
+        val /= stand;
+    }
 }
 
 tpl_score_t ChordTpl::GetScore(pcp_t *pcp)

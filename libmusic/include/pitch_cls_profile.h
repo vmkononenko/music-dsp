@@ -66,9 +66,9 @@ public:
 
     amplitude_t euclideanDistance(PitchClsProfile &pcp);
 
-    amplitude_t divergenceKullbackLeibler(std::vector<uint8_t> &v);
+    amplitude_t divergenceKullbackLeibler(std::vector<amplitude_t> &v);
 
-    amplitude_t sumProduct(std::vector<uint8_t> &v);
+    amplitude_t sumProduct(std::vector<amplitude_t> &v);
 
     PitchClsProfile & operator+=(const PitchClsProfile& pcp);
 

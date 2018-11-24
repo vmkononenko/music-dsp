@@ -120,7 +120,7 @@ amplitude_t PitchClsProfile::euclideanDistance(PitchClsProfile &pcp)
     return d;
 }
 
-amplitude_t PitchClsProfile::divergenceKullbackLeibler(vector<uint8_t> &v)
+amplitude_t PitchClsProfile::divergenceKullbackLeibler(vector<amplitude_t> &v)
 {
     if (v.size() != __mPCP.size()) {
         throw invalid_argument("divergenceKullbackLeibler(): wrong vector size");
@@ -135,7 +135,7 @@ amplitude_t PitchClsProfile::divergenceKullbackLeibler(vector<uint8_t> &v)
     return d;
 }
 
-amplitude_t PitchClsProfile::sumProduct(std::vector<uint8_t> &v)
+amplitude_t PitchClsProfile::sumProduct(std::vector<amplitude_t> &v)
 {
     if (v.size() != __mPCP.size()) {
         throw invalid_argument("sumProduct(): wrong vector size");

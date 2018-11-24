@@ -38,17 +38,22 @@ typedef class ChordTpl {
 private:
     static std::map<chord_quality_t, std::vector<std::vector<note_presense_state_t>>> chord_qlty_tpls_;
 
-    note_t                  root_note_;
-    note_t                  bass_note_ = note_Unknown;
-    chord_quality_t         chord_quality_;
-    std::vector<uint8_t>    tpl_;
+    note_t                      root_note_;
+    note_t                      bass_note_ = note_Unknown;
+    chord_quality_t             chord_quality_;
+    std::vector<amplitude_t>    tpl_;
 
-    void __initTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
+    void InitTpl_(note_t note, chord_quality_t cq, uint8_t slash_subtype);
 
     /**
      * Initialize template instance for N chord
      */
     void InitN_();
+
+    /**
+     * Post initialization step
+     */
+    void PostInit_(float boost);
 
 public:
     /**
