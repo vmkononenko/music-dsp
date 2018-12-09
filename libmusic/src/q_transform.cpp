@@ -111,7 +111,34 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block,
         lsg.push_back(col);
     }
 
+    Denoise_(lsg);
+
     return lsg;
+}
+
+void QTransform::Denoise_(log_spectrogram_t &block)
+{
+    for (auto & col : block) {
+        vector<amplitude_t> devs;
+        amplitude_t thr_uni, sigma, mad;
+        amplitude_t median = Helpers::median(col);
+
+        for (auto val : col) {
+            devs.push_back(abs(val - median));
+        }
+
+        mad = Helpers::median(devs);
+
+        sigma = mad / 0.6745;
+
+        thr_uni = sigma * sqrt(2 * log10(interval_));
+
+        for (auto & bin : col) {
+            if (abs(bin) < thr_uni) {
+                bin = 0;
+            }
+        }
+    }
 }
 
 uint32_t QTransform::SpectrogramInterval()

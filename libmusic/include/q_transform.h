@@ -29,6 +29,8 @@ private:
 
     log_spectrogram_t ConvertRealBlock_(CQBase::RealBlock &block, uint32_t hop_size);
 
+    void Denoise_(log_spectrogram_t &block);
+
 public:
 
     QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
