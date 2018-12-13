@@ -69,7 +69,7 @@ public:
 
 private:
     PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
-    ChordTplCollection *tpl_collection_ = new ChordTplCollection();
+    ChordTplCollection *tpl_collection_;
 
     FFT * GetFft_(amplitude_t *td, uint32_t samples, uint32_t samplerate);
 
@@ -116,6 +116,11 @@ public:
      * Constructor
      */
     ChordDetector();
+
+    /**
+     * Destructor
+     */
+    ~ChordDetector();
 
     /**
      * Detect chord corresponding to the given time domain
