@@ -80,7 +80,9 @@ PitchClsProfile::PitchClsProfile(std::vector<amplitude_t> &fd_mags, QTransform *
 
         note = pc.pitchToNote(pc.getPitch(q_transform->BinToFreq(bin)));
 
-        __mPCP[note - note_Min] += tmp * bass_win[bin / bps];
+        if (bin / bps < bass_win.size()) {
+            __mPCP[note - note_Min] += tmp * bass_win[bin / bps];
+        }
         __mPCP[note - note_Min + notes_Total] += tmp * treble_win[bin / bps];
     }
 
