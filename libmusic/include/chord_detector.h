@@ -104,7 +104,7 @@ private:
                   uint32_t samples, uint32_t sr, ResultsListener *l,
                   chromagram_t *c);
 
-    void Tune_(log_spectrogram_t &lsg);
+    float Tune_(log_spectrogram_t &lsg);
 
     Viterbi::obs_matrix_t GetScoreMatrix_(chromagram_t &chromagram);
 
