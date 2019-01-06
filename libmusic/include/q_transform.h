@@ -25,6 +25,7 @@ private:
     CQSpectrogram   *cq_spectrogram_;
     freq_hz_t       f_min_;
     freq_hz_t       f_max_;
+    uint32_t        win_size_;
     uint32_t        interval_;
 
     log_spectrogram_t ConvertRealBlock_(CQBase::RealBlock &block, uint32_t hop_size);

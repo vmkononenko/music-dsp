@@ -30,6 +30,7 @@ QTransform::QTransform(uint8_t bpo, uint32_t samplerate, freq_hz_t f_low,
 
     f_min_ = cq_spectrogram_->getMinFrequency();
     f_max_ = cq_spectrogram_->getMaxFrequency();
+    win_size_ = win_size;
     interval_ = round(1.0 * win_size / cq_spectrogram_->getColumnHop())
                 * cq_spectrogram_->getColumnHop();
 
@@ -49,26 +50,25 @@ log_spectrogram_t QTransform::GetSpectrogram(amplitude_t *td, uint32_t td_len,
 {
     CQBase::RealBlock output_block, output;
 
-#if 0
-    for (uint32_t sample = offset; sample < td_len; sample += hop_size) {
-        uint32_t len = min(win_size, td_len - sample);
-        CQBase::RealSequence input(td + sample, td + sample + len);
-        output_block = cq_spectrogram_->process(input);
+    if (hop_size > 1) {
+        for (uint32_t sample = offset; sample < td_len; sample += hop_size) {
+            uint32_t len = min(win_size_, td_len - sample);
+            CQBase::RealSequence input(td + sample, td + sample + len);
+            output_block = cq_spectrogram_->process(input);
 
-        if (!output_block.empty()) {
-            output.insert(output.end(), output_block.begin(), output_block.end());
-            output_block.clear();
+            if (!output_block.empty()) {
+                output.insert(output.end(), output_block.begin(), output_block.end());
+                output_block.clear();
+            }
         }
+    } else {
+        CQBase::RealSequence input(td, td + td_len);
+        output_block = cq_spectrogram_->process(input);
+        output.insert(output.end(), output_block.begin(), output_block.end());
     }
-#else
-    UNUSED(offset);
-    CQBase::RealSequence input(td, td + td_len);
-    output_block = cq_spectrogram_->process(input);
-    output.insert(output.end(), output_block.begin(), output_block.end());
 
     output_block = cq_spectrogram_->getRemainingOutput();
     output.insert(output.end(), output_block.begin(), output_block.end());
-#endif /* 0 */
 
     output.erase(output.begin(), output.begin() + cq_spectrogram_->getLatency() /
                                                   cq_spectrogram_->getColumnHop());
