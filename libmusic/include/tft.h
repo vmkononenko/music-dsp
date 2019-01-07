@@ -68,23 +68,16 @@ public:
      * Constructor
      */
     TFT(freq_hz_t f_min, freq_hz_t f_max, uint16_t bpo, uint32_t sample_rate,
-        uint16_t win_size, uint16_t hop_size) :
-                                                f_min_(f_min),
-                                                f_max_(f_max),
-                                                bpo_(bpo),
-                                                sample_rate_(sample_rate),
-                                                win_size_(win_size),
-                                                hop_size_(hop_size)
-    {
-        spectrogram_ = log_spectrogram_t(0, fd_t(0));
-        interval_ = win_size;
-    }
+        uint16_t win_size, uint16_t hop_size);
 
     /**
      * Destructor
      */
     virtual ~TFT() {}
 
+    virtual log_spectrogram_t GetSpectrogram();
+
+    virtual uint32_t SpectrogramInterval();
 
     virtual void Process(td_t td, uint32_t offset) = 0;
 
@@ -93,16 +86,6 @@ public:
     virtual uint32_t FreqToBin(freq_hz_t f) = 0;
 
     virtual freq_hz_t BinToFreq(uint32_t idx) = 0;
-
-    virtual log_spectrogram_t GetSpectrogram()
-    {
-        return spectrogram_;
-    }
-
-    virtual uint32_t SpectrogramInterval()
-    {
-        return interval_;
-    }
 } tft_t;
 
 }

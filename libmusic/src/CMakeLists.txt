@@ -16,6 +16,7 @@ set(LIB_SOURCES
     pcp_buf.cpp
     pitch_cls_profile.cpp
     recursive_filter.cpp
+    tft.cpp
     transform.cpp
     viterbi.cpp
     window_functions.cpp
