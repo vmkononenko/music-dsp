@@ -1,6 +1,6 @@
 /**
- * @file        q_transform.h
- * @brief       Constant Q Transform API
+ * @file        cqt_wrapper.h
+ * @brief       Wrapper class for ext/cqtt constant Q implementation
  * @addtogroup  libmusic
  * @{
  */
@@ -15,7 +15,7 @@
 
 namespace anatomist {
 
-typedef class QTransform : public TFT {
+typedef class CQTWrapper : public TFT {
 
 private:
     CQSpectrogram   *cq_spectrogram_;
@@ -26,13 +26,13 @@ private:
 
 public:
 
-    QTransform(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
+    CQTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
                uint32_t sample_rate, uint16_t win_size, uint16_t hop_size);
 
-    QTransform(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
+    CQTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
                uint16_t win_size, uint16_t hop_size);
 
-    ~QTransform();
+    ~CQTWrapper();
 
     void Process(td_t td, uint32_t offset) override;
 

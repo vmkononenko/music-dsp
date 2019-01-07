@@ -3,14 +3,14 @@
 
 #include "CQParameters.h"
 
+#include "cqt_wrapper.h"
 #include "lmhelpers.h"
-#include "q_transform.h"
 
 namespace anatomist {
 
 using namespace std;
 
-QTransform::QTransform(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
+CQTWrapper::CQTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
                        uint32_t sample_rate, uint16_t win_size, uint16_t hop_size) :
             TFT(f_low, f_high, bpo, sample_rate, win_size, hop_size)
 {
@@ -37,17 +37,17 @@ QTransform::QTransform(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
 
 }
 
-QTransform::QTransform(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
+CQTWrapper::CQTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
                        uint16_t win_size, uint16_t hop_size) :
-            QTransform(f_low, f_high, BINS_PER_OCTAVE_DEFAULT, sample_rate,
+            CQTWrapper(f_low, f_high, BINS_PER_OCTAVE_DEFAULT, sample_rate,
                        win_size, hop_size) {}
 
-QTransform::~QTransform()
+CQTWrapper::~CQTWrapper()
 {
     delete cq_spectrogram_;
 }
 
-void QTransform::Process(td_t td, uint32_t offset)
+void CQTWrapper::Process(td_t td, uint32_t offset)
 {
     CQBase::RealBlock output_block, output;
 
@@ -80,7 +80,7 @@ void QTransform::Process(td_t td, uint32_t offset)
     spectrogram_ = ConvertRealBlock_(output);
 }
 
-log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block)
+log_spectrogram_t CQTWrapper::ConvertRealBlock_(CQBase::RealBlock &block)
 {
     if (block.empty()) {
         throw invalid_argument("Empty input block");
@@ -113,7 +113,7 @@ log_spectrogram_t QTransform::ConvertRealBlock_(CQBase::RealBlock &block)
     return lsg;
 }
 
-void QTransform::Denoise_(log_spectrogram_t &block)
+void CQTWrapper::Denoise_(log_spectrogram_t &block)
 {
     for (auto & col : block) {
         vector<amplitude_t> devs;
@@ -138,22 +138,22 @@ void QTransform::Denoise_(log_spectrogram_t &block)
     }
 }
 
-uint8_t QTransform::BinsPerSemitone()
+uint8_t CQTWrapper::BinsPerSemitone()
 {
     return cq_spectrogram_->getBinsPerOctave() / notes_Total;
 }
 
-uint32_t QTransform::FreqToBin(freq_hz_t f)
+uint32_t CQTWrapper::FreqToBin(freq_hz_t f)
 {
     if ((f < f_min_) || (f > f_max_))
     {
-        throw invalid_argument("QTransform::FreqToBin(): f is out of range");
+        throw invalid_argument("CQTWrapper::FreqToBin(): f is out of range");
     }
 
     return (log2(f / f_min_) * cq_spectrogram_->getBinsPerOctave());
  }
 
-freq_hz_t QTransform::BinToFreq(uint32_t idx)
+freq_hz_t CQTWrapper::BinToFreq(uint32_t idx)
 {
     return cq_spectrogram_->getBinFrequency(cq_spectrogram_->getTotalBins() - idx - 1);
 }

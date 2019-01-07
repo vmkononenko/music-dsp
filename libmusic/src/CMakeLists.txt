@@ -3,6 +3,7 @@ set(LIB_SOURCES
     chord_detector.cpp
     chord_tpl_collection.cpp
     chord_tpl.cpp
+    cqt_wrapper.cpp
     envelope.cpp
     fft.cpp
     lmhelpers.cpp
@@ -14,7 +15,6 @@ set(LIB_SOURCES
     pitch_calculator.cpp
     pcp_buf.cpp
     pitch_cls_profile.cpp
-    q_transform.cpp
     recursive_filter.cpp
     transform.cpp
     viterbi.cpp

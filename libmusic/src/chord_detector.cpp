@@ -14,7 +14,6 @@
 #include "envelope.h"
 #include "lmhelpers.h"
 #include "lmlogger.h"
-#include "q_transform.h"
 #include "tft.h"
 #include "window_functions.h"
 
@@ -420,7 +419,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
 #if !defined(CFG_TFT_TYPE) || (CFG_TFT_TYPE == TFT_TYPE_FFT)
     tft_t *tft = new FFTWrapper(samplerate, 36, 1047, win_size);
 #else
-    tft_t *tft = new QTransform(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
+    tft_t *tft = new CQTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
 #endif
     vector<double> init_p;
     vector<vector<double>> trans_p;

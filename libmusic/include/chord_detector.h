@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "chord_tpl_collection.h"
+#include "cqt_wrapper.h"
 #include "fft.h"
 #include "lmhelpers.h"
 #include "lmtypes.h"
@@ -19,7 +20,6 @@
 #include "pcp_buf.h"
 #include "pitch_calculator.h"
 #include "pitch_cls_profile.h"
-#include "q_transform.h"
 #include "viterbi.h"
 
 #ifndef CHORD_DETECTOR_TEST_FRIENDS
