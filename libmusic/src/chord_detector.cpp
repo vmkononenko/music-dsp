@@ -14,8 +14,12 @@
 #include "envelope.h"
 #include "lmhelpers.h"
 #include "lmlogger.h"
+#include "q_transform.h"
+#include "tft.h"
 #include "window_functions.h"
 
+#define FREQ_E1     ((freq_hz_t)41.203)
+#define FREQ_C6     ((freq_hz_t)1046.5)
 #define FREQ_E2     ((freq_hz_t)82.4)
 #define FREQ_C8     ((freq_hz_t)4186)
 
@@ -237,8 +241,9 @@ vector<amplitude_t> SpecialConvolution(vector<amplitude_t> &convolvee, vector<am
     return Z;
 }
 
-float ChordDetector::Tune_(log_spectrogram_t &lsg)
+float ChordDetector::Tune_(tft_t *tft)
 {
+    log_spectrogram_t lsg = tft->GetSpectrogram();
     uint32_t col_size = lsg[0].size();
     int nBPS = 3; /* TBD: fix magic number */
     vector<amplitude_t> hw = WindowFunctions::getHamming(col_size + 1, 0);
@@ -317,13 +322,13 @@ float ChordDetector::Tune_(log_spectrogram_t &lsg)
     return cumulativetuning;
 }
 
-chromagram_t ChordDetector::ChromagramFromSpectrogram_(log_spectrogram_t &lsg,
-                                                       QTransform *q_transform)
+chromagram_t ChordDetector::ChromagramFromSpectrogram_(tft_t *tft)
 {
+    log_spectrogram_t lsg = tft->GetSpectrogram();
     chromagram_t chromagram;
 
     for (uint32_t win_idx = 0; win_idx < lsg.size(); win_idx++) {
-        chromagram.push_back(PitchClsProfile(lsg[win_idx], q_transform));
+        chromagram.push_back(PitchClsProfile(lsg[win_idx], tft));
     }
 
     return chromagram;
@@ -393,7 +398,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
                              vector<amplitude_t> &td, uint32_t samplerate,
                              ResultsListener *listener, chromagram_t *c)
 {
-    uint32_t win_size, offset, hop_size;
+    uint32_t win_size, offset;
 
 #ifdef CFG_DYNAMIC_WINDOW
     Envelope *e = new Envelope(td, samples);
@@ -408,36 +413,29 @@ void ChordDetector::Process_(vector<segment_t> *segments,
     offset = 0;
 #endif
 
-    log_spectrogram_t lsg;
+    uint32_t hop_size = win_size / CFG_HOPS_PER_WINDOW;
     Viterbi::obs_matrix_t score_mtx;
     vector<uint32_t> mtx_path;
     uint32_t seg_start_idx = 0;
-    QTransform *q_transform = new QTransform(samplerate, 36, 1047, win_size);
+#if !defined(CFG_TFT_TYPE) || (CFG_TFT_TYPE == TFT_TYPE_FFT)
+    tft_t *tft = new FFTWrapper(samplerate, 36, 1047, win_size);
+#else
+    tft_t *tft = new QTransform(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
+#endif
     vector<double> init_p;
     vector<vector<double>> trans_p;
     uint32_t chords_total = tpl_collection_->Size();
     chromagram_t chromagram;
 
-    hop_size = win_size / CFG_HOPS_PER_WINDOW;
-
     if (listener != nullptr) {
         listener->onPreprocessingProgress(1);
     }
 
-    lsg = q_transform->GetSpectrogram(td, samples, offset, hop_size);
+    tft->Process(td, offset);
 
-    Tune_(lsg);
+    Tune_(tft);
 
-    chromagram = ChromagramFromSpectrogram_(lsg, q_transform);
-
-#if 0
-    for (uint32_t sampleIdx = offset; sampleIdx < samples; sampleIdx += hop_size) {
-        uint32_t len = min(win_size, samples - sampleIdx);
-        FFT *fft = GetFft_(td + sampleIdx, len, samplerate);
-        chromagram.push_back(PitchClsProfile(fft));
-        delete fft;
-    }
-#endif
+    chromagram = ChromagramFromSpectrogram_(tft);
 
     if (c != nullptr) {
         *c = chromagram;
@@ -488,12 +486,12 @@ void ChordDetector::Process_(vector<segment_t> *segments,
             if (listener == nullptr) {
                 segments->push_back(segment);
             } else {
-                listener->onChordSegmentProcessed(segment, (segment.endIdx / (float)samples));
+                listener->onChordSegmentProcessed(segment, (segment.endIdx / (float)td.size()));
             }
         }
     }
 
-    delete q_transform;
+    delete tft;
 
     if (listener != nullptr) {
         listener->onChordAnalysisFinished();

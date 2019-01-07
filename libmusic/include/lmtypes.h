@@ -20,6 +20,9 @@
 #define WINDOW_FUNC_MIN             WINDOW_FUNC_RECTANGULAR
 #define WINDOW_FUNC_MAX             WINDOW_FUNC_HANN
 
+#define TFT_TYPE_FFT        1
+#define TFT_TYPE_CONSTANTQ  2
+
 typedef double amplitude_t;
 typedef double freq_hz_t;
 typedef std::complex<amplitude_t> complex_t;

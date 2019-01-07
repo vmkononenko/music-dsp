@@ -57,14 +57,14 @@ PitchClsProfile::PitchClsProfile(FFT *fft)
     __normalize();
 }
 
-PitchClsProfile::PitchClsProfile(std::vector<amplitude_t> &fd_mags, QTransform *q_transform)
+PitchClsProfile::PitchClsProfile(fd_t &fd_mags, tft_t *tft)
 {
     PitchCalculator& pc = PitchCalculator::getInstance();
-    uint8_t bps = q_transform->BinsPerSemitone();
-    int32_t offset = q_transform->FreqToBin(pc.noteToPitch(note_E, OCTAVE_MIN));
+    uint8_t bps = tft->BinsPerSemitone();
+    int32_t offset = tft->FreqToBin(pc.noteToPitch(note_E, OCTAVE_MIN));
     uint8_t semitones_cnt = fd_mags.size() / bps;
     freq_hz_t f3 = pc.noteToPitch(note_F, OCTAVE_3);
-    uint32_t f3_idx = q_transform->FreqToBin(f3);
+    uint32_t f3_idx = tft->FreqToBin(f3);
     uint32_t win_offset = 0; // TODO: calculate
     vector<amplitude_t> bass_win = WindowFunctions::getHamming(f3_idx / bps, win_offset);
     vector<amplitude_t> treble_win = WindowFunctions::getHamming(semitones_cnt, win_offset);
@@ -78,7 +78,7 @@ PitchClsProfile::PitchClsProfile(std::vector<amplitude_t> &fd_mags, QTransform *
             tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (i/2 + 1)));
         }
 
-        note = pc.pitchToNote(pc.getPitch(q_transform->BinToFreq(bin)));
+        note = pc.pitchToNote(pc.getPitch(tft->BinToFreq(bin)));
 
         if (bin / bps < bass_win.size()) {
             __mPCP[note - note_Min] += tmp * bass_win[bin / bps];

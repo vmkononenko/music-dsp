@@ -102,12 +102,11 @@ private:
     void Process_(std::vector<segment_t> *segments, std::vector<amplitude_t> &x,
                   uint32_t sr, ResultsListener *l, chromagram_t *c);
 
-    float Tune_(log_spectrogram_t &lsg);
+    float Tune_(tft_t *tft);
 
     Viterbi::obs_matrix_t GetScoreMatrix_(chromagram_t &chromagram);
 
-    chromagram_t ChromagramFromSpectrogram_(log_spectrogram_t &lsg,
-                                            QTransform *q_transform);
+    chromagram_t ChromagramFromSpectrogram_(tft_t *tft);
 
 public:
     /**

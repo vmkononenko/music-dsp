@@ -11,7 +11,7 @@
 
 #include "fft.h"
 #include "lmtypes.h"
-#include "q_transform.h"
+#include "tft.h"
 
 
 namespace anatomist {
@@ -37,7 +37,7 @@ public:
 
     PitchClsProfile(FFT *fft);
 
-    PitchClsProfile(std::vector<amplitude_t> &fd, QTransform *q_transform);
+    PitchClsProfile(fd_t &fd, tft_t *tft);
 
     /**
      * Get pitch class value for the specified note

@@ -11,6 +11,10 @@
 //#define CFG_DYNAMIC_WINDOW
 #endif
 
+#ifndef CFG_TFT_TYPE
+#define CFG_TFT_TYPE TFT_TYPE_CONSTANTQ
+#endif /* CFG_TFT_TYPE */
+
 #ifndef CFG_WINDOW_SIZE
 #define CFG_WINDOW_SIZE     ((uint32_t)4096)
 #endif /* CFG_WINDOW_SIZE */
