@@ -243,8 +243,6 @@ void printFFT(amplitude_t *td, int samplerate, uint32_t samples,
         throw runtime_error("Not implemented");
     }
 
-    WindowFunctions::applyDefault(td, samples);
-
     anatomist::FFT *fft = new anatomist::FFT(td, samples, samplerate, polar);
     amplitude_t *p = fft->GetFreqDomain().p;
     double mag_max = max_amplitude(p, fft->GetFreqDomainLen());

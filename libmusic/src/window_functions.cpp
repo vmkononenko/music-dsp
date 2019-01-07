@@ -26,42 +26,41 @@ vector<amplitude_t> WindowFunctions::getHamming(uint32_t len, uint32_t offset)
     return win;
 }
 
-void WindowFunctions::applyHamming(amplitude_t *points, uint32_t pointsCnt)
+void WindowFunctions::applyHamming(td_t td)
 {
-    vector<amplitude_t> win = getHamming(pointsCnt, 0);
+    vector<amplitude_t> win = getHamming(td.size(), 0);
 
-    for (uint32_t i = 0; i < pointsCnt; i++) {
-        points[i] = points[i] * win[i];
+    for (uint32_t i = 0; i < td.size(); i++) {
+        td[i] *= win[i];
     }
 }
 
-void WindowFunctions::applyBlackman(amplitude_t *points, uint32_t pointsCnt)
+void WindowFunctions::applyBlackman(td_t td)
 {
-    for (uint32_t i = 0; i < pointsCnt; i++) {
-        points[i] = points[i] * (0.42 - 0.5 * cos(2 * M_PI * i / (pointsCnt - 1)) +
-                                 0.08 * cos(4 * M_PI * i / (pointsCnt - 1)));
+    for (uint32_t i = 0; i < td.size(); i++) {
+        td[i] *= (0.42 - 0.5 * cos(2 * M_PI * i / (td.size() - 1)) +
+                    0.08 * cos(4 * M_PI * i / (td.size() - 1)));
     }
 }
 
-void WindowFunctions::applyHann(amplitude_t *points, uint32_t pointsCnt)
+void WindowFunctions::applyHann(td_t td)
 {
-    for (uint32_t i = 0; i < pointsCnt; i++) {
-        points[i] = points[i] * (0.5 * (1 - cos(2 * M_PI * i / (pointsCnt - 1))));
+    for (uint32_t i = 0; i < td.size(); i++) {
+        td[i] *= (0.5 * (1 - cos(2 * M_PI * i / (td.size() - 1))));
     }
 }
 
-void WindowFunctions::applyDefault(amplitude_t *points, uint32_t pointsCnt)
+void WindowFunctions::applyDefault(td_t td)
 {
 #if !defined(CFG_WINDOW_FUNC) || (CFG_WINDOW_FUNC == WINDOW_FUNC_RECTANGULAR)
     /* rectangular is a default. Do nothing for it */
-    UNUSED(points);
-    UNUSED(pointsCnt);
+    UNUSED(td);
 #elif CFG_WINDOW_FUNC == WINDOW_FUNC_BLACKMAN
-    applyBlackman(points, pointsCnt);
+    applyBlackman(td);
 #elif CFG_WINDOW_FUNC == WINDOW_FUNC_HAMMING
-    applyHamming(points, pointsCnt);
+    applyHamming(td);
 #elif CFG_WINDOW_FUNC == WINDOW_FUNC_HANN
-    applyHann(points, pointsCnt);
+    applyHann(td);
 #endif
 }
 

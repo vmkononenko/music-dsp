@@ -65,6 +65,10 @@ FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, freq_hz_t f_low,
 FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, bool polar) :
         FFT(td, td_len, samplerate, 0, samplerate / 2, polar, false) {}
 
+FFT::FFT(td_t td, uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high) :
+     FFT(td.data(), static_cast<uint32_t>(td.size()), samplerate, f_low,
+         f_high, true, false) {}
+
 FFT::FFT()
 {
     fd_.p = nullptr;

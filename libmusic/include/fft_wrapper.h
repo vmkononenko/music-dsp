@@ -11,7 +11,8 @@
 
 namespace anatomist {
 
-class FFTWrapper : TFT {
+class FFTWrapper : public TFT {
+
 private:
 
 

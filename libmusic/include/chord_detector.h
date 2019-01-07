@@ -71,7 +71,7 @@ private:
     PitchCalculator& __mPitchCalculator = PitchCalculator::getInstance();
     ChordTplCollection *tpl_collection_;
 
-    FFT * GetFft_(amplitude_t *td, uint32_t samples, uint32_t samplerate);
+    FFT * GetFft_(td_t &td, uint32_t samplerate);
 
     /**
      * Implementation of the main chord detection algorithm

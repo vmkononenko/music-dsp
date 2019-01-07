@@ -41,17 +41,16 @@ ChordDetector::~ChordDetector()
     delete tpl_collection_;
 }
 
-FFT * ChordDetector::GetFft_(amplitude_t *td, uint32_t samples, uint32_t samplerate)
+FFT * ChordDetector::GetFft_(td_t &td, uint32_t samplerate)
 {
-    if ((td == nullptr) || (samples == 0) || samplerate == 0 ||
-        (samples > CFG_FFT_SIZE))
+    if ((td.size() == 0) || (td.size() > CFG_FFT_SIZE) || (samplerate == 0))
     {
         throw invalid_argument("__getFftResults() invalid argument");
     }
 
-    WindowFunctions::applyDefault(td, samples);
+    WindowFunctions::applyDefault(td);
 
-    return new FFT(td, samples, samplerate, FREQ_E2, FREQ_C8, true, false);
+    return new FFT(td, samplerate, FREQ_E2, FREQ_C8);
 }
 
 chord_t ChordDetector::GetChordFromFft_(FFT *fft)
@@ -68,11 +67,11 @@ chord_t ChordDetector::GetChordFromFft_(FFT *fft)
     return chord;
 }
 
-chord_t ChordDetector::getChord(amplitude_t *td, uint32_t samples,
+chord_t ChordDetector::getChord(amplitude_t *x, uint32_t samples,
                                 uint32_t samplerate)
 {
-
-    FFT *fft = GetFft_(td, samples, samplerate);
+    td_t td(x, x + samples);
+    FFT *fft = GetFft_(td, samplerate);
     chord_t ret = GetChordFromFft_(fft);
 
     delete fft;
@@ -514,7 +513,8 @@ void ChordDetector::getSegments(amplitude_t *timeDomain, uint32_t samples,
 
 pcp_t * ChordDetector::GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate)
 {
-    FFT *fft = GetFft_(x, samples, samplerate);
+    td_t td(x, x + samples);
+    FFT *fft = GetFft_(td, samplerate);
     pcp_t *pcp = new PitchClsProfile(fft);
 
     delete fft;

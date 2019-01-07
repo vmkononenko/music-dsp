@@ -108,6 +108,8 @@ public:
 
     FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, bool polar);
 
+    FFT(td_t td, uint32_t samplerate, freq_hz_t f_low, freq_hz_t f_high);
+
     ~FFT();
 
     uint32_t FreqToIdx(freq_hz_t, double (*roundFunc)(double)) override;
