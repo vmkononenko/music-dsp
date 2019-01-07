@@ -96,13 +96,11 @@ private:
      *
      * @param   segments    output vector of segments
      * @param   x           full channel time domain data
-     * @param   samples     number of samples in x
      * @param   sampleRate  sample rate of x
      * @param   l           listener to report progress to if \p segments is null
      */
-    void Process_(std::vector<segment_t> *segments, amplitude_t *x,
-                  uint32_t samples, uint32_t sr, ResultsListener *l,
-                  chromagram_t *c);
+    void Process_(std::vector<segment_t> *segments, std::vector<amplitude_t> &x,
+                  uint32_t sr, ResultsListener *l, chromagram_t *c);
 
     float Tune_(log_spectrogram_t &lsg);
 

@@ -389,10 +389,9 @@ Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 }
 #endif /* 0 */
 
-void ChordDetector::Process_(std::vector<segment_t> *segments,
-                             amplitude_t *td, uint32_t samples,
-                             uint32_t samplerate, ResultsListener *listener,
-                             chromagram_t *c)
+void ChordDetector::Process_(vector<segment_t> *segments,
+                             vector<amplitude_t> &td, uint32_t samplerate,
+                             ResultsListener *listener, chromagram_t *c)
 {
     uint32_t win_size, offset, hop_size;
 
@@ -479,8 +478,8 @@ void ChordDetector::Process_(std::vector<segment_t> *segments,
             chord_tpl_t *tpl = tpl_collection_->GetTpl(mtx_path[seg_start_idx]);
             segment_t segment;
 
-            segment.startIdx = seg_start_idx * q_transform->SpectrogramInterval();
-            segment.endIdx = min(res * q_transform->SpectrogramInterval(), samples);
+            segment.startIdx = seg_start_idx * tft->SpectrogramInterval();
+            segment.endIdx = min(res * tft->SpectrogramInterval(), static_cast<uint32_t>(td.size()));
             segment.chord = Chord(tpl->RootNote(), tpl->Quality());
             segment.silence = false;
 
@@ -505,13 +504,15 @@ void ChordDetector::getSegments(std::vector<segment_t>& segments,
                                 amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate)
 {
-    Process_(&segments, timeDomain, samples, sampleRate, nullptr, nullptr);
+    td_t td(timeDomain, timeDomain + samples);
+    Process_(&segments, td, sampleRate, nullptr, nullptr);
 }
 
 void ChordDetector::getSegments(amplitude_t *timeDomain, uint32_t samples,
                                 uint32_t sampleRate, ResultsListener *listener)
 {
-    Process_(nullptr, timeDomain, samples, sampleRate, listener, nullptr);
+    td_t td(timeDomain, timeDomain + samples);
+    Process_(nullptr, td, sampleRate, listener, nullptr);
 }
 
 pcp_t * ChordDetector::GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate)
@@ -528,8 +529,9 @@ chromagram_t ChordDetector::GetChromagram(amplitude_t *x, uint32_t samples,
                                           uint32_t samplerate)
 {
     chromagram_t chromagram;
+    td_t td(x, x + samples);
 
-    Process_(nullptr, x, samples, samplerate, nullptr, &chromagram);
+    Process_(nullptr, td, samplerate, nullptr, &chromagram);
 
     return chromagram;
 }

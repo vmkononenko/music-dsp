@@ -11,6 +11,7 @@
 #include <complex>
 #include <map>
 #include <stdint.h>
+#include <vector>
 
 #define WINDOW_FUNC_RECTANGULAR     1
 #define WINDOW_FUNC_BLACKMAN        2
@@ -22,6 +23,8 @@
 typedef double amplitude_t;
 typedef double freq_hz_t;
 typedef std::complex<amplitude_t> complex_t;
+typedef std::vector<amplitude_t> td_t;  /* time domain      */
+typedef std::vector<amplitude_t> fd_t;  /* frequency domain */
 
 typedef enum {
     note_Unknown = 0,   // all note_t variables will be initialized as "unknown" by default
