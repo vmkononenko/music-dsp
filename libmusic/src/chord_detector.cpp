@@ -11,7 +11,9 @@
 #include "beat_detector.h"
 #include "chord_detector.h"
 #include "config.h"
+#include "cqt_wrapper.h"
 #include "envelope.h"
+#include "fft_wrapper.h"
 #include "lmhelpers.h"
 #include "lmlogger.h"
 #include "tft.h"
@@ -416,7 +418,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
     vector<uint32_t> mtx_path;
     uint32_t seg_start_idx = 0;
 #if !defined(CFG_TFT_TYPE) || (CFG_TFT_TYPE == TFT_TYPE_FFT)
-    tft_t *tft = new FFTWrapper(samplerate, 36, 1047, win_size);
+    tft_t *tft = new FFTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
 #else
     tft_t *tft = new CQTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
 #endif

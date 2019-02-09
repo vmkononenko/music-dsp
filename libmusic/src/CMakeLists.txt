@@ -6,6 +6,7 @@ set(LIB_SOURCES
     cqt_wrapper.cpp
     envelope.cpp
     fft.cpp
+    fft_wrapper.cpp
     lmhelpers.cpp
     lmlogger.cpp
     lmpriority_queue.cpp

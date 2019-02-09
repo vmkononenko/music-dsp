@@ -12,7 +12,6 @@
 #include <vector>
 
 #include "chord_tpl_collection.h"
-#include "cqt_wrapper.h"
 #include "fft.h"
 #include "lmhelpers.h"
 #include "lmtypes.h"
