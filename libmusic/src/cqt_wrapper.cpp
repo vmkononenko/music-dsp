@@ -4,7 +4,7 @@
 #include "CQParameters.h"
 
 #include "cqt_wrapper.h"
-#include "lmhelpers.h"
+
 
 namespace anatomist {
 
@@ -111,31 +111,6 @@ log_spectrogram_t CQTWrapper::ConvertRealBlock_(CQBase::RealBlock &block)
     Denoise_(lsg);
 
     return lsg;
-}
-
-void CQTWrapper::Denoise_(log_spectrogram_t &block)
-{
-    for (auto & col : block) {
-        vector<amplitude_t> devs;
-        amplitude_t thr_uni, sigma, mad;
-        amplitude_t median = Helpers::median(col);
-
-        for (auto val : col) {
-            devs.push_back(abs(val - median));
-        }
-
-        mad = Helpers::median(devs);
-
-        sigma = mad / 0.6745;
-
-        thr_uni = sigma * sqrt(2 * log10(interval_));
-
-        for (auto & bin : col) {
-            if (abs(bin) < thr_uni) {
-                bin = 0;
-            }
-        }
-    }
 }
 
 uint8_t CQTWrapper::BinsPerSemitone()

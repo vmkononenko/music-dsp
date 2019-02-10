@@ -22,8 +22,6 @@ private:
 
     log_spectrogram_t ConvertRealBlock_(CQBase::RealBlock &block);
 
-    void Denoise_(log_spectrogram_t &block);
-
 public:
 
     CQTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,

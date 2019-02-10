@@ -63,6 +63,8 @@ protected:
      */
     uint32_t        interval_;
 
+    void Denoise_(log_spectrogram_t &block);
+
 public:
     /**
      * Constructor

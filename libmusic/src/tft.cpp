@@ -4,7 +4,9 @@
  *  TFT class implementation
  */
 
+#include <algorithm>
 
+#include "lmhelpers.h"
 #include "tft.h"
 
 namespace anatomist {
@@ -30,6 +32,31 @@ log_spectrogram_t TFT::GetSpectrogram()
 uint32_t TFT::SpectrogramInterval()
 {
     return interval_;
+}
+
+void TFT::Denoise_(log_spectrogram_t &block)
+{
+    for (auto & col : block) {
+        std::vector<amplitude_t> devs;
+        amplitude_t thr_uni, sigma, mad;
+        amplitude_t median = Helpers::median(col);
+
+        for (auto val : col) {
+            devs.push_back(abs(val - median));
+        }
+
+        mad = Helpers::median(devs);
+
+        sigma = mad / 0.6745;
+
+        thr_uni = sigma * sqrt(2 * log10(interval_));
+
+        for (auto & bin : col) {
+            if (abs(bin) < thr_uni) {
+                bin = 0;
+            }
+        }
+    }
 }
 
 }
