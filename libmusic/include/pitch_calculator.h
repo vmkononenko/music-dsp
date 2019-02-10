@@ -130,6 +130,11 @@ public:
     freq_hz_t getPitchByInterval(freq_hz_t pitch, int16_t n);
 
     /**
+     * Calculate pitch frequency at i bins interval from given frequency
+     */
+    freq_hz_t getFreqByInterval(freq_hz_t f, float i);
+
+    /**
      * Interval between two frequencies measured in octaves
      *
      * @param   f1, f2  frequencies between which measurement is taken

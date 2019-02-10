@@ -85,6 +85,11 @@ freq_hz_t PitchCalculator::getPitchByInterval(freq_hz_t pitch, int16_t n)
     return (IS_PITCH_IDX_VALID(retIdx) ? __mPitches[retIdx]  : FREQ_INVALID);
 }
 
+freq_hz_t PitchCalculator::getFreqByInterval(freq_hz_t f, float i)
+{
+    return pow(2, i) * f;
+}
+
 int16_t PitchCalculator::__getPitchIdx(freq_hz_t freq)
 {
     int16_t start = 0, end = SEMITONES_TOTAL - 1, mid;
