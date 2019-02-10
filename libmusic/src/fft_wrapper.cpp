@@ -7,6 +7,7 @@
 #include "fft.h"
 #include "fft_wrapper.h"
 #include "lmhelpers.h"
+#include "pitch_calculator.h"
 #include "window_functions.h"
 
 
@@ -16,7 +17,10 @@ namespace anatomist {
 
 FFTWrapper::FFTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint16_t bpo,
                        uint32_t sample_rate, uint16_t win_size, uint16_t hop_size) :
-            TFT(f_low, f_high, bpo, sample_rate, win_size, hop_size) {}
+            TFT(f_low, f_high, bpo, sample_rate, win_size, hop_size)
+{
+    f_min_ = pc_.getPitch(f_low);
+}
 
 FFTWrapper::FFTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
                        uint16_t win_size, uint16_t hop_size) :
@@ -42,27 +46,42 @@ void FFTWrapper::Process(td_t td, uint32_t offset)
 
 fd_t FFTWrapper::FFTPruned(FFT *fft)
 {
-    UNUSED(fft);
+    uint32_t fft_bin;
+    freq_hz_t f = f_min_;
     fd_t fd;
+    uint32_t i;
+
+    while (f < f_max_) {
+        fft_bin = fft->FreqToIdx(f, round);
+        fd.push_back(fft->GetFreqDomain().p[fft_bin]);
+        i++;
+        f =  pc_.getFreqByInterval(f, 1.0 / bpo_);
+    }
+    if (i % (bpo_ / notes_Total)) {
+        f = pc_.getPitch(f);
+    }
 
     return fd;
 }
 
 uint8_t FFTWrapper::BinsPerSemitone()
 {
-    return 0;
+    return bpo_ / notes_Total;
 }
 
 uint32_t FFTWrapper::FreqToBin(freq_hz_t f)
 {
-    UNUSED(f);
-    return 0;
+    if ((f < f_min_) || (f > f_max_))
+    {
+        throw invalid_argument("FFTWrapper::FreqToBin(): f is out of range");
+    }
+
+    return round(static_cast<double>(log2(f / f_min_) * bpo_));
 }
 
 freq_hz_t FFTWrapper::BinToFreq(uint32_t idx)
 {
-    UNUSED(idx);
-    return 0;
+    return f_min_ * pow(2, (1.0 * idx / bpo_));
 }
 
 }

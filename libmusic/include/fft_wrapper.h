@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "pitch_calculator.h"
 #include "tft.h"
 
 namespace anatomist {
@@ -14,6 +15,8 @@ namespace anatomist {
 class FFTWrapper : public TFT {
 
 private:
+    PitchCalculator     &pc_ = PitchCalculator::getInstance();
+
     /**
      * Performs logarithmic pruning of FFT frequencies
      */
