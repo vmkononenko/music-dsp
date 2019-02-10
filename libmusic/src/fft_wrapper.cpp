@@ -42,6 +42,8 @@ void FFTWrapper::Process(td_t td, uint32_t offset)
 
         delete fft;
     }
+
+    Denoise_(spectrogram_);
 }
 
 fd_t FFTWrapper::FFTPruned(FFT *fft)
