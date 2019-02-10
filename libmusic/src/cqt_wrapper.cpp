@@ -150,7 +150,7 @@ uint32_t CQTWrapper::FreqToBin(freq_hz_t f)
         throw invalid_argument("CQTWrapper::FreqToBin(): f is out of range");
     }
 
-    return (log2(f / f_min_) * cq_spectrogram_->getBinsPerOctave());
+    return round(static_cast<double>(log2(f / f_min_) * cq_spectrogram_->getBinsPerOctave()));
  }
 
 freq_hz_t CQTWrapper::BinToFreq(uint32_t idx)
