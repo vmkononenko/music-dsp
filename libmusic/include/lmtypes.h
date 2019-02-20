@@ -25,6 +25,7 @@
 
 typedef double amplitude_t;
 typedef double freq_hz_t;
+typedef double prob_t;
 typedef std::complex<amplitude_t> complex_t;
 typedef std::vector<amplitude_t> td_t;  /* time domain      */
 typedef std::vector<amplitude_t> fd_t;  /* frequency domain */

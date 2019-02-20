@@ -103,7 +103,7 @@ private:
 
     float Tune_(tft_t *tft);
 
-    Viterbi::obs_matrix_t GetScoreMatrix_(chromagram_t &chromagram);
+    Viterbi::prob_matrix_t GetScoreMatrix_(chromagram_t &chromagram);
 
     chromagram_t ChromagramFromSpectrogram_(tft_t *tft);
 

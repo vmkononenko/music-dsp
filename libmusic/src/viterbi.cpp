@@ -8,7 +8,7 @@ using namespace std;
 typedef pair<uint32_t, double> state_metric_t;
 
 
-bool Viterbi::ValidateProbVector_(const std::vector<double> &v)
+bool Viterbi::ValidateProbVector_(const std::vector<prob_t> &v)
 {
     double p_total = 0;
 
@@ -19,7 +19,7 @@ bool Viterbi::ValidateProbVector_(const std::vector<double> &v)
     return Helpers::almostEqual(p_total, 1, (1.0 / 10000));
 }
 
-void Viterbi::ValidateInitProbs_(const std::vector<double> &init_p)
+void Viterbi::ValidateInitProbs_(const vector<prob_t> &init_p)
 {
     if (init_p.empty()) {
         throw invalid_argument("ValidateInitProbs_(): empty vector of initial probabilities");
@@ -46,8 +46,8 @@ void Viterbi::ValidateMatrix_(const vector<vector<double>> &obs) {
     }
 }
 
-vector<uint32_t> Viterbi::GetPath(obs_matrix_t &obs, vector<double> init_p,
-        vector<vector<double>> trans_p)
+vector<uint32_t> Viterbi::GetPath(std::vector<prob_t> &init_p, prob_matrix_t &obs,
+                                  prob_matrix_t &trans_p)
 {
     ValidateInitProbs_(init_p);
     ValidateMatrix_(obs);

@@ -20,16 +20,16 @@ class Viterbi {
 VITERBI_TEST_FRIENDS;
 
 public:
-    typedef std::vector<std::vector<double>> obs_matrix_t;
+    typedef std::vector<std::vector<prob_t>> prob_matrix_t;
 
-    static std::vector<uint32_t> GetPath(obs_matrix_t &obs,
-                                         std::vector<double> init_p,
-                                         std::vector<std::vector<double>> trans_p);
+    static std::vector<uint32_t> GetPath(std::vector<prob_t> &init_p,
+                                         prob_matrix_t &obs,
+                                         prob_matrix_t &trans_p);
 
 private:
-    static void ValidateMatrix_(const std::vector<std::vector<double>> &obs);
-    static bool ValidateProbVector_(const std::vector<double> &v);
-    static void ValidateInitProbs_(const std::vector<double> &init_p);
+    static void ValidateMatrix_(const prob_matrix_t &obs);
+    static bool ValidateProbVector_(const std::vector<prob_t> &v);
+    static void ValidateInitProbs_(const std::vector<prob_t> &init_p);
 };
 
 /** @} */

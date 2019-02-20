@@ -357,9 +357,9 @@ Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
     return score_mtx;
 }
 #else
-Viterbi::obs_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
+Viterbi::prob_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 {
-    Viterbi::obs_matrix_t score_mtx(chromagram.size());
+    Viterbi::prob_matrix_t score_mtx(chromagram.size());
 
     for (uint32_t win_idx = 0; win_idx < chromagram.size(); win_idx++) {
         pcp_t *pcp = &chromagram[win_idx];
@@ -414,7 +414,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
 #endif
 
     uint32_t hop_size = win_size / CFG_HOPS_PER_WINDOW;
-    Viterbi::obs_matrix_t score_mtx;
+    Viterbi::prob_matrix_t score_mtx;
     vector<uint32_t> mtx_path;
     uint32_t seg_start_idx = 0;
 #if !defined(CFG_TFT_TYPE) || (CFG_TFT_TYPE == TFT_TYPE_FFT)
@@ -423,7 +423,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
     tft_t *tft = new CQTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
 #endif
     vector<double> init_p;
-    vector<vector<double>> trans_p;
+    Viterbi::prob_matrix_t trans_p;
     uint32_t chords_total = tpl_collection_->Size();
     chromagram_t chromagram;
 
@@ -465,7 +465,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
         trans_p.push_back(t);
     }
 
-    mtx_path = Viterbi::GetPath(score_mtx, init_p, trans_p);
+    mtx_path = Viterbi::GetPath(init_p, score_mtx, trans_p);
 
     if (mtx_path.size() != chromagram.size()) {
         throw runtime_error("__getSegments(): mtx_path.size() != chromagram.size()");
