@@ -17,22 +17,22 @@ namespace anatomist {
 
 ChordTplCollection::ChordTplCollection()
 {
-    __initChordTpls();
+    InitChordTpls_();
 }
 
 ChordTplCollection::~ChordTplCollection()
 {
-    __clearChordTpls();
+    ClearChordTpls_();
 }
 
-void ChordTplCollection::__clearChordTpls()
+void ChordTplCollection::ClearChordTpls_()
 {
     for (auto tpl : tpls_) {
         delete tpl;
     }
 }
 
-void ChordTplCollection::__initChordTpls()
+void ChordTplCollection::InitChordTpls_()
 {
     for (int n = note_Min; n <= note_Max; n++) {
         note_t note = (note_t)n;

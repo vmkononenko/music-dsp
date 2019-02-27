@@ -23,8 +23,8 @@ class ChordTplCollection {
 private:
     std::vector<chord_tpl_t *>  tpls_;
 
-    void __clearChordTpls();
-    void __initChordTpls();
+    void ClearChordTpls_();
+    void InitChordTpls_();
 
 public:
     /**
