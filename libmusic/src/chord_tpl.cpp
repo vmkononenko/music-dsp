@@ -97,6 +97,18 @@ ChordTpl::ChordTpl(note_t root_note, chord_quality_t cq, uint8_t slash_subtype) 
     InitTpl_(root_note, cq, slash_subtype);
 }
 
+ChordTpl::ChordTpl(note_t root_note, chord_quality_t cq, std::vector<prob_t> &tpl) :
+        root_note_(root_note), chord_quality_(cq), tpl_(tpl)
+{
+    if ((root_note < note_Min) || (root_note > note_Max)) {
+        throw std::invalid_argument("ChordTpl(): Invalid note");
+    }
+
+    if ((cq < cq_Min) || (cq > cq_Max)) {
+        throw std::invalid_argument("ChordTpl(): Invalid chord quality");
+    }
+}
+
 void ChordTpl::InitTpl_(note_t root_note, chord_quality_t cq, uint8_t ss)
 {
     vector<note_t> scale = MusicScale::getMajorScale(root_note);

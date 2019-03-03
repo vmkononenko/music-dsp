@@ -25,6 +25,8 @@ private:
 
     void ClearChordTpls_();
     void InitChordTpls_();
+    void InitFromHmm_();
+    void InitTheoretical_();
 
 public:
     /**

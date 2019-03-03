@@ -294,7 +294,6 @@ float ChordDetector::Tune_(tft_t *tft)
         currentTunedSpec.push_back(0.0);
         currentTunedSpec.push_back(0.0); // upper edge
 
-        /*
         vector<amplitude_t> runningmean = SpecialConvolution(currentTunedSpec, hw);
         vector<amplitude_t> runningstd;
 
@@ -314,7 +313,6 @@ float ChordDetector::Tune_(tft_t *tft)
                 throw runtime_error("Negative value in log spectrum");
             }
         }
-        */
 
         col = currentTunedSpec;
     }

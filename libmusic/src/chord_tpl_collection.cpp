@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "chord_tpl_collection.h"
+#include "chord_tpls_hmm.h"
+#include "config.h"
 #include "lmtypes.h"
 
 
@@ -33,6 +35,31 @@ void ChordTplCollection::ClearChordTpls_()
 }
 
 void ChordTplCollection::InitChordTpls_()
+{
+#if (!defined(CHORD_TPLS_HMM_TRAINED) || CHORD_TPLS_HMM_TRAINED == 0) && CFG_USE_HMM_TPLS == 1
+#error "Can't use HMM templates because of missing training results"
+#elif defined(CHORD_TPLS_HMM_TRAINED) && CHORD_TPLS_HMM_TRAINED == 1 && CFG_USE_HMM_TPLS == 1
+    InitFromHmm_();
+#else
+    InitTheoretical_();
+#endif
+}
+
+void ChordTplCollection::InitFromHmm_()
+{
+    for (int n = note_Min; n <= note_Max; n++) {
+        note_t note = (note_t)n;
+
+        for (int q = cq_Min; q <= cq_Max; q++) {
+            chord_quality_t cq = (chord_quality_t)q;
+
+            chord_tpl_t *tpl = new ChordTpl(note, cq, hmm_training_res[note][cq]);
+            tpls_.push_back(tpl);
+        }
+    }
+}
+
+void ChordTplCollection::InitTheoretical_()
 {
     for (int n = note_Min; n <= note_Max; n++) {
         note_t note = (note_t)n;

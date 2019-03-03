@@ -58,8 +58,17 @@ private:
 public:
     /**
      * Constructor
+     *
+     * Used for theoretical template generation
      */
     ChordTpl(note_t note, chord_quality_t cq, uint8_t slash_subtype);
+
+    /**
+     * Constructor
+     *
+     * Used for creating a class instance for HMM training results
+     */
+    ChordTpl(note_t note, chord_quality_t cq, std::vector<prob_t> &tpl);
 
     tpl_score_t GetScore(pcp_t *pcp);
 
