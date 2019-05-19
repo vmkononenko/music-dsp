@@ -88,7 +88,7 @@ typedef enum {
     cq_diminished_7th,
     cq_5th,
     cq_Min = cq_major,
-    cq_Max = cq_minor
+    cq_Max = cq_half_diminished_7th
 } chord_quality_t;
 
 std::ostream& operator<<(std::ostream& os, const chord_quality_t& q);
