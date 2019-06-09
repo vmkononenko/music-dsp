@@ -70,7 +70,7 @@ fd_t FFTWrapper::FFTPruned(FFT *fft)
     uint32_t fft_bin;
     freq_hz_t f = f_min_;
     fd_t fd;
-    uint32_t i;
+    uint32_t i = 0;
 
     while (f < f_max_) {
         fft_bin = fft->FreqToIdx(f, round);
