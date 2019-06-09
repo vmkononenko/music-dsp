@@ -61,7 +61,7 @@ void TFT::Denoise_(log_spectrogram_t &block)
         amplitude_t median = Helpers::median(col);
 
         for (auto val : col) {
-            devs.push_back(abs(val - median));
+            devs.push_back(std::abs(val - median));
         }
 
         mad = Helpers::median(devs);
@@ -71,7 +71,7 @@ void TFT::Denoise_(log_spectrogram_t &block)
         thr_uni = sigma * sqrt(2 * log10(interval_));
 
         for (auto & bin : col) {
-            if (abs(bin) < thr_uni) {
+            if (std::abs(bin) < thr_uni) {
                 bin = 0;
             }
         }
