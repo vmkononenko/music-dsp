@@ -76,10 +76,11 @@ fd_t FFTWrapper::FFTPruned(FFT *fft)
         fft_bin = fft->FreqToIdx(f, round);
         fd.push_back(fft->GetFreqDomain().p[fft_bin]);
         i++;
-        f =  pc_.getFreqByInterval(f, 1.0 / bpo_);
-    }
-    if (i % (bpo_ / notes_Total)) {
-        f = pc_.getPitch(f);
+        if (i % (bpo_ / notes_Total)) {
+            f = pc_.getPitch(f);
+        } else {
+            f =  pc_.getFreqByInterval(f, 1.0 / bpo_);
+        }
     }
 
     return fd;
