@@ -37,7 +37,7 @@ Welcome to the project and find your way to contribute and benefit from it!
 
 ## Native console client
 If `-DWITH_CLIENT=y` (on by default) has been specified during the build, native built-in CLI client will be provided along with the shared lib.
-Run `bin/lmclient -h` to check what it's capable of.
+Run `bin/lmclient -h` for the quick help. Check [the wiki](https://github.com/vmkononenko/music-dsp/wiki/Lmclient-%E2%80%92-the-Power-of-Console-Audio-Analysis) to discover advanced features.
 
 ## Linking
 The code is licensed under LGPL v3.0, meaning that:
