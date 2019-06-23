@@ -18,6 +18,9 @@ At some point code base has shaped into a project I consider worth sharing with 
 Welcome to the project and find your way to contribute and benefit from it!
 
 # Building
+
+While [setting up development environment](https://github.com/vmkononenko/music-dsp/wiki/Setting-Up-Development-Environment) is covered in wiki, use quick steps below as a quick start:
+
 1. Download source code
    ```
    git clone https://github.com/vmkononenko/music-dsp
