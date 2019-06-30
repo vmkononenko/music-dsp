@@ -35,6 +35,7 @@ While [setting up development environment](https://github.com/vmkononenko/music-
    cmake ../music-dsp
    make
    ```
+This is sufficient to build the project with the default configuration. If you want to fine tune it for your specific needs [parameters guide](https://github.com/vmkononenko/music-dsp/wiki/Fine-Tuning-Music-DSP-Lib-with-config.h) will help.
 
 # Using
 
