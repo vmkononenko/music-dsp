@@ -22,8 +22,10 @@ endif()
 set (LMCLIENT_TARGET lmclient)
 set (MUSIC_DSP_TARGET music-dsp)
 set (TESTS_TARGET tests)
+set (VAMP_TARGET parachord-vamp)
 set (EXT_CQTT_TARGET cqtt)
 set (EXT_KISSFFT_TARGET kissfft)
+set (EXT_VAMPSDK_TARGET vamp-plugin-sdk)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/libmusic/include
@@ -46,8 +48,9 @@ endif()
 
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
-option(WITH_CLIENT ON)
-option(WITH_TESTS ON)
+option(WITH_CLIENT "Build console client" OFF)
+option(WITH_TESTS "Build unit tests" OFF)
+option(WITH_VAMP "Build Parachord VAMP plugin" ON)
 
 if(WITH_TESTS)
     add_subdirectory(tests)
@@ -59,6 +62,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra")
 
 if(WITH_CLIENT)
     add_subdirectory(client)
+endif()
+
+if(WITH_VAMP)
+    add_subdirectory(vamp)
 endif()
 
 add_subdirectory(libmusic)
