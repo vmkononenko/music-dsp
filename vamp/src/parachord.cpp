@@ -195,6 +195,18 @@ Parachord::segmentToFeature(segment_t *s)
     return f;
 }
 
+void
+Parachord::trimInput()
+{
+    auto it = m_channelInput.end();
+    while (it != m_channelInput.begin() && *it == 0 &&
+           static_cast<size_t>(std::distance(it, m_channelInput.end())) < m_blockSize)
+    {
+        it--;
+    }
+    m_channelInput.erase(it, m_channelInput.end());
+}
+
 Parachord::FeatureSet
 Parachord::getChordFeatures()
 {
@@ -218,12 +230,14 @@ Parachord::getChordFeatures()
 Parachord::FeatureSet
 Parachord::getRemainingFeatures()
 {
+    Parachord::FeatureSet retFeatures;
+
     if (m_stepSize == 0) {
         cerr << "ERROR: Parachord::getRemainingFeatures(): not initialised";
         return FeatureSet();
     }
 
-    Parachord::FeatureSet retFeatures;
+    trimInput();
 
     retFeatures = getChordFeatures();
 

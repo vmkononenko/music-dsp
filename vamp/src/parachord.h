@@ -33,6 +33,18 @@ private:
     Feature segmentToFeature(segment_t *s);
     FeatureSet getChordFeatures();
 
+    /**
+     * Trim trailing zeros in the last processed block
+     *
+     * There's no way to get audio file information from
+     * plugin context, which means the last processed block
+     * always contains trailing zeros - unless block size
+     * is an aliquot of an audio time domain. This results
+     * in inadequate duration calculation for the last
+     * feature.
+     */
+    void trimInput();
+
 protected:
     size_t m_stepSize;
     size_t m_blockSize;
