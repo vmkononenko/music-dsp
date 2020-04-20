@@ -389,7 +389,7 @@ void ChordDetector::Process_(vector<segment_t> *segments,
             segment_t segment;
 
             segment.startIdx = seg_start_idx * tft->SpectrogramInterval();
-            segment.endIdx = min(res * tft->SpectrogramInterval(), static_cast<uint32_t>(td.size()));
+            segment.endIdx = min(res * tft->SpectrogramInterval(), static_cast<uint32_t>(td.size() - 1));
             segment.chord = Chord(tpl->RootNote(), tpl->Quality());
             segment.silence = false;
 
