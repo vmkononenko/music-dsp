@@ -23,17 +23,19 @@
 
 #include "vamp-sdk/Plugin.h"
 
+#include <chord_detector.h>
+
 class Parachord : public Vamp::Plugin
 {
+private:
+    td_t m_channelInput;
+
+    Feature segmentToFeature(segment_t *s);
+    FeatureSet getChordFeatures();
+
 protected:
     size_t m_stepSize;
     size_t m_blockSize;
-
-    float  m_threshold;
-    float  m_sensitivity;
-    float *m_priorMagnitudes;
-    float  m_dfMinus1;
-    float  m_dfMinus2;
 
 public:
     Parachord(float inputSampleRate);

@@ -20,9 +20,11 @@
 #include "parachord.h"
 
 using namespace std;
+using Vamp::RealTime;
 
 Parachord::Parachord(float inputSampleRate) :
     Plugin(inputSampleRate),
+    m_stepSize(0),
     m_blockSize(0)
 {
 }
@@ -135,7 +137,7 @@ Parachord::getOutputDescriptors() const
     d.isQuantized = false;
     d.sampleType = OutputDescriptor::VariableSampleRate;
     d.hasDuration = false;
-    //d.sampleRate = featureRate;
+    d.sampleRate = 0;
     list.push_back(d);
 
     return list;
@@ -148,10 +150,8 @@ Parachord::initialise(size_t channels, size_t stepSize, size_t blockSize)
         return false;
     }
 
-    (void) stepSize;
-    (void) blockSize;
-
-    // Real initialisation work goes here!
+    m_stepSize = stepSize;
+    m_blockSize = blockSize;
 
     return true;
 }
@@ -159,7 +159,9 @@ Parachord::initialise(size_t channels, size_t stepSize, size_t blockSize)
 void
 Parachord::reset()
 {
-    // Clear buffers, reset stored values, etc
+    m_stepSize = 0;
+    m_blockSize = 0;
+    m_channelInput.clear();
 }
 
 Parachord::FeatureSet
@@ -167,12 +169,63 @@ Parachord::process(const float *const *inputBuffers, Vamp::RealTime timestamp)
 {
     (void)inputBuffers;
     (void)timestamp;
-    // Do actual work!
+
+    if (m_stepSize == 0) {
+        cerr << "ERROR: Parachord::process(): not initialized";
+        return FeatureSet();
+    }
+
+    m_channelInput.insert(m_channelInput.end(), inputBuffers[0],
+                          inputBuffers[0] + m_blockSize);
+
     return FeatureSet();
+}
+
+Parachord::Feature
+Parachord::segmentToFeature(segment_t *s)
+{
+    Parachord::Feature f;
+
+    f.label = s->silence ? "S" : s->chord.toString();
+    f.hasTimestamp = true;
+    f.timestamp = RealTime::frame2RealTime(s->startIdx, m_inputSampleRate);
+    f.hasDuration = true;
+    f.duration = RealTime::frame2RealTime(s->endIdx, m_inputSampleRate) - f.timestamp;
+
+    return f;
+}
+
+Parachord::FeatureSet
+Parachord::getChordFeatures()
+{
+    anatomist::ChordDetector *cd = new anatomist::ChordDetector();
+    vector<segment_t> segments;
+    Parachord::FeatureSet retFeatures;
+
+    cd->getSegments(segments, m_channelInput.data(), m_channelInput.size(), m_inputSampleRate);
+
+    for (uint32_t i = 0; i < segments.size(); i++) {
+        segment_t *s = &segments[i];
+        cout << s->chord << endl;
+        retFeatures[0].push_back(segmentToFeature(s));
+    }
+
+    free(cd);
+
+    return retFeatures;
 }
 
 Parachord::FeatureSet
 Parachord::getRemainingFeatures()
 {
-    return FeatureSet();
+    if (m_stepSize == 0) {
+        cerr << "ERROR: Parachord::getRemainingFeatures(): not initialised";
+        return FeatureSet();
+    }
+
+    Parachord::FeatureSet retFeatures;
+
+    retFeatures = getChordFeatures();
+
+    return retFeatures;
 }
