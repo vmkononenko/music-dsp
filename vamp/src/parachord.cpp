@@ -159,8 +159,6 @@ Parachord::initialise(size_t channels, size_t stepSize, size_t blockSize)
 void
 Parachord::reset()
 {
-    m_stepSize = 0;
-    m_blockSize = 0;
     m_channelInput.clear();
 }
 
