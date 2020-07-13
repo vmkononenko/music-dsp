@@ -140,7 +140,6 @@ kiss_fastfir_cfg kiss_fastfir_alloc(
     ptr += sizeof(kiss_fft_cpx) * n_freq_bins;
     
     st->fir_freq_resp = (kiss_fft_cpx*)ptr;
-    ptr += sizeof(kiss_fft_cpx) * n_freq_bins;
 
     FFT_ALLOC (nfft,0,st->fftcfg , &len_fftcfg);
     FFT_ALLOC (nfft,1,st->ifftcfg , &len_ifftcfg);
