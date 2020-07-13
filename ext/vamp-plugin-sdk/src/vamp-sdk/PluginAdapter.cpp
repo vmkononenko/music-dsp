@@ -229,7 +229,7 @@ PluginAdapterBase::Impl::getDescriptor()
     
     m_descriptor.parameterCount = m_parameters.size();
     m_descriptor.parameters = (const VampParameterDescriptor **)
-        malloc(m_parameters.size() * sizeof(VampParameterDescriptor));
+        malloc(m_parameters.size() * sizeof(VampParameterDescriptor *));
 
     unsigned int i;
     
