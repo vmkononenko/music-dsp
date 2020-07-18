@@ -220,7 +220,7 @@ Parachord::getChordFeatures()
         retFeatures[0].push_back(segmentToFeature(s));
     }
 
-    free(cd);
+    delete cd;
 
     return retFeatures;
 }
