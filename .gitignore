@@ -1,6 +1,8 @@
+*.csv
 .cproject
 .project
 .settings
+.DS_Store
 /Default
 /build
 /doc/generated
