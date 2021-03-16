@@ -4,3 +4,9 @@
 /Default
 /build
 /doc/generated
+
+
+/tools/DatasetExtraction/.idea
+/tools/DatasetExtraction/__pycache__
+/tools/DatasetExtraction/test_chords_txt
+/tools/DatasetExtraction/testing.py
