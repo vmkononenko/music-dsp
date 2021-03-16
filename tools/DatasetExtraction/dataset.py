@@ -6,47 +6,80 @@ from glob import glob
 
 class Dataset:
     #i - song, j - chord
-    songlist = [[]]
+    song_list = []
+    chord_id = {}
+    dir_path = ""
+    window_size = 100.0
 
+    def __init__(self, dir_path, chord_id, window_size):
+        self.dir_path = dir_path
+        self.chord_id = chord_id
+        self.window_size = window_size
+        self.song_list = self.load()
 
     @protected
     def validate(self):
         pass
 
-    @protected
+    #@protected
     def load(self):
+        file_list = glob(self.dir_path)
+        for file in file_list:
+            self.song_list.append(Song(self.load_chords(file)))
+        return self.song_list
+
+    @protected
+    def load_chords(self, filename):
         pass
 
+    #returns vector with probabilities (dtype np array)
     def get_hmm_matrix_i(self):
-        pass
+        self.song_list = self.load(self.dir_path)
+        i_matrix = np.array(len(self.chord_id), dtype=float)
+        for song in self.song_list:
+            i_matrix[self.chord_id.get(song.chords_list[
+                                      0].label)] += 1
+        i_matrix = i_matrix / len(self.song_list)
+        return i_matrix
 
+    # returns matrix with probabilities (dtype np array)
     def get_hmm_matrix_t(self):
-        pass
+        tran_count = 0.0
+        remainder = 0.0
+        drtn = 0.0
+        w_cnt = 0.0
+        t_matrix = np.array((len(self.chord_id), len(self.chord_id)), dtype=float)
+
+        for song_i in self.song_list:
+            t_matrix[self.chord_id.get(song_i[-1].label)][  # analyze last elem
+                self.chord_id.get(song_i[-1].label)] += (song_i[-1].end_time - song_i[-1].start_time) / self.window_size
+            itr = song_i[:-1]  # remove last element (because use elem+1)
+
+            for j in range(itr):
+                curr_chord = song_i.chords_list[j]
+                drtn = curr_chord.end_time - curr_chord.start_time
+                w_cnt = int(drtn / self.window_size)
+
+                if (remainder > self.window_size / 2):
+                    w_cnt = + 1
+
+                remainder = drtn % self.window_size
+
+                tran_count += w_cnt
+
+                t_matrix[self.chord_id.get(curr_chord.label)][    #self trasition
+                    self.chord_id.get(curr_chord.label)] += w_cnt
+
+                t_matrix[self.chord_id.get(curr_chord.label.label)][    #chord changing transition
+                    self.chord_id.get(song_i.chords_list[j + 1].label)] += 1
+        t_matrix = t_matrix / tran_count
+        return  t_matrix
 
     def get_hmm_matrix_e(self):
         pass
 
 
 class Iso_Dataset(Dataset):
-
-    # assume we have chord_id dictionary which maps Chords into ids
-    def get_hmm_matrix_i(self, chord_id, dir_path):
-        chord_id = {}
-        song_list = self.load(dir_path)
-        i_matrix = np.array(len(chord_id), dtype=float)
-        for song in song_list:
-            i_matrix[chord_id.get(song.chords_list[0].label)] += 1 #для каждого аккорда получили кол-во раз, когда аккорд являлся первым в песне
-        i_matrix = i_matrix/len(song_list) #оцениваем вероятность через частоту
-        return i_matrix
-
-
-    #returns list of Songs class instances (Song class instance contains list of Chord class instances)
-    def load(self, dir_path):
-        song_list = []
-        file_list = glob(dir_path)
-        for file in file_list:
-            song_list.append(Song(self.load_chords(file)))
-        return song_list
 
     #Load chords from a text file, returns list of Chord instances
     def load_chords(self, filename):
@@ -80,6 +113,4 @@ class Iso_Dataset(Dataset):
 
 
 
-if __name__ == '__main__':
-    Iso_Dataset().load("D:\\ChordsRecognition\\music-dsp\\tools\\DatasetExtraction\\test_chords_txt\\*.txt")
 
