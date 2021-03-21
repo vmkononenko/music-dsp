@@ -1,7 +1,3 @@
-find_path(
-    SND_HEADERS
-    NAMES sndfile.h
-)
 set(SOURCES
     lmclient.cpp
 )
@@ -9,10 +5,5 @@ set(SOURCES
 include_directories(${SND_HEADERS})
 add_executable(${LMCLIENT_TARGET} ${SOURCES})
 add_dependencies(${LMCLIENT_TARGET} ${MUSIC_DSP_TARGET})
-
-find_library(
-    LIBSNDFILE
-    NAMES sndfile
-)
 
 target_link_libraries(${LMCLIENT_TARGET} ${MUSIC_DSP_TARGET} ${LIBSNDFILE})
