@@ -18,6 +18,7 @@
  */
 
 #include "parachord.h"
+#include "config.h"
 
 using namespace std;
 using Vamp::RealTime;
@@ -78,15 +79,13 @@ Parachord::getInputDomain() const
 size_t
 Parachord::getPreferredBlockSize() const
 {
-    return 0; // 0 means "I can handle any block size"
+    return CFG_WINDOW_SIZE;
 }
 
 size_t
 Parachord::getPreferredStepSize() const
 {
-    return 0; // 0 means "anything sensible"; in practice this
-              // means the same as the block size for TimeDomain
-              // plugins, or half of it for FrequencyDomain plugins
+    return CFG_WINDOW_SIZE;
 }
 
 size_t
@@ -138,6 +137,19 @@ Parachord::getOutputDescriptors() const
     d.sampleType = OutputDescriptor::VariableSampleRate;
     d.hasDuration = false;
     d.sampleRate = 0;
+    list.push_back(d);
+
+    d.identifier = "chromagram";
+    d.name = "Chroma Information";
+    d.description = "Pitch Class Profile Visualization";
+    d.unit = "pitch class";
+    d.binCount = notes_Total;
+    d.binNames = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    d.hasKnownExtents = true;
+    d.minValue = 0;
+    d.maxValue = 1;
+    d.sampleType = OutputDescriptor::FixedSampleRate;
+    d.sampleRate = m_inputSampleRate / m_blockSize;
     list.push_back(d);
 
     return list;
@@ -220,6 +232,14 @@ Parachord::getChordFeatures()
         retFeatures[0].push_back(segmentToFeature(s));
     }
 
+    anatomist::chromagram_t chromagram = cd->GetChromagram(m_channelInput.data(), m_channelInput.size(), m_inputSampleRate);
+    for (uint32_t i = 0; i < chromagram.size(); i++) {
+        Parachord::Feature f;
+        f.hasTimestamp = false;
+        for (int N = note_Min; N <= note_Max; N++)
+            f.values.push_back(chromagram[i].getPitchCls(static_cast<note_t>(N)));
+        retFeatures[1].push_back(f);
+    }
     delete cd;
 
     return retFeatures;
