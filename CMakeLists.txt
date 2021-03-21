@@ -34,6 +34,9 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/ext/kissfft/tools
 )
 
+find_path(SND_HEADERS NAMES sndfile.h)
+find_library(LIBSNDFILE NAMES sndfile)
+
 if (DEFINED ANDROID_ABI)
     if (${ANDROID_ABI} STREQUAL "x86_64")
         include_directories(${ANDROID_SYSROOT}/usr/include/x86_64-linux-android)
