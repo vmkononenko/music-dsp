@@ -61,9 +61,10 @@ public:
     /**
      * Get pitch class value for the specified note
      * @param note  note to get PCP for
+     * @param is_treble true for treble notes, false for bass notes. Default is true.
      * @return      PCP value
      */
-    amplitude_t getPitchCls(note_t note) const;
+    amplitude_t getPitchCls(note_t note, bool is_treble = true) const;
 
     size_t size();
 
