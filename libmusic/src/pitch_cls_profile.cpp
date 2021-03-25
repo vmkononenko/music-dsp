@@ -124,13 +124,13 @@ void PitchClsProfile::__normalize()
     }
 }
 
-amplitude_t PitchClsProfile::getPitchCls(note_t note) const
+amplitude_t PitchClsProfile::getPitchCls(note_t note, bool is_treble) const
 {
     if ((note < note_Min) || (note > note_Max)) {
         throw std::invalid_argument("Invalid note");
     }
-
-    return __mPCP[note - note_Min];
+    size_t idx = (note - note_Min + notes_Total * is_treble) % __mPCP.size();
+    return __mPCP[idx];
 }
 
 size_t PitchClsProfile::size()
