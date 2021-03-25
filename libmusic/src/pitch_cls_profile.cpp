@@ -97,6 +97,9 @@ PitchClsProfile::PitchClsProfile(fd_t &fd_mags, tft_t *tft)
             tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (i/2 + 1)));
         }
 
+        if (0 == tmp)
+            continue;
+
         note = pc.pitchToNote(pc.getPitch(tft->BinToFreq(bin)));
 
         if (bin / bps < bass_win.size()) {
