@@ -143,8 +143,14 @@ Parachord::getOutputDescriptors() const
     d.name = "Chroma Information";
     d.description = "Pitch Class Profile Visualization";
     d.unit = "pitch class";
-    d.binCount = notes_Total;
-    d.binNames = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    for (int n = note_Min; n <= note_Max; n++) {
+        stringstream ss;
+        ss << static_cast<note_t>(n);
+        d.binNames.push_back(ss.str());
+    }
+    // double size for both bass & treble PCPs
+    d.binCount = notes_Total * 2;
+    d.binNames.insert(d.binNames.end(), d.binNames.begin(), d.binNames.end());
     d.hasKnownExtents = true;
     d.minValue = 0;
     d.maxValue = 1;
@@ -236,8 +242,12 @@ Parachord::getChordFeatures()
     for (uint32_t i = 0; i < chromagram.size(); i++) {
         Parachord::Feature f;
         f.hasTimestamp = false;
+        if (chromagram[i].size() > notes_Total){
+            for (int N = note_Min; N <= note_Max; N++)
+                f.values.push_back(chromagram[i].getPitchCls(static_cast<note_t>(N), false));
+        }
         for (int N = note_Min; N <= note_Max; N++)
-            f.values.push_back(chromagram[i].getPitchCls(static_cast<note_t>(N)));
+            f.values.push_back(chromagram[i].getPitchCls(static_cast<note_t>(N), true));
         retFeatures[1].push_back(f);
     }
     delete cd;
