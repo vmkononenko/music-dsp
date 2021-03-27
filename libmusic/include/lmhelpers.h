@@ -28,6 +28,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <fstream>
 
 #include "lmtypes.h"
 
@@ -122,6 +123,30 @@ public:
 
         return median;
     }
+
+    template<typename T>
+    static void lm_helpers_peep(const char *name, const std::vector<std::vector<T>> & matrix)
+    {
+        const char *path = getenv(name);
+        if (!path)
+            return;
+        std::ofstream csv(path, std::ios::out | std::ios::trunc);
+        if (csv.is_open()) {
+            for (auto &row : matrix) {
+                for (auto &value: row)
+                    csv << value << ",";
+                csv.seekp(-1, std::ios_base::end);
+                csv << std::endl;
+            }
+            csv.close();
+        }
+    }
 };
+
+#ifndef NDEBUG
+    #define LM_PEEP(name, var) Helpers::lm_helpers_peep(#name, (var))
+#else
+    #define LM_PEEP(name, var)
+#endif
 
 /** @} */
