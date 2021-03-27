@@ -23,7 +23,7 @@
 #include "CQParameters.h"
 
 #include "cqt_wrapper.h"
-
+#include "lmhelpers.h"
 
 namespace anatomist {
 
@@ -88,7 +88,7 @@ void CQTWrapper::Process(td_t td, uint32_t offset)
 
     output_block = cq_spectrogram_->getRemainingOutput();
     output.insert(output.end(), output_block.begin(), output_block.end());
-
+    LM_PEEP(CQTProcess_OUTPUT, output);
     output.erase(output.begin(), output.begin() + cq_spectrogram_->getLatency() /
                                                   cq_spectrogram_->getColumnHop());
 
@@ -126,9 +126,9 @@ log_spectrogram_t CQTWrapper::ConvertRealBlock_(CQBase::RealBlock &block)
 
         lsg.push_back(col);
     }
-
+    LM_PEEP(CQT_lsg, lsg);
     Denoise_(lsg);
-
+    LM_PEEP(CQT_lsg_denoised, lsg);
     return lsg;
 }
 
