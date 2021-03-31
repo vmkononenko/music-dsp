@@ -80,24 +80,16 @@ chord_t ChordDetector::GetChordFromFft_(FFT *fft)
         throw std::invalid_argument("GetChordFromFft_: invalid fft");
     }
 
-    pcp_t *pcp = new PitchClsProfile(fft);
-    chord_t chord = tpl_collection_->getBestMatch(pcp);
-
-    delete pcp;
-
-    return chord;
+    std::unique_ptr<pcp_t> pcp(new PitchClsProfile(fft));
+    return tpl_collection_->getBestMatch(pcp.get());
 }
 
 chord_t ChordDetector::getChord(amplitude_t *x, uint32_t samples,
                                 uint32_t samplerate)
 {
     td_t td(x, x + samples);
-    FFT *fft = GetFft_(td, samplerate);
-    chord_t ret = GetChordFromFft_(fft);
-
-    delete fft;
-
-    return ret;
+    std::unique_ptr<FFT> fft(GetFft_(td, samplerate));
+    return GetChordFromFft_(fft.get());
 }
 
 chord_t ChordDetector::__getChordFromPCPBuf(PCPBuf *pcpBuf)
@@ -313,13 +305,11 @@ void ChordDetector::Process_(vector<segment_t> *segments,
     uint32_t win_size, offset;
 
 #ifdef CFG_DYNAMIC_WINDOW
-    Envelope *e = new Envelope(td, samples);
-    BeatDetector *bd = new BeatDetector(e, sampleRate);
+    std::unique_ptr<Envelope> e(new Envelope(td.data(), td.size()));
+    std::unique_ptr<BeatDetector> bd(new BeatDetector(e.get(), samplerate));
 
     win_size = bd->getIdxInterval();
     offset = bd->getOffset();
-
-    delete bd;
 #else
     win_size = CFG_WINDOW_SIZE;
     offset = 0;
@@ -330,9 +320,9 @@ void ChordDetector::Process_(vector<segment_t> *segments,
     vector<uint32_t> mtx_path;
     uint32_t seg_start_idx = 0;
 #if !defined(CFG_TFT_TYPE) || (CFG_TFT_TYPE == TFT_TYPE_FFT)
-    tft_t *tft = new FFTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
+    std::unique_ptr<tft_t> tft(new FFTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size));
 #else
-    tft_t *tft = new CQTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size);
+    std::unique_ptr<tft_t> tft(new CQTWrapper(FREQ_E1, FREQ_C6, samplerate, win_size, hop_size));
 #endif
     vector<double> init_p;
     Viterbi::prob_matrix_t trans_p;
@@ -345,9 +335,9 @@ void ChordDetector::Process_(vector<segment_t> *segments,
 
     tft->Process(td, offset);
 
-    Tune_(tft);
+    Tune_(tft.get());
 
-    chromagram = ChromagramFromSpectrogram_(tft);
+    chromagram = ChromagramFromSpectrogram_(tft.get());
 
     if (c != nullptr) {
         *c = chromagram;
@@ -403,8 +393,6 @@ void ChordDetector::Process_(vector<segment_t> *segments,
         }
     }
 
-    delete tft;
-
     if (listener != nullptr) {
         listener->onChordAnalysisFinished();
     }
@@ -428,12 +416,8 @@ void ChordDetector::getSegments(amplitude_t *timeDomain, uint32_t samples,
 pcp_t * ChordDetector::GetPCP(amplitude_t *x, uint32_t samples, uint32_t samplerate)
 {
     td_t td(x, x + samples);
-    FFT *fft = GetFft_(td, samplerate);
-    pcp_t *pcp = new PitchClsProfile(fft);
-
-    delete fft;
-
-    return pcp;
+    std::unique_ptr<FFT> fft(GetFft_(td, samplerate));
+    return new PitchClsProfile(fft.get());
 }
 
 chromagram_t ChordDetector::GetChromagram(amplitude_t *x, uint32_t samples,
