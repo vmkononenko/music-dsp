@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <math.h>
+#include <sstream>
 
 #include "lmhelpers.h"
 #include "pitch_calculator.h"
@@ -215,6 +216,17 @@ ostream& operator<<(ostream& os, const PitchClsProfile& pcp)
     }
 
     return os;
+}
+
+string PitchClsProfile::toCSV()
+{
+    std::stringstream csv;
+
+    for (uint8_t i = 0; i < __mPCP.size(); i++) {
+        csv << setprecision(8) << __mPCP[i] << ((i < __mPCP.size() - 1) ? "," : "");
+    }
+
+    return csv.str();
 }
 
 }

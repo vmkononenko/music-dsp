@@ -95,6 +95,8 @@ public:
     PitchClsProfile & operator/=(float denominator);
 
     friend std::ostream& operator<<(std::ostream& os, const PitchClsProfile& pcp);
+
+    std::string toCSV();
 } pcp_t;
 
 typedef std::vector<pcp_t> chromagram_t;
