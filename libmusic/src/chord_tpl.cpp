@@ -25,6 +25,7 @@
 
 #include "chord_tpl.h"
 #include "lmhelpers.h"
+#include "lmtypes.h"
 #include "music_scale.h"
 
 
@@ -247,6 +248,16 @@ size_t ChordTpl::SlashSubtypesCnt(chord_quality_t q)
     }
 
     return chord_qlty_tpls_[q].size();
+}
+
+ostream& operator<<(std::ostream& os, const ChordTpl& tpl)
+{
+    os << Chord(tpl.root_note_, tpl.chord_quality_) << ",";
+    for (uint8_t i = 0; i < tpl.tpl_.size(); i++) {
+        os << tpl.tpl_[i] << ((i < tpl.tpl_.size() - 1) ? "," : "");
+    }
+
+    return os;
 }
 
 }

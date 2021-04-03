@@ -101,6 +101,8 @@ public:
 
     static size_t SlashSubtypesCnt(chord_quality_t q);
 
+    friend std::ostream& operator<<(std::ostream& os, const ChordTpl& tpl);
+
 } chord_tpl_t;
 
 }
