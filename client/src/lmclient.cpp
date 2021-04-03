@@ -45,7 +45,7 @@ void printScales();
 void printSigEnvelope(amplitude_t *, uint32_t);
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, uint32_t, bool, bool);
-void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int, bool);
+void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int, bool, bool);
 void printAudioFileInfo(SF_INFO &);
 void printBPM(amplitude_t *, uint32_t, uint32_t);
 
@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
     bool printAFI = false;          // audio file meta information
     bool detectChord = false;       // print detected chord
     bool printPCP = false;          // print pitch class profile
+    bool pcpCSV = false;            // Raw PCP data in CSV format
     bool printEnvelope = false;     // print signal envelope
     bool detectBeat = false;        // print beats per minute
     bool legacy = false;            // legacy version of the feature
@@ -108,6 +109,10 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i], "--pcp") == 0)) {
             printPCP = true;
             minArgCnt++;
+        } else if (strcmp(argv[i], "--pcpcsv") == 0) {
+            printPCP = true;
+            pcpCSV = true;
+            minArgCnt++;
         } else if ((strcmp(argv[i], "-n") == 0)) {
             i++;
             if (i >= argc) { usage(); return 1; }
@@ -135,7 +140,7 @@ int main(int argc, char* argv[])
         (printFD && printTD) || (isPolar && !printFD) ||
         (printAFI && minArgCnt > 3) || (logScale && !isPolar) ||
         (tdViaInverseDFT && !printTD) || (detectChord && minArgCnt > 6) ||
-        (winSize > 0 && !detectChord && !printPCP) ||
+        (winSize > 0 && !detectChord && (!printPCP && !pcpCSV)) ||
         (detectChord && legacy && (winSize || n > 0)) ||
         (printEnvelope && minArgCnt > 3) ||
         (detectBeat && !printTD && minArgCnt > 3) ||
@@ -173,7 +178,7 @@ int main(int argc, char* argv[])
     } else if (printAFI) {
         printAudioFileInfo(sfinfo);
     } else if (detectChord || printPCP) {
-        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize, legacy);
+        printChordInfo(buf, sfinfo, itemsCnt, n, refChord, printPCP, winSize, legacy, pcpCSV);
     } else if (printEnvelope) {
         printSigEnvelope(buf, itemsCnt);
     } else if (detectBeat && !printTD) {
@@ -338,7 +343,7 @@ void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
 
 void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
                     uint32_t n, string refChord, bool printPCP, int winSize,
-                    bool legacy)
+                    bool legacy, bool pcpCSV)
 {
     if (legacy) {
         return __printChordInfoLegacy(timeDomain, sfinfo, itemsCnt, n, refChord,
@@ -376,13 +381,19 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
         }
     } else {
         chromagram_t chromagram = cd->GetChromagram(channelTD, sfinfo.frames, sfinfo.samplerate);
-        uint32_t print_cnt = (n == 0) ? chromagram.size() : std::min(static_cast<uint32_t>(chromagram.size()), n);
+        uint32_t printCnt = (n == 0) ? chromagram.size() : std::min(static_cast<uint32_t>(chromagram.size()), n);
 
-        for (uint32_t i = 0; i < print_cnt; i++) {
-            cout << chromagram[i] << endl;
+        for (uint32_t i = 0; i < printCnt; i++) {
+            if (pcpCSV) {
+                cout << chromagram[i].toCSV() << endl;
+            } else {
+                cout << chromagram[i] << endl;
+            }
         }
 
-        cout << chromagram.size() << endl;
+        if (printCnt < chromagram.size()) {
+            cout << "Printed " << printCnt << " / " << chromagram.size() << endl;
+        }
     }
 
     free(channelTD);
