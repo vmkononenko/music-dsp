@@ -469,6 +469,7 @@ void usage()
          << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
          << "\t-b\tdetect BPM of the input audio\n"
          << "\t\tIn combination with -t prints peaks at the beat indices along with time domain.\n"
+         << "\t--tplsdump\tdump all chord templates used for processing.\n"
          << "\t--legacy\tuse legacy version of the feature. Can't be used a standalone option."
          << endl;
 

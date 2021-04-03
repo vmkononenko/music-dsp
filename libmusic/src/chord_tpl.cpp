@@ -252,9 +252,9 @@ size_t ChordTpl::SlashSubtypesCnt(chord_quality_t q)
 
 ostream& operator<<(std::ostream& os, const ChordTpl& tpl)
 {
-    os << Chord(tpl.root_note_, tpl.chord_quality_) << ",";
-    for (uint8_t i = 0; i < tpl.tpl_.size(); i++) {
-        os << tpl.tpl_[i] << ((i < tpl.tpl_.size() - 1) ? "," : "");
+    os << Chord(tpl.root_note_, tpl.chord_quality_);
+    for (auto &v : tpl.tpl_) {
+        os << "," << v;
     }
 
     return os;
