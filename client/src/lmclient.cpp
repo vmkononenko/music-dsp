@@ -448,6 +448,7 @@ void usage()
          << "\t-r <rc>\tcalculate precision score. The file has to contain single chord recording.\n"
          << "\t\tUsed with -c\n"
          << "\t--pcp\tprint Pitch Class Profile\n"
+         << "\t--pcpcsv\tprint raw pitch class profile values in CSV format.\n"
          << "\t-w\twindow size in samples - length of blocks to pass for analysis.\n"
          << "\t\tUsed with -c and --pcp\n"
          << "\t-n <iterations>\tnumber of FFT windows to analyse. Used with -c or --pcp\n"
