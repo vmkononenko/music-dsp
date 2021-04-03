@@ -48,6 +48,7 @@ void printTimeDomain(double *, uint32_t, uint32_t, bool, bool);
 void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int, bool, bool);
 void printAudioFileInfo(SF_INFO &);
 void printBPM(amplitude_t *, uint32_t, uint32_t);
+void dumpTemplates();
 
 
 int main(int argc, char* argv[])
@@ -123,6 +124,9 @@ int main(int argc, char* argv[])
             if (i >= argc) { usage(); return 1; }
             refChord = string(argv[i]);
             minArgCnt++;
+        } else if ((strcmp(argv[i], "--tplsdump") == 0)) {
+            dumpTemplates();
+            return 0;
         } else if ((strcmp(argv[i], "--legacy") == 0)) {
             legacy = true;
             minArgCnt++;
@@ -425,6 +429,17 @@ void printScales()
         note_t note = (note_t)n;
         __printScale(note, MusicScale::getMajorScale(note));
     }
+}
+
+void dumpTemplates()
+{
+    ChordTplCollection *c = new ChordTplCollection();
+
+    for (uint32_t i = 0; i < c->Size(); i++) {
+        cout << *(c->GetTpl(i)) << endl;
+    }
+
+    delete c;
 }
 
 void usage()
