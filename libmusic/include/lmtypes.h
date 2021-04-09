@@ -116,15 +116,18 @@ typedef struct Chord {
 
 private:
     note_t          __mRootNote;
+    note_t          __mBassNote;
     chord_quality_t __mQuality;
 
 public:
-    Chord(note_t n, chord_quality_t q) : __mRootNote(n), __mQuality(q) {}
+    Chord(note_t n, chord_quality_t q, note_t b = note_Unknown) : __mRootNote(n), __mBassNote(b), __mQuality(q) {}
     Chord() : Chord(note_Unknown, cq_unknown) {} // Delegate to the other constructor.
 
     friend bool operator==(const Chord &c1, const Chord &c2)
     {
-        return ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality == c2.__mQuality));
+        return ((c1.__mRootNote == c2.__mRootNote)  &&
+                (c1.__mQuality == c2.__mQuality)    &&
+                (c1.__mBassNote == c2.__mBassNote));
     }
 
     friend bool operator!=(const Chord &c1, const Chord &c2)
@@ -145,6 +148,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Chord &c)
     {
         os << c.__mRootNote << c.__mQuality;
+        if (c.__mBassNote != note_Unknown)
+            os << "/" << c.__mBassNote;
         return os;
     }
 
@@ -152,6 +157,8 @@ public:
     {
         std::ostringstream ss;
         ss << __mRootNote << __mQuality;
+        if (__mBassNote != note_Unknown)
+            ss << "/" << __mBassNote;
         return ss.str();
     }
 } chord_t;
