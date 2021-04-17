@@ -101,4 +101,8 @@
 #define CFG_CHORD_SELF_TRANSITION_P 0.1f
 #endif /* CFG_CHORD_SELF_TRANSITION_P */
 
+#ifndef CFG_HARTE_SYNTAX
+#define CFG_HARTE_SYNTAX 1
+#endif /* CFG_HARTE_SYNTAX */
+
 /** @} */

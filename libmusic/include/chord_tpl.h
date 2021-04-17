@@ -59,6 +59,7 @@ private:
 
     note_t                      root_note_;
     note_t                      bass_note_ = note_Unknown;
+    int8_t                      bass_interval_ = -1;
     chord_quality_t             chord_quality_;
     std::vector<amplitude_t>    tpl_;
 

@@ -237,6 +237,7 @@ void ChordTpl::InitTpl_(note_t root_note, chord_quality_t cq, uint8_t ss)
             // the first half of a template is bass and the second is treble
             if (i < qt->size() / 2) {
                 bass_note_ = note;
+                bass_interval_ = scale_idx + 1;
                 treble_offset = 0;
             }
             tpl_[note - note_Min + treble_offset] = 1;
@@ -316,7 +317,7 @@ size_t ChordTpl::SlashSubtypesCnt(chord_quality_t q)
 
 ostream& operator<<(std::ostream& os, const ChordTpl& tpl)
 {
-    os << Chord(tpl.root_note_, tpl.chord_quality_, tpl.bass_note_);
+    os << Chord(tpl.root_note_, tpl.chord_quality_, tpl.bass_note_, tpl.bass_interval_);
     for (auto &v : tpl.tpl_) {
         os << "," << v;
     }
