@@ -95,7 +95,7 @@ void Common::testChord(const char *fileName, chord_t &expectedChord)
 void TestChord_C::__test()
 {
     const char *testFile;
-    chord_t expected(note_C, cq_major);
+    chord_t expected(note_C, cq_maj);
 
     testFile = "C_chord_construction_guitarlessonworld.wav";
     Common::testChord(testFile, expected);
@@ -113,7 +113,7 @@ void TestChord_C::__test()
 void TestChord_D::__test()
 {
     const char *testFile;
-    chord_t expected(note_D, cq_major);
+    chord_t expected(note_D, cq_maj);
 
     testFile = "D_the_animals_house_of_the_rising_sun.wav";
     Common::testChord(testFile, expected);
@@ -122,7 +122,7 @@ void TestChord_D::__test()
 void TestChord_Dm::__test()
 {
     const char *testFile;
-    chord_t expected(note_D, cq_minor);
+    chord_t expected(note_D, cq_min);
 
     testFile = "Dm_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);
@@ -134,7 +134,7 @@ void TestChord_Dm::__test()
 void TestChord_Em::__test()
 {
     const char *testFile;
-    chord_t expected(note_E, cq_minor);
+    chord_t expected(note_E, cq_min);
 
     testFile = "Em_nikolskii_moi_drug_hudozhnik_i_poet_1.wav";
     Common::testChord(testFile, expected);
@@ -149,7 +149,7 @@ void TestChord_Em::__test()
 void TestChord_F::__test()
 {
     const char *testFile;
-    chord_t expected(note_F, cq_major);
+    chord_t expected(note_F, cq_maj);
 
     testFile = "F_the_animals_house_of_the_rising_sun.wav";
     Common::testChord(testFile, expected);
@@ -158,7 +158,7 @@ void TestChord_F::__test()
 void TestChord_G::__test()
 {
     const char *testFile;
-    chord_t expected(note_G, cq_major);
+    chord_t expected(note_G, cq_maj);
 
     testFile = "G_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);
@@ -167,7 +167,7 @@ void TestChord_G::__test()
 void TestChord_Am::__test()
 {
     const char *testFile;
-    chord_t expected(note_A, cq_minor);
+    chord_t expected(note_A, cq_min);
 
     testFile = "Am_liapis_trubetskoi_v_platie_belom.wav";
     Common::testChord(testFile, expected);

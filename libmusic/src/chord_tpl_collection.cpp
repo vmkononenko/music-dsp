@@ -114,7 +114,7 @@ chord_t ChordTplCollection::getBestMatch(pcp_t *pcp)
 {
     tpl_score_t scoreMin = FLT_MAX;
     note_t winningNote = note_Unknown;
-    chord_quality_t winningQuality = cq_major;
+    chord_quality_t winningQuality = cq_maj;
     tpl_score_t score;
 
     for (const auto tpl : tpls_) {
