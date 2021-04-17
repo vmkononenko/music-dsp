@@ -32,6 +32,8 @@
 #include <stdint.h>
 #include <vector>
 
+#include "config.h"
+
 #define WINDOW_FUNC_RECTANGULAR     1
 #define WINDOW_FUNC_BLACKMAN        2
 #define WINDOW_FUNC_HAMMING         3
@@ -126,17 +128,20 @@ typedef struct Chord {
 private:
     note_t          __mRootNote;
     note_t          __mBassNote;
+    int8_t          __mBassInterval;
     chord_quality_t __mQuality;
 
 public:
-    Chord(note_t n, chord_quality_t q, note_t b = note_Unknown) : __mRootNote(n), __mBassNote(b), __mQuality(q) {}
+    Chord(note_t n, chord_quality_t q, note_t b = note_Unknown, int8_t bi = -1) :
+        __mRootNote(n), __mBassNote(b),  __mBassInterval(bi), __mQuality(q) {}
     Chord() : Chord(note_Unknown, cq_unknown) {} // Delegate to the other constructor.
 
     friend bool operator==(const Chord &c1, const Chord &c2)
     {
         return ((c1.__mRootNote == c2.__mRootNote)  &&
                 (c1.__mQuality == c2.__mQuality)    &&
-                (c1.__mBassNote == c2.__mBassNote));
+                (c1.__mBassNote == c2.__mBassNote) &&
+                (c1.__mBassInterval == c2.__mBassInterval));
     }
 
     friend bool operator!=(const Chord &c1, const Chord &c2)
@@ -154,15 +159,7 @@ public:
                 ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality < c2.__mQuality)));
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Chord &c)
-    {
-        os << c.__mRootNote << c.__mQuality;
-        if (c.__mBassNote != note_Unknown)
-            os << "/" << c.__mBassNote;
-        return os;
-    }
-
-    std::string toString()
+    std::string toString() const
     {
         std::ostringstream ss;
         ss << __mRootNote << __mQuality;
@@ -170,6 +167,32 @@ public:
             ss << "/" << __mBassNote;
         return ss.str();
     }
+
+    std::string toHarte() const
+    {
+        std::ostringstream ss;
+
+        ss << __mRootNote;
+        if (__mRootNote != note_Unknown) {
+            ss << ":" << __mQuality;
+        }
+        if (__mBassInterval > 1) {
+            ss << "/" << (int)__mBassInterval;
+        }
+
+        return ss.str();
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Chord &c)
+    {
+#if defined(CFG_HARTE_SYNTAX) && CFG_HARTE_SYNTAX == 1
+        os << c.toHarte();
+#else
+        os << c.toString();
+#endif /* CFG_HARTE_SYNTAX */
+        return os;
+    }
+
 } chord_t;
 
 /** @} */
