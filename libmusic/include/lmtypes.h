@@ -159,15 +159,6 @@ public:
                 ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality < c2.__mQuality)));
     }
 
-    std::string toString() const
-    {
-        std::ostringstream ss;
-        ss << __mRootNote << __mQuality;
-        if (__mBassNote != note_Unknown)
-            ss << "/" << __mBassNote;
-        return ss.str();
-    }
-
     std::string toHarte() const
     {
         std::ostringstream ss;
@@ -183,13 +174,29 @@ public:
         return ss.str();
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Chord &c)
+    std::string toUser() const
+    {
+        std::ostringstream ss;
+
+        ss << __mRootNote << __mQuality;
+        if (__mBassNote != note_Unknown)
+            ss << "/" << __mBassNote;
+
+        return ss.str();
+    }
+
+    std::string toString() const
     {
 #if defined(CFG_HARTE_SYNTAX) && CFG_HARTE_SYNTAX == 1
-        os << c.toHarte();
+        return toHarte();
 #else
-        os << c.toString();
+        return toUser();
 #endif /* CFG_HARTE_SYNTAX */
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const Chord &c)
+    {
+        os << c.toString();
         return os;
     }
 
