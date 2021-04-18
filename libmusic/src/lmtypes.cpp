@@ -95,24 +95,32 @@ std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
     q2sMap[cq_maj13]        = "maj13";
     q2sMap[cq_min13]        = "min13";
 #else
-#error "Non-Harte chord types string representations need to be updated"
-    q2sMap[cq_major]                = "";
-    q2sMap[cq_minor]                = "m";
-    q2sMap[cq_7th]                  = "7";
-    q2sMap[cq_major_7th]            = "maj7";
-    q2sMap[cq_minor_7th]            = "m7";
-    q2sMap[cq_6th]                  = "6";
-    q2sMap[cq_minor_6th]            = "m6";
-    q2sMap[cq_diminished]           = "dim";
-    q2sMap[cq_diminished_7th]       = "dim7";
-    q2sMap[cq_half_diminished_7th]  = "m7b5";
-    q2sMap[cq_9th]                  = "9";
-    q2sMap[cq_major_9th]            = "maj9";
-    q2sMap[cq_added_9th]            = "add9";
-    q2sMap[cq_minor_9th]            = "m9";
-    q2sMap[cq_suspended_4th]        = "sus4";
-    q2sMap[cq_suspended_2nd]        = "sus2";
-    q2sMap[cq_5th]                  = "5";
+    q2sMap[cq_maj]          = "";
+    q2sMap[cq_min]          = "m";
+    q2sMap[cq_5]            = "5";
+    q2sMap[cq_7]            = "7";
+    q2sMap[cq_maj7]         = "maj7";
+    q2sMap[cq_min7]         = "m7";
+    q2sMap[cq_sus2]         = "sus2";
+    q2sMap[cq_sus4]         = "sus4";
+    q2sMap[cq_hdim7]        = "m7b5";
+    q2sMap[cq_aug]          = "aug";
+    q2sMap[cq_dim]          = "dim";
+    q2sMap[cq_dim7]         = "dim7";
+    q2sMap[cq_maj_add9]     = "add9";
+    q2sMap[cq_min_add9]     = "m(add9)";
+    q2sMap[cq_maj6]         = "6";
+    q2sMap[cq_min6]         = "m6";
+    q2sMap[cq_maj9]         = "maj9";
+    q2sMap[cq_min9]         = "m9";
+    q2sMap[cq_maj_add11]    = "add11";
+    q2sMap[cq_7_add9sharp]  = "7#9";
+    q2sMap[cq_9]            = "9";
+    q2sMap[cq_aug7]         = "aug7";
+    q2sMap[cq_maj11]        = "maj11";
+    q2sMap[cq_min11]        = "m11";
+    q2sMap[cq_maj13]        = "maj13";
+    q2sMap[cq_min13]        = "m13";
 #endif /*CFG_HARTE_SYNTAX*/
 
     os << q2sMap[q];

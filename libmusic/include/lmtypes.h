@@ -179,8 +179,9 @@ public:
         std::ostringstream ss;
 
         ss << __mRootNote << __mQuality;
-        if (__mBassNote != note_Unknown)
+        if (__mBassInterval > 1) {
             ss << "/" << __mBassNote;
+        }
 
         return ss.str();
     }
