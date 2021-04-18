@@ -24,6 +24,7 @@
  */
 
 #include "chord_tpl.h"
+#include "config.h"
 #include "lmhelpers.h"
 #include "lmtypes.h"
 #include "music_scale.h"
@@ -318,6 +319,13 @@ size_t ChordTpl::SlashSubtypesCnt(chord_quality_t q)
 ostream& operator<<(std::ostream& os, const ChordTpl& tpl)
 {
     os << Chord(tpl.root_note_, tpl.chord_quality_, tpl.bass_note_, tpl.bass_interval_);
+    if (tpl.bass_interval_ == 1) {
+#if defined(CFG_HARTE_SYNTAX) && CFG_HARTE_SYNTAX == 1
+        os << "/" << 1;
+#else
+        os << "/" << tpl.bass_note_;
+#endif /* CFG_HARTE_SYNTAX */
+    }
     for (auto &v : tpl.tpl_) {
         os << "," << v;
     }
