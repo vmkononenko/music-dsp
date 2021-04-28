@@ -83,7 +83,7 @@ std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
     q2sMap[cq_maj_add9]     = "maj(9)";
     q2sMap[cq_min_add9]     = "min(9)";
     q2sMap[cq_maj6]         = "maj6";
-    q2sMap[cq_min6]         = "min7";
+    q2sMap[cq_min6]         = "min6";
     q2sMap[cq_maj9]         = "maj9";
     q2sMap[cq_min9]         = "min9";
     q2sMap[cq_maj_add11]    = "maj(11)";
