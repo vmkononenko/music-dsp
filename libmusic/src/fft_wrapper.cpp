@@ -49,7 +49,7 @@ FFTWrapper::FFTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
 void FFTWrapper::Process(td_t td, uint32_t offset)
 {
     for (uint32_t sample_idx = offset; sample_idx < td.size(); sample_idx += hop_size_) {
-        uint32_t len = min(win_size_, static_cast<uint16_t>(td.size() - sample_idx));
+        size_t len = min(static_cast<size_t>(win_size_), td.size() - sample_idx);
         td_t td_win(td.begin() + sample_idx, td.begin() + sample_idx + len);
         FFT *fft;
 
