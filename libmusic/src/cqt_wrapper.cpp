@@ -71,8 +71,8 @@ void CQTWrapper::Process(const td_t & td, uint32_t offset)
     CQBase::RealBlock output_block, output;
 
     if (hop_size_ > 1) {
-        for (uint32_t sample = offset; sample < td.size(); sample += hop_size_) {
-            uint32_t len = min(win_size_, static_cast<uint16_t>(td.size() - sample));
+        for (size_t sample = offset; sample < td.size(); sample += hop_size_) {
+            size_t len = min(static_cast<size_t>(win_size_), td.size() - sample);
             CQBase::RealSequence input(td.begin() + sample, td.begin() + sample + len);
             output_block = cq_spectrogram_->process(input);
 
