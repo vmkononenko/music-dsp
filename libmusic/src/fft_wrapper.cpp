@@ -77,9 +77,9 @@ fd_t FFTWrapper::FFTPruned(FFT *fft)
         fd.push_back(fft->GetFreqDomain().p[fft_bin]);
         i++;
         if (i % (bpo_ / notes_Total)) {
-            f = pc_.getPitch(f);
-        } else {
             f =  pc_.getFreqByInterval(f, 1.0 / bpo_);
+        } else {
+            f = pc_.getPitch(f);
         }
     }
 
