@@ -48,6 +48,8 @@ FFTWrapper::FFTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
 
 void FFTWrapper::Process(td_t td, uint32_t offset)
 {
+    std::vector<fd_t> fft_sg;
+
     for (uint32_t sample_idx = offset; sample_idx < td.size(); sample_idx += hop_size_) {
         size_t len = min(static_cast<size_t>(win_size_), td.size() - sample_idx);
         td_t td_win(td.begin() + sample_idx, td.begin() + sample_idx + len);
@@ -56,13 +58,16 @@ void FFTWrapper::Process(td_t td, uint32_t offset)
         WindowFunctions::applyDefault(td_win);
 
         fft = new FFT(td_win, sample_rate_, f_min_, f_max_);
-
+        fft_sg.push_back(fd_t(fft->GetFreqDomain().p, fft->GetFreqDomain().p + fft->GetFreqDomainLen()));
         spectrogram_.push_back(FFTPruned(fft));
 
         delete fft;
     }
 
+    LM_PEEP(FFT_sg, fft_sg);
+    LM_PEEP(FFT_lsg, spectrogram_);
     Denoise_(spectrogram_);
+    LM_PEEP(FFT_lsg_denoised, spectrogram_);
 }
 
 fd_t FFTWrapper::FFTPruned(FFT *fft)
