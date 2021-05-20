@@ -49,6 +49,8 @@ void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, 
 void printAudioFileInfo(SF_INFO &);
 void printBPM(amplitude_t *, uint32_t, uint32_t);
 void dumpTemplates();
+void printChordEvalScore(amplitude_t *, SF_INFO &, string);
+
 
 
 int main(int argc, char* argv[])
@@ -187,6 +189,8 @@ int main(int argc, char* argv[])
         printSigEnvelope(buf, itemsCnt);
     } else if (detectBeat && !printTD) {
         printBPM(buf, itemsCnt, sfinfo.samplerate);
+    } else if (!refChord.empty()) {
+        printChordEvalScore(buf, sfinfo, refChord);
     }
 
     sf_close(sf);
@@ -282,7 +286,7 @@ void printFFT(amplitude_t *td, int samplerate, uint32_t samples,
     delete fft;
 }
 
-void __printChordEvalScore(uint32_t total, uint32_t fails)
+void __printChordEvalScoreLegacy(uint32_t total, uint32_t fails)
 {
     float score = (total - fails) * 100.f / total;
     cout << fixed << setprecision(2) << score << " %" << endl;
@@ -339,10 +343,35 @@ void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
     }
 
     if (!refChord.empty()) {
-        __printChordEvalScore(iterMax, fails);
+        __printChordEvalScoreLegacy(iterMax, fails);
     }
 
     delete cd;
+}
+void printChordEvalScore(amplitude_t *timeDomain, SF_INFO &sfinfo, string refChord)
+{
+    std::vector<amplitude_t> channelTD(sfinfo.frames);
+    auto i = channelTD.begin();
+    auto t = timeDomain - sfinfo.channels;
+    while (i != channelTD.end())
+        *i++ = *(t += sfinfo.channels);
+
+    ChordDetector cd;
+    chromagram_t chromagram = cd.GetChromagram(channelTD.data(), channelTD.size(), sfinfo.samplerate);
+    pcp_t avg;
+    for (auto &p : chromagram)
+        avg += p;
+    avg /= chromagram.size();
+    ChordTplCollection tpl_collection;
+    for (auto tpl_idx = 0U; tpl_idx < tpl_collection.Size(); tpl_idx++) {
+        chord_tpl_t *tpl = tpl_collection.GetTpl(tpl_idx);
+        chord_t c(tpl->RootNote(),tpl->Quality());
+        if (!refChord.compare(c.toString())) {
+            tpl_score_t score = tpl_collection.GetTpl(tpl_idx)->GetScore(&avg);
+            cout << fixed << setprecision(2) << score << endl;
+            break;
+        }
+    }
 }
 
 void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
@@ -381,7 +410,7 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
         }
 
         if (!refChord.empty()) {
-            __printChordEvalScore(sfinfo.frames, fails);
+            __printChordEvalScoreLegacy(sfinfo.frames, fails);
         }
     } else {
         chromagram_t chromagram = cd->GetChromagram(channelTD, sfinfo.frames, sfinfo.samplerate);
@@ -461,7 +490,6 @@ void usage()
          << "\t-s\tprint major scales for all notes\n"
          << "\t-c\tprint recognized chord information\n"
          << "\t-r <rc>\tcalculate precision score. The file has to contain single chord recording.\n"
-         << "\t\tUsed with -c\n"
          << "\t--pcp\tprint Pitch Class Profile\n"
          << "\t--pcpcsv\tprint raw pitch class profile values in CSV format.\n"
          << "\t-w\twindow size in samples - length of blocks to pass for analysis.\n"
