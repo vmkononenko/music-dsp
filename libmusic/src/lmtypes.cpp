@@ -21,19 +21,16 @@
 #include "lmtypes.h"
 
 
-note_t& operator+(note_t& note, int32_t term)
+note_t operator+(note_t note, int term)
 {
-    int32_t tmp = static_cast<int32_t>(note) + term;
+    int tmp = static_cast<int>(note) + term % notes_Total;
 
-    if (tmp > note_Max) {
+    if (tmp > static_cast<int>(note_Max))
         tmp -= note_Max;
-    } else if (note < note_Min) {
+    else if (tmp < static_cast<int>(note_Min))
         tmp += note_Max;
-    }
 
-    note = static_cast<note_t>(tmp);
-
-    return note;
+    return static_cast<note_t>(tmp);
 }
 
 std::ostream& operator<<(std::ostream& os, const note_t& n)
