@@ -70,7 +70,7 @@ typedef enum {
     notes_Total = note_Max - note_Min + 1
 } note_t;
 
-note_t& operator+(note_t& note, int32_t term);
+note_t operator+(note_t note, int term);
 std::ostream& operator<<(std::ostream& os, const note_t& n);
 
 typedef enum : int32_t {
