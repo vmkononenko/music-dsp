@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
             usage();
             return 0;
         } else if (argv[i][0] == '-') {
-            cout << "Unrecognized option: " << argv[i] << endl;
+            cerr << "Unrecognized option: " << argv[i] << endl;
             usage();
             return 1;
         }
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     /* Open input sound file */
     memset (&sfinfo, 0, sizeof (sfinfo)) ;
     if (!(sf = sf_open(inputFilePath, SFM_READ, &sfinfo))) {
-        cout << "Failed to open the file" << endl;
+        cerr << "Failed to open the file" << endl;
         return 1;
     }
 
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
     buf = (double*) malloc(itemsCnt * sizeof(double));
 
     if(!sf_read_double(sf, buf, itemsCnt)) {
-        cout << "Could not read file" << endl;
+        cerr << "Could not read file" << endl;
         return 1;
     }
 
