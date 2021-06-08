@@ -100,7 +100,7 @@ public:
 
     virtual uint32_t SpectrogramInterval();
 
-    virtual void Process(td_t td, uint32_t offset) = 0;
+    virtual void Process(const td_t & td, uint32_t offset) = 0;
 
     virtual uint8_t BinsPerSemitone() = 0;
 

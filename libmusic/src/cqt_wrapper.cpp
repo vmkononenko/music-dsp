@@ -66,7 +66,7 @@ CQTWrapper::~CQTWrapper()
     delete cq_spectrogram_;
 }
 
-void CQTWrapper::Process(td_t td, uint32_t offset)
+void CQTWrapper::Process(const td_t & td, uint32_t offset)
 {
     CQBase::RealBlock output_block, output;
 

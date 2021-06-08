@@ -299,7 +299,7 @@ Viterbi::prob_matrix_t ChordDetector::GetScoreMatrix_(chromagram_t &chromagram)
 #endif /* 0 */
 
 void ChordDetector::Process_(vector<segment_t> *segments,
-                             vector<amplitude_t> &td, uint32_t samplerate,
+                             const td_t &td, uint32_t samplerate,
                              ResultsListener *listener, chromagram_t *c)
 {
     uint32_t win_size, offset;
