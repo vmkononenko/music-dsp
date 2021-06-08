@@ -46,7 +46,7 @@ FFTWrapper::FFTWrapper(freq_hz_t f_low, freq_hz_t f_high, uint32_t sample_rate,
             FFTWrapper(f_low, f_high, BINS_PER_OCTAVE_DEFAULT, sample_rate,
                        win_size, hop_size) {}
 
-void FFTWrapper::Process(td_t td, uint32_t offset)
+void FFTWrapper::Process(const td_t & td, uint32_t offset)
 {
     for (uint32_t sample_idx = offset; sample_idx < td.size(); sample_idx += hop_size_) {
         size_t len = min(static_cast<size_t>(win_size_), td.size() - sample_idx);

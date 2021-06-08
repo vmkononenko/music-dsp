@@ -50,7 +50,7 @@ public:
 
     ~FFTWrapper() {}
 
-    void Process(td_t td, uint32_t offset) override;
+    void Process(const td_t & td, uint32_t offset) override;
 
     uint8_t BinsPerSemitone() override;
 
