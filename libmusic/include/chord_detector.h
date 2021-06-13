@@ -117,7 +117,7 @@ private:
      * @param   sampleRate  sample rate of x
      * @param   l           listener to report progress to if \p segments is null
      */
-    void Process_(std::vector<segment_t> *segments, std::vector<amplitude_t> &x,
+    void Process_(std::vector<segment_t> *segments, const td_t &x,
                   uint32_t sr, ResultsListener *l, chromagram_t *c);
 
     float Tune_(tft_t *tft);

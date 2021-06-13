@@ -38,6 +38,8 @@ namespace anatomist {
 FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, freq_hz_t f_low,
         freq_hz_t f_high, bool polar, bool hps)
 {
+    constexpr size_t avg_win = CFG_FFT_AVG_WINDOW;
+
     if ((td == nullptr) || (td_len == 0) || (f_low >= f_high) || (f_high > samplerate / 2))
     {
         throw invalid_argument("FFT(): invalid argument");
@@ -61,14 +63,13 @@ FFT::FFT(amplitude_t *td, uint32_t td_len, uint32_t samplerate, freq_hz_t f_low,
         return;
     }
 
-    fd_.p = new amplitude_t[fd_len_ + CFG_FFT_AVG_WINDOW - 1];
+    fd_.p = new amplitude_t[fd_len_ + avg_win - 1];
     memset(fd_.p, 0, sizeof(fd_.p[0]) * fd_len_);
 
-    fd_len_ = ToPolar_(x, fd_.p, fd_len_ + CFG_FFT_AVG_WINDOW - 1, f_low_idx);
+    fd_len_ = ToPolar_(x, fd_.p, fd_len_ + avg_win - 1, f_low_idx);
 
-#if (defined(CFG_FFT_AVG_WINDOW) && (CFG_FFT_AVG_WINDOW > 1))
-    Avg_(fd_.p, fd_len_, CFG_FFT_AVG_WINDOW);
-#endif
+    if (avg_win > 1)
+        Avg_(fd_.p, fd_len_, avg_win);
 
 #if (defined(CFG_FFT_HPS_HARMONICS) && (CFG_FFT_HPS_HARMONICS > 1))
     if (hps) {

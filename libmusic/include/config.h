@@ -50,6 +50,9 @@
 #define CFG_FFT_SIZE        ((uint32_t)8192)
 #endif /* CFG_FFT_SIZE */
 
+/**
+ * @brief set to 1 to avoid averaging
+ */
 #ifndef CFG_FFT_AVG_WINDOW
 #define CFG_FFT_AVG_WINDOW 2
 #endif /* CFG_FFT_AVG_WINDOW */
