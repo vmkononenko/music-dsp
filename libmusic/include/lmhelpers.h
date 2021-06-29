@@ -141,6 +141,11 @@ public:
             csv.close();
         }
     }
+    template<typename T>
+    static void lm_helpers_peep(const char *name, const std::vector<T> & vect)
+    {
+        lm_helpers_peep(name, std::vector<std::vector<T>>(1, vect));
+    }
 };
 
 #ifndef NDEBUG
