@@ -146,7 +146,7 @@ public:
 #ifndef NDEBUG
     #define LM_PEEP(name, var) Helpers::lm_helpers_peep(#name, (var))
 #else
-    #define LM_PEEP(name, var)
+    #define LM_PEEP(name, var) UNUSED(var) // make release build happpy
 #endif
 
 /** @} */
