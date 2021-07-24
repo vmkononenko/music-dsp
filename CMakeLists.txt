@@ -20,6 +20,7 @@ if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
 endif()
 
 set (LMCLIENT_TARGET lmclient)
+set (LMCSR_TARGET lmcsr)
 set (MUSIC_DSP_TARGET music-dsp)
 set (TESTS_TARGET tests)
 set (VAMP_TARGET parachord-vamp)
