@@ -39,10 +39,10 @@ class WindowFunctions {
 WINDOW_FUNCIONS_TEST_FRIENDS;
 
 public:
-    static void applyHamming(td_t td);
-    static void applyHann(td_t td);
-    static void applyBlackman(td_t td);
-    static void applyDefault(td_t td);
+    static void applyHamming(td_t &td);
+    static void applyHann(td_t &td);
+    static void applyBlackman(td_t &td);
+    static void applyDefault(td_t &td);
 
     static std::vector<amplitude_t> getHamming(uint32_t len, uint32_t offset);
 
