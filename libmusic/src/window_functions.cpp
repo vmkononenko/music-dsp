@@ -45,7 +45,7 @@ vector<amplitude_t> WindowFunctions::getHamming(uint32_t len, uint32_t offset)
     return win;
 }
 
-void WindowFunctions::applyHamming(td_t td)
+void WindowFunctions::applyHamming(td_t &td)
 {
     vector<amplitude_t> win = getHamming(td.size(), 0);
 
@@ -54,7 +54,7 @@ void WindowFunctions::applyHamming(td_t td)
     }
 }
 
-void WindowFunctions::applyBlackman(td_t td)
+void WindowFunctions::applyBlackman(td_t &td)
 {
     for (uint32_t i = 0; i < td.size(); i++) {
         td[i] *= (0.42 - 0.5 * cos(2 * M_PI * i / (td.size() - 1)) +
@@ -62,14 +62,14 @@ void WindowFunctions::applyBlackman(td_t td)
     }
 }
 
-void WindowFunctions::applyHann(td_t td)
+void WindowFunctions::applyHann(td_t &td)
 {
     for (uint32_t i = 0; i < td.size(); i++) {
         td[i] *= (0.5 * (1 - cos(2 * M_PI * i / (td.size() - 1))));
     }
 }
 
-void WindowFunctions::applyDefault(td_t td)
+void WindowFunctions::applyDefault(td_t &td)
 {
 #if !defined(CFG_WINDOW_FUNC) || (CFG_WINDOW_FUNC == WINDOW_FUNC_RECTANGULAR)
     /* rectangular is a default. Do nothing for it */
