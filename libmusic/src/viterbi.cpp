@@ -24,7 +24,7 @@
 
 using namespace std;
 
-typedef pair<uint32_t, double> state_metric_t;
+typedef pair<uint32_t, prob_t> state_metric_t;
 
 
 bool Viterbi::ValidateProbVector_(const std::vector<prob_t> &v)
@@ -87,20 +87,20 @@ vector<uint32_t> Viterbi::GetPath(std::vector<prob_t> &init_p, prob_matrix_t &ob
     vector<uint32_t> path(obs.size());
 
     for (uint32_t state = 0; state < states_cnt; state++) {
-        metrics[0][state] = make_pair(0, init_p[state] * obs[0][state]);
+        metrics[0][state] = make_pair(0, std::log(init_p[state] * obs[0][state]));
     }
 
     for (uint32_t o = 1; o < obs_cnt; o++) {
         for (uint32_t i_state = 0; i_state < states_cnt; i_state++) {
             if (obs[o][i_state] > 0) {
-                state_metric_t max_metric(states_cnt - 1, 0), cur_metric;
+                state_metric_t max_metric(states_cnt - 1, -INFINITY), cur_metric;
                 for (uint32_t j_state = 0; j_state < states_cnt; j_state++) {
-                    cur_metric = make_pair(j_state, metrics[o-1][j_state].second * trans_p[j_state][i_state]);
+                    cur_metric = make_pair(j_state, metrics[o-1][j_state].second + std::log(trans_p[j_state][i_state]));
                     if (cur_metric.second > max_metric.second) {
                         max_metric = cur_metric;
                     }
                 }
-                metrics[o][i_state] = make_pair(max_metric.first, max_metric.second * obs[o][i_state]);
+                metrics[o][i_state] = make_pair(max_metric.first, max_metric.second + std::log(obs[o][i_state]));
             }
         }
     }
