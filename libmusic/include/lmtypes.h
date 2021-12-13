@@ -121,6 +121,10 @@ typedef enum {
     cq_Max = cq_min13
 } chord_quality_t;
 
+#include <unordered_set>
+typedef std::unordered_set<note_t, std::hash<int>> pcset_t;
+pcset_t make_pcset(note_t, chord_quality_t);
+
 std::ostream& operator<<(std::ostream& os, const chord_quality_t& q);
 
 typedef struct Chord {

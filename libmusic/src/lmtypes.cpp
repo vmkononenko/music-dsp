@@ -19,7 +19,7 @@
 
 #include "config.h"
 #include "lmtypes.h"
-
+#include "music_scale.h"
 
 note_t operator+(note_t note, int term)
 {
@@ -123,4 +123,43 @@ std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
     os << q2sMap[q];
 
     return os;
+}
+
+static std::map<chord_quality_t, const std::vector<std::pair<size_t, int>>> pctpls = {
+    {cq_maj,           {{2, 0}, {4, 0}                             }},
+    {cq_min,           {{2,-1}, {4, 0}                             }},
+    {cq_5,             {{4, 0}                                     }},
+    {cq_7,             {{2, 0}, {4, 0}, {6,-1}                     }},
+    {cq_maj7,          {{2, 0}, {4, 0}, {6, 0}                     }},
+    {cq_min7,          {{2,-1}, {4, 0}, {6,-1}                     }},
+    {cq_sus2,          {{1, 0}, {4, 0}                             }},
+    {cq_sus4,          {{3, 0}, {4, 0}                             }},
+    {cq_hdim7,         {{2,-1}, {4,-1}, {6,-1}                     }},
+    {cq_aug,           {{2, 0}, {4,+1}                             }},
+    {cq_dim,           {{2,-1}, {4,-1}                             }},
+    {cq_dim7,          {{2,-1}, {4,-1}, {6,-2}                     }},
+    {cq_maj_add9,      {{2, 0}, {4, 0}, {8, 0}                     }},
+    {cq_min_add9,      {{2,-1}, {4, 0}, {8, 0}                     }},
+    {cq_maj6,          {{2, 0}, {4, 0}, {5, 0}                     }},
+    {cq_min6,          {{2,-1}, {4, 0}, {5, 0}                     }},
+    {cq_maj9,          {{2, 0}, {4, 0}, {6, 0}, {8, 0}             }},
+    {cq_min9,          {{2,-1}, {4, 0}, {6,-1}, {8, 0}             }},
+    {cq_maj_add11,     {{2, 0}, {4, 0}, {10,0}                     }},
+    {cq_7_add9sharp,   {{2, 0}, {4, 0}, {6,-1}, {8,+1}             }},
+    {cq_9,             {{2, 0}, {4, 0}, {6,-1}, {8, 0}             }},
+    {cq_aug7,          {{2, 0}, {4,+1}, {6,-1}                     }},
+    {cq_maj11,         {{2, 0}, {4, 0}, {6, 0}, {8, 0},{10,0}      }},
+    {cq_min11,         {{2,-1}, {4, 0}, {6,-1}, {8, 0},{10,0}      }},
+    {cq_maj13,         {{2, 0}, {4, 0}, {6, 0}, {8, 0},{10,0},{12,0}}},
+    {cq_min13,         {{2,-1}, {4, 0}, {6,-1}, {8, 0},{10,0},{12,0}}},
+};
+
+pcset_t make_pcset(note_t root, chord_quality_t cq)
+{
+    auto scale = MusicScale::getMajorScale(root);
+    pcset_t pcset = { scale[0] };
+    const std::vector<std::pair<size_t, int>> & pctpl = pctpls[cq];
+    for (auto & E: pctpl)
+        pcset.insert(scale[E.first] + E.second);
+    return pcset;
 }
