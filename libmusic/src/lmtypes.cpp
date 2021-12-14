@@ -21,11 +21,13 @@
 #include "lmtypes.h"
 #include "music_scale.h"
 
-Chord::Chord(const std::string &cs):
+using namespace std;
+
+Chord::Chord(const string &cs):
     __mRootNote(note_Unknown), __mQuality(cq_unknown)
 {
     const bool is_sharp = cs.length() > 1 && cs[1] == '#';
-    std::string cn = cs.substr(0, cs.find("/"));
+    string cn = cs.substr(0, cs.find("/"));
 
     switch (cs[0]) {
         case 'C': __mRootNote = is_sharp ? note_C_sharp: note_C; break;
@@ -36,12 +38,12 @@ Chord::Chord(const std::string &cs):
         case 'A': __mRootNote = is_sharp ? note_A_sharp: note_A; break;
         case 'B': __mRootNote = note_B; break;
         default:
-            throw std::runtime_error("can't parse " + cs);
+            throw runtime_error("can't parse " + cs);
     }
     cn.erase(0, is_sharp ? 2 : 1);
     if (cn[0] == ':')
         cn.erase(0,1);
-    static const std::map<const std::string,const chord_quality_t> s2cq {
+    static const map<const string,const chord_quality_t> s2cq {
         {"maj", cq_maj}, {"", cq_maj},
         {"min", cq_min}, {"m", cq_min},
         {"5", cq_5},
@@ -70,7 +72,7 @@ Chord::Chord(const std::string &cs):
     };
 
     if (s2cq.find(cn) == s2cq.end())
-        throw std::runtime_error("can't parse " + cs);
+        throw runtime_error("can't parse " + cs);
     __mQuality = s2cq.at(cn);
     __mPCset = make_pcset(__mRootNote, __mQuality);
 }
@@ -87,9 +89,9 @@ note_t operator+(note_t note, int term)
     return static_cast<note_t>(tmp);
 }
 
-std::ostream& operator<<(std::ostream& os, const note_t& n)
+ostream& operator<<(ostream& os, const note_t& n)
 {
-    std::map<note_t, std::string> n2sMap;
+    map<note_t, string> n2sMap;
 
     n2sMap[note_C]          = "C";
     n2sMap[note_C_sharp]    = "C#";
@@ -114,9 +116,9 @@ std::ostream& operator<<(std::ostream& os, const note_t& n)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
+ostream& operator<<(ostream& os, const chord_quality_t& q)
 {
-    std::map<chord_quality_t, std::string> q2sMap;
+    map<chord_quality_t, string> q2sMap;
 
 #if defined(CFG_HARTE_SYNTAX) && CFG_HARTE_SYNTAX == 1
     q2sMap[cq_maj]          = "maj";
@@ -179,7 +181,7 @@ std::ostream& operator<<(std::ostream& os, const chord_quality_t& q)
     return os;
 }
 
-static std::map<chord_quality_t, const std::vector<std::pair<size_t, int>>> pctpls = {
+static map<chord_quality_t, const vector<pair<size_t, int>>> pctpls = {
     {cq_maj,           {{2, 0}, {4, 0}                             }},
     {cq_min,           {{2,-1}, {4, 0}                             }},
     {cq_5,             {{4, 0}                                     }},
@@ -212,7 +214,7 @@ pcset_t make_pcset(note_t root, chord_quality_t cq)
 {
     auto scale = MusicScale::getMajorScale(root);
     pcset_t pcset = { scale[0] };
-    const std::vector<std::pair<size_t, int>> & pctpl = pctpls[cq];
+    const vector<pair<size_t, int>> & pctpl = pctpls[cq];
     for (auto & E: pctpl)
         pcset.insert(scale[E.first] + E.second);
     return pcset;
