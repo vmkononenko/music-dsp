@@ -141,6 +141,7 @@ public:
         __mRootNote(n), __mBassNote(b),  __mBassInterval(bi), __mQuality(q),
         __mPCset(make_pcset(n, q)) {}
     Chord() : Chord(note_Unknown, cq_unknown) {} // Delegate to the other constructor.
+    Chord(const std::string &);
 
     friend bool operator==(const Chord &c1, const Chord &c2)
     {

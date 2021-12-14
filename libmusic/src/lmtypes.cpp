@@ -21,6 +21,60 @@
 #include "lmtypes.h"
 #include "music_scale.h"
 
+Chord::Chord(const std::string &cs):
+    __mRootNote(note_Unknown), __mQuality(cq_unknown)
+{
+    const bool is_sharp = cs.length() > 1 && cs[1] == '#';
+    std::string cn = cs.substr(0, cs.find("/"));
+
+    switch (cs[0]) {
+        case 'C': __mRootNote = is_sharp ? note_C_sharp: note_C; break;
+        case 'D': __mRootNote = is_sharp ? note_D_sharp: note_D; break;
+        case 'E': __mRootNote = note_E; break;
+        case 'F': __mRootNote = is_sharp ? note_F_sharp: note_F; break;
+        case 'G': __mRootNote = is_sharp ? note_G_sharp: note_G; break;
+        case 'A': __mRootNote = is_sharp ? note_A_sharp: note_A; break;
+        case 'B': __mRootNote = note_B; break;
+        default:
+            throw std::runtime_error("can't parse " + cs);
+    }
+    cn.erase(0, is_sharp ? 2 : 1);
+    if (cn[0] == ':')
+        cn.erase(0,1);
+    static const std::map<const std::string,const chord_quality_t> s2cq {
+        {"maj", cq_maj}, {"", cq_maj},
+        {"min", cq_min}, {"m", cq_min},
+        {"5", cq_5},
+        {"7", cq_7},
+        {"maj7", cq_maj7},
+        {"min7", cq_min7}, {"m7", cq_min7},
+        {"sus2", cq_sus2},
+        {"sus4", cq_sus4},
+        {"hdim7", cq_hdim7}, {"m7b5", cq_hdim7},
+        {"aug", cq_aug},
+        {"dim", cq_dim},
+        {"dim7", cq_dim7},
+        {"maj(9)", cq_maj_add9}, {"add9", cq_maj_add9},
+        {"min(9)", cq_min_add9}, {"m(add9)", cq_min_add9},
+        {"maj6", cq_maj6}, {"6", cq_maj6},
+        {"min6", cq_min6}, {"m6", cq_min6},
+        {"maj9", cq_maj9},
+        {"min9", cq_min9}, {"m9", cq_min9},
+        {"maj(11)", cq_maj_add11}, {"add11", cq_maj_add11},
+        {"9", cq_9},
+        {"aug7", cq_aug7},
+        {"maj11", cq_maj11},
+        {"min11", cq_min11}, {"m11", cq_min11},
+        {"maj13", cq_maj13},
+        {"min13", cq_min13}, {"m13", cq_min13},
+    };
+
+    if (s2cq.find(cn) == s2cq.end())
+        throw std::runtime_error("can't parse " + cs);
+    __mQuality = s2cq.at(cn);
+    __mPCset = make_pcset(__mRootNote, __mQuality);
+}
+
 note_t operator+(note_t note, int term)
 {
     int tmp = static_cast<int>(note) + term % notes_Total;
