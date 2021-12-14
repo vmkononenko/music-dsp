@@ -134,10 +134,12 @@ private:
     note_t          __mBassNote;
     int8_t          __mBassInterval;
     chord_quality_t __mQuality;
+    pcset_t         __mPCset;
 
 public:
     Chord(note_t n, chord_quality_t q, note_t b = note_Unknown, int8_t bi = -1) :
-        __mRootNote(n), __mBassNote(b),  __mBassInterval(bi), __mQuality(q) {}
+        __mRootNote(n), __mBassNote(b),  __mBassInterval(bi), __mQuality(q),
+        __mPCset(make_pcset(n, q)) {}
     Chord() : Chord(note_Unknown, cq_unknown) {} // Delegate to the other constructor.
 
     friend bool operator==(const Chord &c1, const Chord &c2)
@@ -161,6 +163,11 @@ public:
 
         return (((c1.__mRootNote != c2.__mRootNote) && (c1.__mRootNote < c2.__mRootNote)) ||
                 ((c1.__mRootNote == c2.__mRootNote) && (c1.__mQuality < c2.__mQuality)));
+    }
+
+    bool match(const Chord &c) const
+    {
+        return __mPCset == c.__mPCset;
     }
 
     std::string toHarte() const
