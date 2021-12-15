@@ -45,7 +45,7 @@ void printScales();
 void printSigEnvelope(amplitude_t *, uint32_t);
 void printFFT(double *, int, uint32_t, bool, bool);
 void printTimeDomain(double *, uint32_t, uint32_t, bool, bool);
-void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, string, bool, int, bool, bool);
+void printChordInfo(amplitude_t *, SF_INFO &, uint32_t, uint32_t, const string&, bool, int, bool, bool);
 void printAudioFileInfo(SF_INFO &);
 void printBPM(amplitude_t *, uint32_t, uint32_t);
 void dumpTemplates();
@@ -346,11 +346,11 @@ void __printChordInfoLegacy(amplitude_t *timeDomain, SF_INFO &sfinfo,
 }
 
 void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
-                    uint32_t n, string refChord, bool printPCP, int winSize,
+                    uint32_t n, const string &refChordStr, bool printPCP, int winSize,
                     bool legacy, bool pcpCSV)
 {
     if (legacy) {
-        return __printChordInfoLegacy(timeDomain, sfinfo, itemsCnt, n, refChord,
+        return __printChordInfoLegacy(timeDomain, sfinfo, itemsCnt, n, refChordStr,
                                       printPCP, winSize);
     }
 
@@ -358,6 +358,7 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
     amplitude_t *channelTD = (amplitude_t *) malloc(sfinfo.frames * sizeof(amplitude_t));
     std::vector<segment_t> segments;
     uint32_t fails = 0;
+    chord_t refChord = refChordStr.empty() ? Chord() : Chord(refChordStr);
 
     for (uint32_t i = 0; i < sfinfo.frames; i++) {
         channelTD[i] = timeDomain[i * sfinfo.channels];
@@ -367,20 +368,20 @@ void printChordInfo(amplitude_t *timeDomain, SF_INFO &sfinfo, uint32_t itemsCnt,
         cd->getSegments(segments, channelTD, sfinfo.frames, sfinfo.samplerate);
         for (uint32_t i = 0; i < segments.size(); i++) {
             segment_t *s = &segments[i];
-            if (refChord.empty()) {
+            if (refChordStr.empty()) {
                 auto idxToSec = [&](int idx) {
                     return Helpers::stdRound<float>(idx / (float) sfinfo.samplerate, 2);
                 };
                 cout << setw(3) << i << ": " << setw(3) << (s->silence ? "S" : s->chord.toString())
                      << " [" << idxToSec(s->startIdx) << ", " << idxToSec(s->endIdx) << "]" << endl;
             } else {
-                if (!s->silence && refChord.compare(s->chord.toString())) {
+                if (!s->silence && !refChord.match(s->chord)) {
                     fails += (s->endIdx - s->startIdx + 1);
                 }
             }
         }
 
-        if (!refChord.empty()) {
+        if (!refChordStr.empty()) {
             __printChordEvalScore(sfinfo.frames, fails);
         }
     } else {
