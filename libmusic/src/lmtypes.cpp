@@ -89,6 +89,16 @@ note_t operator+(note_t note, int term)
     return static_cast<note_t>(tmp);
 }
 
+int operator-(note_t ln, note_t rn)
+{
+    return static_cast<size_t>(ln) - static_cast<size_t>(rn);
+}
+
+note_t operator-(note_t note, int term)
+{
+    return note + (-term);
+}
+
 ostream& operator<<(ostream& os, const note_t& n)
 {
     map<note_t, string> n2sMap;
