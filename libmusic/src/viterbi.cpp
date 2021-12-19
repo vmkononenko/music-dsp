@@ -83,7 +83,8 @@ vector<uint32_t> Viterbi::GetPath(std::vector<prob_t> &init_p, prob_matrix_t &ob
         throw invalid_argument("GetPath(): wrong transition matrix dimensions");
     }
 
-    vector<vector<state_metric_t>> metrics(obs_cnt,  vector<state_metric_t>(states_cnt));
+    vector<vector<state_metric_t>> metrics(obs_cnt,
+                                           vector<state_metric_t>(states_cnt, {0, -INFINITY}));
     vector<uint32_t> path(obs.size());
 
     for (uint32_t state = 0; state < states_cnt; state++) {
