@@ -95,7 +95,7 @@ PitchClsProfile::PitchClsProfile(fd_t &fd_mags, tft_t *tft)
         note_t note;
         amplitude_t tmp = 0;
         for (int32_t i = -bps/2; i < bps/2+1; i++) {
-            tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (i/2 + 1)));
+            tmp += fd_mags[bin + i] * (1 - abs(i * 1.0 / (bps/2 + 1)));
         }
 
         if (0 == tmp)
